@@ -104,7 +104,7 @@ scripts = '<script>\n' + shim + '\n</script>\n<script>\n' + P('vc.js') + '\n</sc
 for n in ('ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'resumo.js', 'extras.js', 'csv.js'):
     scripts += '<script>\n' + P(n) + '\n</script>\n'
 scripts += '<script>\n' + abas_js + '\n</script>\n'
-html_final = head + '<style>\n' + tokens + P('style.css') + brand_css + P('tabs.css') + '</style>\n' + corpo + d3tag + '\n' + scripts
+html_final = head + '<style>\n' + tokens + P('style.css') + brand_css + P('tabs.css') + P('refino.css') + '</style>\n' + corpo + d3tag + '\n' + scripts
 if d3local:
     html_final = '<!doctype html><html><head><meta charset="utf8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style></head><body>' + html_final + '</body></html>'
 if site:
