@@ -22,6 +22,6 @@
     const u = serie.length - 1, agora = u >= 0 ? em12(u) : null, antes = u >= 1 ? em12(u - 1) : null;
     el.textContent = agora === null
       ? 'Núcleo do PCE, a medida de inflação preferida do Fed: indisponível, porque a fonte (FRED, do Fed de St. Louis) exige uma chave de acesso que ainda não foi configurada na rotina de atualização.'
-      : `Núcleo do PCE, a medida de inflação preferida do Fed: ${pct(agora)} em 12 meses até ${mes(serie[u].periodo)}` + (antes === null ? '' : ` (mês anterior: ${pct(antes)})`) + '. Fonte: FRED, série PCEPILFE; a variação em 12 meses é conta desta página.';
+      : `Núcleo do PCE, a medida de inflação preferida do Fed: ${pct(agora)} em 12 meses até ${mes(serie[u].periodo)}` + (antes === null ? '' : ` (mês anterior: ${pct(antes)})`) + '. Fonte: FRED, série PCEPILFE; a variação em 12 meses é conta desta página. Este produto usa a API do FRED®, mas não é endossado nem certificado pelo Federal Reserve Bank de St. Louis.';
   });
 })();

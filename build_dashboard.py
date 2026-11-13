@@ -78,7 +78,7 @@ abas_js = '''(() => {
   window.iniciarCurvaDI();
 })();'''
 
-head = '''<title>Curva DI Futuro</title>
+head = '''<title>Dash Vera Cruz</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 ''' + ('' if d3local else '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap">\n')
 nav = '\n'.join('      <a class="vc-tab" href="#%s">%s</a>' % (i, t) for i, t, _ in ABAS)
@@ -101,7 +101,7 @@ corpo = '''<div class="di-wrap">
 ''' % (nav, paineis)
 d3tag = ('<script>' + open(d3local, encoding='utf-8').read() + '</script>') if d3local else '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>'
 scripts = '<script>\n' + shim + '\n</script>\n<script>\n' + P('vc.js') + '\n</script>\n<script>\n(() => {\n' + P('app.js') + '\n})();\n</script>\n'
-for n in ('ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'resumo.js', 'extras.js'):
+for n in ('ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'resumo.js', 'extras.js', 'csv.js'):
     scripts += '<script>\n' + P(n) + '\n</script>\n'
 scripts += '<script>\n' + abas_js + '\n</script>\n'
 html_final = head + '<style>\n' + tokens + P('style.css') + brand_css + P('tabs.css') + '</style>\n' + corpo + d3tag + '\n' + scripts

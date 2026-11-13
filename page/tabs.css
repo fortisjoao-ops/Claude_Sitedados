@@ -56,3 +56,9 @@
 .vc-tiles-resumo { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 @media (max-width: 900px) { .vc-tiles-resumo { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); } }
 .vc-manchetes { list-style: none; padding-left: 0; }
+
+.di-page .vc-baixar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; max-width: none; }
+.vc-botao { min-height: 36px; padding: 8px 14px; border: 1px solid var(--vc-navy); border-radius: var(--cds-radius); background: var(--vc-branco); color: var(--vc-navy); font: inherit; font-weight: 600; cursor: pointer; }
+.vc-botao:hover { background: var(--vc-azul-gelo); }
+.vc-botao:focus-visible { outline: 2px solid var(--vc-azul-aco); outline-offset: 2px; }
+.vc-botao:disabled { opacity: .5; cursor: default; }

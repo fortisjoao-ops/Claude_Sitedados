@@ -2,7 +2,7 @@
 
 Fontes do dashboard público de mercado (página única com nove abas, publicada como artifact).
 
-- `page/`: o conteúdo de cada aba (`tab_*.html`, `index.html` é a aba Curva DI Futuro), os scripts de cálculo e desenho (`*.js`) e os estilos.
+- `page/`: o conteúdo de cada aba (`tab_*.html`, `index.html` é a aba Curva DI Futuro), os scripts de cálculo e desenho (`*.js`) e os estilos. Os botões de baixar em CSV ficam em `page/csv.js`: o arquivo é montado no navegador com os mesmos dados da página.
 - `build_dashboard.py`: monta a página única. Uso: `python3 build_dashboard.py <página com os DADOS atuais> <saída.html> [site]`. Com `site`, gera um documento HTML completo, como o de `site/index.html`; sem ele, gera o conteúdo no formato do artifact. Lê as cores e a identidade visual de `build_public.py`.
 - `atualizar.py`: busca os dados nas fontes públicas e reescreve só a linha `const DADOS = {...};` da página. Uso: `python3 -I atualizar.py <página atual> <saída.html> [noticias]`. Imprime `UPDATED; ...` ou `UNCHANGED`.
 - `assets/`: logotipo e símbolos publicados junto da página.
