@@ -1,0 +1,56 @@
+  <header class="di-head">
+    <h1 class="di-title" id="hist-titulo">Histórico</h1>
+    <p class="di-lede" id="hist-resumo">Como as curvas e os principais indicadores mudaram ao longo do tempo. O histórico vai de <b data-draw="hist-estado" data-campo="inicio">—</b> a <b data-draw="hist-estado" data-campo="fim">—</b>.</p>
+    <p class="di-stamp" id="hist-carimbo">A página grava um registro por dia útil: o ajuste oficial de cada contrato de DI na B3, a taxa de cada NTN-B no Tesouro Direto e a curva dos Treasuries. São dados de fechamento do dia anterior, não cotações do momento.</p>
+  </header>
+
+  <p class="di-note vc-alerta" data-draw="hist-estado" data-campo="aviso" hidden></p>
+
+  <section class="di-block" id="hist-curvas">
+    <h2 class="di-h2">Curva DI em duas datas</h2>
+    <p class="di-note">Taxa de ajuste de cada contrato de DI, em % ao ano, pelo prazo em anos de 252 dias úteis contado a partir de cada data. As curvas são comparadas pelo mesmo prazo, e não pelo mesmo contrato. Os pontos são os contratos; a linha entre eles é só uma ligação suave.</p>
+    <div class="vc-controles">
+      <label class="di-field"><span>Data</span><select class="di-date vc-select" data-draw="hist-data" data-qual="a" aria-label="Primeira data da comparação"></select></label>
+      <label class="di-field"><span>Comparar com</span><select class="di-date vc-select" data-draw="hist-data" data-qual="b" aria-label="Segunda data da comparação"></select></label>
+    </div>
+    <div class="di-chart" data-draw="hist-grafico-curvas"></div>
+    <ul class="di-legend">
+      <li><span class="di-sw di-sw-line"></span>Ajuste de <span class="di-legend-data" data-draw="hist-rotulo" data-qual="a">—</span></li>
+      <li><span class="di-sw di-sw-3m"></span>Ajuste de <span class="di-legend-data" data-draw="hist-rotulo" data-qual="b">—</span></li>
+    </ul>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Prazo</th><th class="di-num">Taxa em <span data-draw="hist-rotulo" data-qual="a">—</span></th><th class="di-num">Taxa em <span data-draw="hist-rotulo" data-qual="b">—</span></th><th class="di-num">Diferença</th></tr></thead>
+        <tbody data-draw="hist-tabela-curvas"></tbody>
+      </table>
+    </div>
+    <p class="di-note">As datas disponíveis para o DI: um ponto por dia útil a partir de 12/11/2026; antes disso, datas avulsas lidas do Boletim Diário do Mercado da B3, cerca de uma por semana desde agosto de 2026 e uma por mês desde dezembro de 2025. Na tabela, a taxa de cada prazo é interpolada em linha reta entre os dois contratos vizinhos.</p>
+  </section>
+
+  <section class="di-block" id="hist-serie">
+    <h2 class="di-h2">Evolução de um indicador</h2>
+    <p class="di-note">Escolha o indicador e o período. Quando há poucos pontos no período, cada um aparece marcado, para ficar claro onde há dado e onde há só a linha que os liga.</p>
+    <div class="vc-controles">
+      <label class="di-field"><span>Indicador</span><select class="di-date vc-select" data-draw="hist-serie" aria-label="Indicador"></select></label>
+      <label class="di-field"><span>Período</span><select class="di-date vc-select" data-draw="hist-periodo" aria-label="Período">
+        <option value="3">3 meses</option><option value="6">6 meses</option><option value="12" selected>12 meses</option><option value="0">Tudo</option>
+      </select></label>
+    </div>
+    <div class="di-chart" data-draw="hist-grafico-serie"></div>
+    <div class="di-scroll">
+      <table class="di-table vc-cab-quebra">
+        <thead><tr><th>Indicador</th><th class="di-num">Primeiro dado do período</th><th class="di-num">Último dado</th><th class="di-num">Variação no período</th><th class="di-num">Mínimo</th><th class="di-num">Máximo</th><th class="di-num">Pontos</th></tr></thead>
+        <tbody data-draw="hist-tabela-serie"></tbody>
+      </table>
+    </div>
+    <p class="di-note vc-baixar"><button type="button" class="vc-botao" data-draw="csv" data-csv="historico-serie">Baixar a série em CSV</button><span>Separado por ponto e vírgula, com vírgula decimal, para abrir direto no Excel.</span></p>
+  </section>
+
+  <details class="di-details" id="hist-metodo">
+    <summary>Fontes e fórmulas</summary>
+    <p>DI: taxa de ajuste de cada contrato futuro de DI de 1 dia, do pregão indicado. A partir de 12/11/2026 vem das cotações da B3 (o ajuste do pregão anterior, lido a cada dia); as datas anteriores vêm do Boletim Diário do Mercado da B3, e algumas ficaram de fora porque a B3 não entregou o boletim do dia. O prazo de cada contrato é contado em dias úteis a partir da data do pregão.</p>
+    <p>DI em prazo fixo (1, 2, 5 e 10 anos): interpolação em linha reta, por dias úteis, entre os dois contratos vizinhos daquele pregão. É uma conta mais simples que a spline da aba Curva DI Futuro, então pode diferir dela em frações de ponto-base.</p>
+    <p>Juro real: taxa de venda da manhã de cada NTN-B no Tesouro Direto, um dado por dia útil. Inflação implícita: (1 + DI no vencimento do título) dividido por (1 + juro real), menos 1, com o DI interpolado em linha reta pelo calendário; só existe nas datas em que há curva de DI gravada.</p>
+    <p>Treasuries: curva diária de rendimento ao par do Tesouro americano. IFIX: fechamentos da B3. Ibovespa: fechamentos do Yahoo Finance. Dólar: PTAX de venda do Banco Central. Esses três cobrem cerca de 13 meses.</p>
+    <p>Variação no período: para taxas, último dado menos o primeiro, em pontos-base; para índices e dólar, último dividido pelo primeiro, menos 1.</p>
+  </details>

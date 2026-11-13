@@ -4,11 +4,8 @@ const BASE = 252;
 
 // ---------- Cálculos (cada um aparece em Fontes com a própria fórmula) ----------
 
-dash.calc('curva', {
-  title: 'Curva interpolada por spline cúbica',
-  description: 'Taxa para cada dia útil entre o primeiro vértice e 5 anos, por spline cúbica natural sobre os vértices DI1: agora, no ajuste anterior e três meses atrás.',
-  inputs: ['di1', 'di1_3m'],
-  fn: (vertices, vertices3m) => {
+// A mesma conta serve à curva de 5 anos, de onde saem todos os números da página, e à de 10 anos, usada só no gráfico.
+const calcularCurva = (anos) => (vertices, vertices3m) => {
     const num = (c) => (c === null || c === undefined || c === '' ? NaN : +c);
     const pontos = vertices
       .map((v) => ({ du: num(v.du), agora: num(v.taxa), ant: num(v.ajuste_ant) }))
@@ -51,7 +48,7 @@ dash.calc('curva', {
       .sort((a, b) => a.du - b.du);
     const tresMeses = pontos3m.length >= 3 ? spline(pontos3m.map((p) => p.du), pontos3m.map((p) => p.taxa)) : null;
     const dentro3m = (du) => tresMeses && du >= pontos3m[0].du && du <= pontos3m[pontos3m.length - 1].du;
-    const fim = Math.min(5 * 252, dus[dus.length - 1]); // 5 anos de 252 dias úteis
+    const fim = Math.min(anos * 252, dus[dus.length - 1]); // anos de 252 dias úteis
     const linhas = [];
     for (let du = dus[0]; du <= fim; du++) {
       linhas.push({
@@ -63,7 +60,30 @@ dash.calc('curva', {
       });
     }
     return linhas;
+  };
+dash.calc('curva', {
+  title: 'Curva interpolada por spline cúbica',
+  description: 'Taxa para cada dia útil entre o primeiro vértice e 5 anos, por spline cúbica natural sobre os vértices DI1: agora, no ajuste anterior e três meses atrás.',
+  inputs: ['di1', 'di1_3m'],
+  fn: calcularCurva(ANOS),
+});
+dash.calc('di1_dez', {
+  title: 'Vértices DI1 até 10 anos',
+  description: 'Contratos DI1 com vencimento dentro de 10 anos, mais o primeiro depois desse prazo, para o gráfico de 10 anos.',
+  inputs: ['di1_longo', 'di1'],
+  fn: (longos, curtos) => {
+    if (!longos.length || !curtos.length) return [];
+    const detalhe = new Map(curtos.map((v) => [v.ticker, v]));
+    const ordenados = longos.map((v) => ({ ...v, ...(detalhe.get(v.ticker) || {}), cotacao_em: curtos[0].cotacao_em })).sort((a, b) => +a.du - +b.du);
+    const fim = ordenados.findIndex((v) => +v.du >= 10 * BASE);
+    return fim < 0 ? ordenados : ordenados.slice(0, fim + 1);
   },
+});
+dash.calc('curva_dez', {
+  title: 'Curva interpolada até 10 anos',
+  description: 'A mesma spline cúbica natural, passando também pelos vértices entre 5 e 10 anos. Serve só ao gráfico de 10 anos.',
+  inputs: ['di1_dez', 'di1_3m_longo'],
+  fn: calcularCurva(10),
 });
 
 dash.calc('prazos', {
@@ -106,11 +126,7 @@ dash.calc('variacao', {
     .map((v) => ({ ticker: v.ticker, var_bps: +((+v.taxa - +v.ajuste_ant) * 100).toFixed(1) })),
 });
 
-dash.calc('cdi_por_data', {
-  title: 'CDI médio projetado até cada data',
-  description: 'Para cada dia dos próximos 5 anos: dias úteis desde a cotação, CDI médio anualizado lido na curva interpolada e CDI acumulado no período.',
-  inputs: ['di1', 'curva'],
-  fn: (vertices, curva) => {
+const calcularCdiPorData = (vertices, curva) => {
     if (!vertices.length || !curva || !curva.length) return [];
     const dia = 86400000;
     const iso = (t) => new Date(t).toISOString().slice(0, 10);
@@ -143,7 +159,7 @@ dash.calc('cdi_por_data', {
     const linhas = [];
     let t = Date.UTC(ano0, mes0 - 1, dia0);
     let du = 0; // dias úteis da data da cotação (inclusive) até a data da linha (exclusive)
-    while (linhas.length < 4000) {
+    while (linhas.length < 6000) {
       if (util(t)) du++;
       t += dia;
       if (du > ultimoDu) break;
@@ -159,7 +175,18 @@ dash.calc('cdi_por_data', {
       });
     }
     return linhas;
-  },
+  };
+dash.calc('cdi_por_data', {
+  title: 'CDI médio projetado até cada data',
+  description: 'Para cada dia dos próximos 5 anos: dias úteis desde a cotação, CDI médio anualizado lido na curva interpolada e CDI acumulado no período.',
+  inputs: ['di1', 'curva'],
+  fn: calcularCdiPorData,
+});
+dash.calc('cdi_por_data_dez', {
+  title: 'Datas da curva de 10 anos',
+  description: 'A mesma conta sobre a curva de 10 anos; dá a data de cada prazo no arquivo CSV do gráfico de 10 anos.',
+  inputs: ['di1_dez', 'curva_dez'],
+  fn: calcularCdiPorData,
 });
 
 dash.calc('copom_implicito', {
@@ -539,9 +566,27 @@ dash.draw('tabela-vertices', (corpo) => {
 
 // ---------- Gráfico ----------
 
+// Horizonte do gráfico: 5 anos (padrão) ou 10. As tabelas e os demais números usam sempre a curva de 5 anos.
+let horizonte = ANOS;
+const temDezAnos = () => { const g = dash.data('curva_dez'); return g.status === 'ok' && !!g.data && g.data.length > 1 && g.data[g.data.length - 1].du > ANOS * BASE; };
+const horizonteEmUso = () => (horizonte === 10 && temDezAnos() ? 10 : ANOS);
+VC.horizonteDI = horizonteEmUso;
+dash.draw('di-horizonte', (el) => { el.textContent = String(horizonteEmUso()); });
+dash.draw('di-horizonte-nota', (el) => { el.hidden = horizonteEmUso() !== 10; });
+dash.draw('di-horizonte-botao', (botao) => {
+  const anos = +botao.dataset.anos;
+  botao.disabled = anos === 10 && !temDezAnos();
+  botao.setAttribute('aria-pressed', String(horizonteEmUso() === anos));
+  botao.onclick = () => {
+    horizonte = anos;
+    ['grafico', 'di-horizonte', 'di-horizonte-nota', 'di-horizonte-botao'].forEach((nome) => dash.draw(nome));
+  };
+});
+
 dash.draw('grafico', (el) => {
-  const v = dash.data('di1');
-  const c = dash.data('curva');
+  const ANOS = horizonteEmUso();   // dentro do gráfico, o horizonte escolhido
+  const v = dash.data(ANOS === 10 ? 'di1_dez' : 'di1');
+  const c = dash.data(ANOS === 10 ? 'curva_dez' : 'curva');
   const pronto = v.status === 'ok' && c.status === 'ok' && c.data && c.data.length > 1;
   if (!pronto) {
     const aviso = document.createElement('p');

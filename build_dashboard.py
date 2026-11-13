@@ -23,7 +23,8 @@ aba1 = aba1[:aba1.rindex('</div>')].strip('\n')
 
 ABAS = [('visao-geral', 'Resumo', P('tab_resumo.html')), ('juros-br', 'Curva DI Futuro', aba1), ('juro-real-br', 'Juro real BR', P('tab_juroreal.html')),
         ('juros-eua', 'Juros EUA', P('tab_eua.html')), ('inflacao-br', 'Inflação BR', P('tab_inflacao.html')), ('focus', 'Focus', P('tab_focus.html')),
-        ('acoes-br', 'Ações BR', P('tab_acoes.html')), ('fiis', 'FIIs', P('tab_fiis.html')), ('noticias', 'Notícias', P('tab_noticias.html'))]
+        ('acoes-br', 'Ações BR', P('tab_acoes.html')), ('fiis', 'FIIs', P('tab_fiis.html')), ('historico', 'Histórico', P('tab_historico.html')),
+        ('noticias', 'Notícias', P('tab_noticias.html'))]
 
 pagina = open(src, encoding='utf-8').read()
 m = re.search(r'^\s*const DADOS = (\{.*\});[ \t]*$', pagina, re.M)
@@ -101,14 +102,33 @@ corpo = '''<div class="di-wrap">
 ''' % (nav, paineis)
 d3tag = ('<script>' + open(d3local, encoding='utf-8').read() + '</script>') if d3local else '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>'
 scripts = '<script>\n' + shim + '\n</script>\n<script>\n' + P('vc.js') + '\n</script>\n<script>\n(() => {\n' + P('app.js') + '\n})();\n</script>\n'
-for n in ('ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'resumo.js', 'extras.js', 'csv.js'):
+for n in ('ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'resumo.js', 'extras.js', 'historico.js', 'csv.js'):
     scripts += '<script>\n' + P(n) + '\n</script>\n'
 scripts += '<script>\n' + abas_js + '\n</script>\n'
 html_final = head + '<style>\n' + tokens + P('style.css') + brand_css + P('tabs.css') + P('refino.css') + '</style>\n' + corpo + d3tag + '\n' + scripts
 if d3local:
     html_final = '<!doctype html><html><head><meta charset="utf8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style></head><body>' + html_final + '</body></html>'
+# Endereço público do site: entra na prévia de compartilhamento. Troque aqui quando o site ganhar domínio próprio.
+ENDERECO = 'https://veracruzdata.netlify.app/'
+DESCRICAO = 'Curva DI, juro real, juros dos Estados Unidos, inflação, Focus, ações, fundos imobiliários e notícias, atualizados automaticamente.'
+META = ('''<meta name="description" content="%(d)s">
+<meta name="theme-color" content="#1C466C">
+<link rel="icon" type="image/png" href="icone.png">
+<link rel="apple-touch-icon" href="icone.png">
+<link rel="canonical" href="%(u)s">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Vera Cruz">
+<meta property="og:title" content="Dash Vera Cruz">
+<meta property="og:description" content="%(d)s">
+<meta property="og:url" content="%(u)s">
+<meta property="og:image" content="%(u)sprevia.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+''' % {'d': DESCRICAO, 'u': ENDERECO})
 if site:
-    html_final = ('<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n'
+    html_final = ('<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n' + META +
                   '<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>\n' + html_final.replace('<meta name="claude:viewport-fit-sides" content="cover">\n', '')
                   .replace('<div class="di-wrap">', '</head>\n<body>\n<div class="di-wrap">', 1) + '</body>\n</html>\n')
 open(out, 'w', encoding='utf-8').write(html_final)

@@ -56,8 +56,12 @@
   </section>
 
   <section class="di-block" id="curva">
-    <h2 class="di-h2" id="curva-titulo">Taxa DI por prazo, de hoje até 5 anos</h2>
+    <h2 class="di-h2" id="curva-titulo">Taxa DI por prazo, de hoje até <span data-draw="di-horizonte">5</span> anos</h2>
     <p class="di-note">Em % ao ano, base 252 dias úteis. A linha é uma spline cúbica natural que passa por todos os vértices; entre dois vértices a taxa é interpolada, não negociada.</p>
+    <div class="vc-seg" role="group" aria-label="Horizonte do gráfico">
+      <button type="button" class="vc-seg-botao" data-draw="di-horizonte-botao" data-anos="5" aria-pressed="true">5 anos</button>
+      <button type="button" class="vc-seg-botao" data-draw="di-horizonte-botao" data-anos="10" aria-pressed="false">10 anos</button>
+    </div>
     <div class="di-chart" id="grafico" data-draw="grafico" data-source="di1 di1_3m curva cdi_por_data"></div>
     <ul class="di-legend" id="legenda">
       <li><span class="di-sw di-sw-line"></span>Curva interpolada agora</li>
@@ -67,6 +71,7 @@
       <li><span class="di-sw di-sw-ring"></span>Vértice sem negócio hoje</li>
       <li><span class="di-sw di-sw-ref"></span>Data consultada</li>
     </ul>
+    <p class="di-note" data-draw="di-horizonte-nota" hidden>No gráfico de 10 anos a spline passa também pelos vértices além de 5 anos, onde há menos contratos e menos negócios. Por isso a linha pode diferir em frações de ponto-base da de 5 anos. As tabelas, o CDI projetado e o resumo continuam vindo da curva de 5 anos.</p>
     <p class="di-note vc-baixar"><button type="button" class="vc-botao" data-draw="csv" data-csv="curva-di">Baixar as curvas em CSV</button><span>Separado por ponto e vírgula, com vírgula decimal, para abrir direto no Excel.</span></p>
   </section>
 
@@ -152,6 +157,7 @@
     <p>Os vértices são os contratos futuros de DI de 1 dia (DI1) da B3 com vencimento dentro de 5 anos, mais o primeiro contrato depois desse prazo, que ancora o trecho final.</p>
     <p>O prazo de cada vértice é contado em dias úteis entre a data da cotação e o vencimento, descontando fins de semana e feriados nacionais.</p>
     <p>A interpolação é uma spline cúbica natural da taxa em função dos dias úteis: passa exatamente por todos os vértices e tem curvatura zero nas duas pontas. A curva não é extrapolada para antes do primeiro vértice.</p>
+    <p>O gráfico pode ser estendido a 10 anos. Nesse caso a spline é refeita com os contratos de até 10 anos, mais o primeiro depois desse prazo; a curva de 5 anos, de onde saem os números da página, não muda.</p>
     <p>O CDI médio projetado até uma data é a taxa da curva interpolada no número de dias úteis até essa data. O CDI acumulado é essa taxa capitalizada pelo período: (1 + taxa) elevado a dias úteis ÷ 252, menos 1. São taxas embutidas nos preços de mercado, não uma previsão.</p>
     <p>As mudanças por reunião do Copom são lidas na curva interpolada: para cada reunião, a página calcula o CDI médio embutido entre o dia em que a decisão passa a valer e o dia em que vale a decisão seguinte, e compara com o trecho anterior. Depois da última reunião com data divulgada, o trecho usado é de 30 dias úteis. O arredondamento em passos de 0,25 ponto é feito no nível acumulado, para a soma das barras não se afastar do que a curva embute.</p>
     <p>NTN-B: preços e taxas do Tesouro Direto, publicados pelo Tesouro Nacional (arquivo de preços e taxas dos títulos ofertados). O PU é o "PU base" da manhã de cada dia e a taxa é a de venda. NTN-B é o Tesouro IPCA+ com Juros Semestrais e NTN-B Principal é o Tesouro IPCA+. Variação em R$: PU da data de referência menos o PU da data comparada. Variação em %: PU da data de referência dividido pelo PU da data comparada, menos 1. A data comparada de 3 meses é a mesma data três meses antes ou, se não houver dado nesse dia, o dia anterior mais próximo com dado. Compara-se sempre o mesmo título, com o mesmo vencimento; sem dado numa das datas, a célula mostra "indisponível".</p>

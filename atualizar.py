@@ -55,6 +55,10 @@ def meses_antes(d,n):
     return date(y,m,min(d.day,calendar.monthrange(y,m)[1]))
 def agora_br(): return datetime.now(BRT).replace(microsecond=0)
 
+# Historico diario: cada bloco deixa aqui o que leu (por data), e o fim da rodada acrescenta ao arquivo indicado em HISTORICO.
+HIST={'di':{},'ntnb':{},'ust':{}}
+UST_ANO_ANTERIOR=False   # vira True quando o arquivo de historico ainda tem poucos dias de Treasuries
+
 # ---------------------------------------------------------------- Curva DI (B3)
 def quotes(tmp):
     path=os.path.join(tmp,'di1.json')
@@ -83,7 +87,10 @@ def quotes(tmp):
     if len(keep)<20 or keep[-1]['du']<5*252 or not all(0<r['taxa']<60 for r in keep): raise RuntimeError('cotacoes incompletas ou fora do esperado')
     ant=today-timedelta(1)
     while not bd(ant): ant-=timedelta(1)
-    longos=[dict(ticker=r['ticker'],vencimento=r['vencimento'],du=s(r['du']),taxa=s(r['taxa']),ajuste_ant=s(r['ajuste_ant']),data_ajuste_ant=ant.isoformat()) for r in rows]
+    longos=[dict(ticker=r['ticker'],vencimento=r['vencimento'],du=s(r['du']),taxa=s(r['taxa']),ajuste_ant=s(r['ajuste_ant']),data_ajuste_ant=ant.isoformat(),
+        ultimo=s(r['ultimo']),compra=s(r['compra']),venda=s(r['venda']),negociados=s(r['negociados'])) for r in rows]
+    # ajuste oficial do pregao anterior, com os dias uteis contados a partir daquele pregao
+    HIST['di'][ant.isoformat()]=[[r['vencimento'],du(ant,date.fromisoformat(r['vencimento'])),r['ajuste_ant']] for r in rows]
     return today,[{k:s(v) for k,v in r.items()} for r in keep],longos
 
 MONTH=dict(zip('FGHJKMNQUVXZ',range(1,13)))
@@ -167,7 +174,7 @@ def brnum(t):
     return None if t=='' else float(t.replace('.','').replace(',','.'))
 def bloco_ntnb(dados,tmp,notes):
     path=baixar(TD_URL,os.path.join(tmp,'td.csv'),300)
-    corte=date.today()-timedelta(days=150)
+    corte=date.today()-timedelta(days=400)
     por={}; datas=set()
     with open(path,encoding='latin-1',newline='') as f:
         rd=csv.reader(f,delimiter=';'); cab=next(rd)
@@ -182,6 +189,9 @@ def bloco_ntnb(dados,tmp,notes):
             por.setdefault((TD_TIPOS[r[0]],dmy(r[1]).isoformat()),{})[d]=(pu,brnum(r[itx]))
             datas.add(d)
     if len(datas)<3: raise RuntimeError('arquivo do Tesouro Direto sem datas recentes')
+    for (titulo,venc),serie in por.items():
+        for d,(pu,taxa) in serie.items():
+            if taxa is not None: HIST['ntnb'].setdefault(d.isoformat(),{})[titulo+' '+venc]=taxa
     ref=max(datas); ant=max(d for d in datas if d<ref)
     alvo=meses_antes(ref,3); anteriores=[d for d in datas if d<=alvo]
     d3=max(anteriores) if anteriores else None
@@ -218,7 +228,9 @@ def tesouro_eua(tmp,tipo,ano):
     return serie
 def curvas_eua(tmp,tipo):
     hoje=date.today(); serie=tesouro_eua(tmp,tipo,hoje.year)
-    if len(serie)<2 or meses_antes(hoje,3).year<hoje.year: serie.update(tesouro_eua(tmp,tipo,hoje.year-1))
+    if len(serie)<2 or meses_antes(hoje,3).year<hoje.year or (UST_ANO_ANTERIOR and tipo=='daily_treasury_yield_curve'): serie.update(tesouro_eua(tmp,tipo,hoje.year-1))
+    if tipo=='daily_treasury_yield_curve':
+        for d,curva in serie.items(): HIST['ust'][d.isoformat()]=dict(curva)
     datas=sorted(serie); ref=datas[-1]; ant=datas[-2]
     alvo=meses_antes(ref,3); d3=max([d for d in datas if d<=alvo],default=None)
     linhas=[]
@@ -485,6 +497,22 @@ def bloco_focus(dados,tmp,notes):
     if len(linhas)<4: raise RuntimeError('Focus devolveu poucas expectativas')
     if linhas!=dados.get('focus'): dados['focus']=linhas; notes.append('Focus de '+linhas[0]['data'])
 
+# ---------------------------------------------------------------- Agenda de divulgacoes (FRED)
+FRED_DIVULGACOES=[(50,'payroll'),(10,'cpi'),(54,'pce')]   # Employment Situation, Consumer Price Index, Personal Income and Outlays
+def bloco_agenda(dados,tmp,notes):
+    chave=os.environ.get('FRED_KEY','').strip()
+    if not chave: raise RuntimeError('agenda dos EUA precisa da chave do FRED')
+    hoje=agora_br().date().isoformat(); linhas=[]
+    for num_,evento in FRED_DIVULGACOES:
+        url='https://api.stlouisfed.org/fred/release/dates?release_id=%d&include_release_dates_with_no_data=true&sort_order=desc&limit=12&file_type=json&api_key=%s'%(num_,chave)
+        try: d=json.load(open(baixar(url,os.path.join(tmp,'fred_%d.json'%num_),60)))
+        except Exception as e: raise RuntimeError(str(e).replace(chave,'***')[:100])
+        futuras=sorted(x['date'] for x in d.get('release_dates',[]) if re.fullmatch(r'\d{4}-\d\d-\d\d',x.get('date','')) and x['date']>=hoje)
+        for data_ in futuras[:2]: linhas.append(dict(chave=evento+' '+data_,evento=evento,data=data_))
+        time.sleep(0.5)
+    if not linhas: raise RuntimeError('FRED sem datas futuras de divulgacao')
+    if linhas!=dados.get('agenda'): dados['agenda']=linhas; notes.append('agenda: %d datas'%len(linhas))
+
 # ---------------------------------------------------------------- Notícias (RSS)
 FEEDS=[  # (veículo, endereço, seção de origem)
  ('Agência Brasil','https://agenciabrasil.ebc.com.br/rss/ultimasnoticias/feed.xml','brasil'),
@@ -587,7 +615,17 @@ def main():
     if not m: sys.exit('ERRO: bloco DADOS nao encontrado na pagina')
     dados=json.loads(m.group(2)); antes=json.dumps(dados,sort_keys=True); notes=[]
     status=dict(dados.get('status',{}))
-    blocos=list(BLOCOS)+([('macro_eua',bloco_macro_eua),('noticias',montar_noticias)] if modo=='noticias' else [])
+    # Arquivo de historico (opcional): caminho na variavel HISTORICO. Um arquivo ilegivel nao e sobrescrito.
+    global UST_ANO_ANTERIOR
+    hist_caminho=os.environ.get('HISTORICO','').strip(); hist=None
+    if hist_caminho:
+        try: hist=json.load(open(hist_caminho,encoding='utf-8'))
+        except FileNotFoundError: hist={}
+        except ValueError: hist=None; notes.append('historico FALHOU (arquivo ilegivel, nao foi alterado)')
+        if hist is not None:
+            for k in HIST: hist.setdefault(k,{})
+            UST_ANO_ANTERIOR=len(hist['ust'])<200
+    blocos=list(BLOCOS)+([('macro_eua',bloco_macro_eua),('agenda',bloco_agenda),('noticias',montar_noticias)] if modo=='noticias' else [])
     with tempfile.TemporaryDirectory() as tmp:
         for nome,fn in blocos:
             if so and nome not in so: continue
@@ -599,6 +637,20 @@ def main():
                 anterior=status.get(nome,{})
                 status[nome]=dict(ok=False,em=anterior.get('em',''),falhou_em=quando,erro=str(e)[:160])
                 notes.append('%s FALHOU (%s)'%(nome,str(e)[:100]))
+    if hist is not None:
+        try:
+            antes_h=json.dumps(hist,sort_keys=True); novos=0
+            for k,lidos in HIST.items():
+                recentes=sorted(lidos)[-2:]   # os dois dias mais novos sao regravados; os antigos so entram se faltarem
+                for d,v in lidos.items():
+                    if d not in hist[k]: novos+=1
+                    if d not in hist[k] or d in recentes: hist[k][d]=v
+            limite=(agora_br().date()-timedelta(days=3*366)).isoformat()   # guarda ate 3 anos
+            for k in HIST: hist[k]={d:hist[k][d] for d in sorted(hist[k]) if d>=limite}
+            if json.dumps(hist,sort_keys=True)!=antes_h:
+                open(hist_caminho,'w',encoding='utf-8').write(json.dumps(hist,ensure_ascii=False,separators=(',',':'))+'\n')
+                notes.append('historico: %d registros novos'%novos)
+        except Exception as e: notes.append('historico FALHOU (%s)'%str(e)[:80])
     # o carimbo "em" de um bloco que deu certo so entra na pagina quando algum dado muda, para nao republicar a toa
     limpo=lambda st:{k:{'ok':v.get('ok'),'erro':v.get('erro','')} for k,v in st.items()}
     dados_sem_status={k:v for k,v in dados.items() if k!='status'}

@@ -68,3 +68,44 @@ body { border-top: 4px solid var(--vc-navy); }
   .di-page .di-title { font-size: 1.625rem; }
   .di-page .di-tile-num { font-size: 1.6rem; }
 }
+
+/* Seletor de horizonte do gráfico (5 ou 10 anos) */
+.vc-seg { display: inline-flex; align-self: flex-start; border: 1px solid var(--vc-navy); border-radius: 2px; overflow: hidden; }
+.vc-seg-botao { min-height: 34px; padding: 6px 14px; border: 0; background: var(--vc-branco); color: var(--vc-navy); font: inherit; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.01em; cursor: pointer; }
+.vc-seg-botao + .vc-seg-botao { border-left: 1px solid var(--vc-navy); }
+.vc-seg-botao:hover { background: var(--vc-azul-gelo); }
+.vc-seg-botao[aria-pressed="true"] { background: var(--vc-navy); color: var(--vc-branco); }
+.vc-seg-botao:focus-visible { outline: 2px solid var(--vc-azul-aco); outline-offset: -3px; }
+.vc-seg-botao:disabled { opacity: .5; cursor: default; }
+
+/* Controles da aba Histórico */
+.vc-controles { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+.di-page .vc-select { max-width: 100%; padding-right: 28px; border-radius: 2px; cursor: pointer; }
+.di-page .vc-controles .di-field { color: var(--vc-navy); }
+
+/* Impressão e "salvar como PDF": só a aba aberta, sem navegação nem botões */
+@media print {
+  @page { margin: 14mm 12mm; }
+  body { border-top: 0; }
+  .di-wrap { max-width: none; padding: 0; }
+  .vc-top { padding-top: 0; }
+  .vc-tabs, .vc-baixar, .vc-seg, .vc-controles, .di-tip, .di-query .di-field { display: none !important; }
+  .di-page .di-head, .di-page .di-tile, .di-page .di-query, .vc-aviso-bloco, .vc-alerta, .di-chart svg { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .di-page .di-head { margin-top: 16px; padding: 22px 26px; }
+  .di-page .di-head::after { display: none; }
+  .di-page { gap: 22px; font-size: 10pt; }
+  .di-tiles { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+  .vc-tiles-resumo { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .di-page .di-tile-num { font-size: 15pt; }
+  .di-page .di-tile-num.vc-num-menor { font-size: 10.5pt; line-height: 1.9; }
+  .di-tile, .di-chart, .di-legend, .di-table tr, .vc-noticias li { break-inside: avoid; }
+  .di-h2, .di-h2 + .di-note { break-after: avoid; }
+  .di-scroll { overflow: visible; }
+  .di-page .di-table { font-size: 8.5pt; }
+  .di-page .di-table th, .di-page .di-table td { padding: 4px 6px; white-space: normal; }
+  .di-page .di-table .di-num { white-space: nowrap; }
+  .di-details:not([open]) { display: none; }
+  .vc-noticias a { color: var(--vc-navy-profundo); }
+}
+.vc-controles .di-field { flex: 0 1 260px; min-width: 0; max-width: 100%; }
+.di-page .vc-select { width: 100%; min-width: 0; }
