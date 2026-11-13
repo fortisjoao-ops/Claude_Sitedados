@@ -373,15 +373,29 @@ def bloco_acoes_br(dados,tmp,notes):
     ibov=[dict(simbolo='IBOV',nivel=s(q['curPrc']),var_dia=s(q.get('prcFlcn')),abertura=s(q.get('opngPric')),minimo=s(q.get('minPric')),maximo=s(q.get('maxPric')),cotado_em=quando)]
     mudou=[{k:v for k,v in r.items() if k!='cotado_em'} for r in ibov]!=[{k:v for k,v in r.items() if k!='cotado_em'} for r in dados.get('br_ibov',[])]
     if mudou: dados['br_ibov']=ibov; notes.append('Ibovespa de '+quando)
+def cotacoes_da_carteira(tmp,cart):
+    # Uma cotacao por papel, com pausa entre os pedidos para pesar pouco na B3. A B3 as vezes recusa pedidos (403 ou 429):
+    # o pedido recusado nao e repetido; com 3 recusas seguidas a rotina para de pedir; e se as recusas deixarem menos de
+    # 90% da carteira com cotacao o bloco falha, porque um ranking com parte da carteira enganaria. Fica o dado anterior.
+    lidos=[]; quando=None; recusas=0; seguidas=0
+    for c in cart:
+        time.sleep(0.35)
+        try: quando,qq=cotacao_b3(tmp,c['cod']); seguidas=0
+        except RuntimeError as e:
+            if 'respondeu 403' in str(e) or 'respondeu 429' in str(e):
+                recusas+=1; seguidas+=1
+                if seguidas>=3: break
+            continue
+        except Exception: continue
+        if qq.get('curPrc') is None or qq.get('prcFlcn') is None: continue
+        lidos.append((c,qq))
+    if recusas and len(lidos)<0.9*len(cart): raise RuntimeError('a B3 recusou %d pedidos de cotacao; so %d de %d papeis lidos'%(recusas,len(lidos),len(cart)))
+    return quando,lidos
 def bloco_papeis_br(dados,tmp,notes):
     # carteira teorica do indice (B3) e cotacao de cada papel
     cart=carteira_b3(tmp,'IBOV')
-    papeis=[]; quando=None
-    for c in cart:
-        try: quando,qq=cotacao_b3(tmp,c['cod'])
-        except Exception: continue
-        if qq.get('curPrc') is None or qq.get('prcFlcn') is None: continue
-        papeis.append(dict(ticker=c['cod'],nome=c['asset'].strip(),preco=s(qq['curPrc']),var_dia=s(qq['prcFlcn'])))
+    quando,lidos=cotacoes_da_carteira(tmp,cart)
+    papeis=[dict(ticker=c['cod'],nome=c['asset'].strip(),preco=s(qq['curPrc']),var_dia=s(qq['prcFlcn'])) for c,qq in lidos]
     if len(papeis)<30: raise RuntimeError('so %d papeis do indice com cotacao'%len(papeis))
     if papeis!=dados.get('br_papeis'):
         dados['br_papeis']=papeis; dados['br_papeis_ref']=[dict(cotado_em=quando,papeis=str(len(papeis)),carteira=str(len(cart)))]; notes.append('%d papeis do Ibovespa'%len(papeis))
@@ -416,12 +430,9 @@ def bloco_ifix(dados,tmp,notes):
     sem=lambda l:[{k:v for k,v in r.items() if k!='cotado_em'} for r in l]
     if sem(ifix)!=sem(dados.get('br_ifix',[])): dados['br_ifix']=ifix; notes.append('IFIX de '+quando)
 def bloco_fiis(dados,tmp,notes):
-    cart=carteira_b3(tmp,'IFIX'); fundos=[]; quando=None
-    for c in cart:
-        try: quando,qq=cotacao_b3(tmp,c['cod'])
-        except Exception: continue
-        if qq.get('curPrc') is None or qq.get('prcFlcn') is None: continue
-        fundos.append(dict(ticker=c['cod'],nome=c['asset'].strip(),preco=s(qq['curPrc']),var_dia=s(qq['prcFlcn']),peso=(c.get('part') or '').replace(',','.')))
+    cart=carteira_b3(tmp,'IFIX')
+    quando,lidos=cotacoes_da_carteira(tmp,cart)
+    fundos=[dict(ticker=c['cod'],nome=c['asset'].strip(),preco=s(qq['curPrc']),var_dia=s(qq['prcFlcn']),peso=(c.get('part') or '').replace(',','.')) for c,qq in lidos]
     if len(fundos)<30: raise RuntimeError('so %d fundos do IFIX com cotacao'%len(fundos))
     if fundos!=dados.get('br_fiis'):
         dados['br_fiis']=fundos; dados['br_fiis_ref']=[dict(cotado_em=quando,fundos=str(len(fundos)),carteira=str(len(cart)))]; notes.append('%d fundos do IFIX'%len(fundos))
