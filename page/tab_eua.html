@@ -1,0 +1,128 @@
+  <header class="di-head">
+    <h1 class="di-title" id="eua-titulo">Juros dos Estados Unidos</h1>
+    <p class="di-lede" id="eua-resumo">A faixa-alvo dos Fed funds está em <b data-draw="eua-faixa">—</b>, com taxa efetiva de <b data-draw="eua-effr">—</b>. O Treasury de 10 anos rende <b data-draw="eua-taxa" data-item="t10">—</b> e o de 2 anos, <b data-draw="eua-taxa" data-item="t2">—</b>.</p>
+    <p class="di-stamp" id="eua-carimbo">Taxa efetiva de <span data-draw="eua-effr-data">—</span> (NY Fed) e Treasuries do fechamento de <span data-draw="eua-ust-data">—</span> (Tesouro americano). São dados de fechamento, não intradiários.</p>
+  </header>
+
+  <section class="di-tiles" id="eua-destaques" aria-label="Taxas de juros dos Estados Unidos">
+    <div class="di-tile">
+      <div class="di-tile-label">Fed funds, faixa-alvo</div>
+      <div class="di-tile-num vc-num-menor" data-draw="eua-faixa">—</div>
+      <div class="di-tile-sub">taxa efetiva de <span data-draw="eua-effr">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Treasury de 2 anos</div>
+      <div class="di-tile-num" data-draw="eua-taxa" data-item="t2">—</div>
+      <div class="di-tile-sub"><span data-draw="eua-var" data-item="t2">—</span> no dia</div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Treasury de 10 anos</div>
+      <div class="di-tile-num" data-draw="eua-taxa" data-item="t10">—</div>
+      <div class="di-tile-sub"><span data-draw="eua-var" data-item="t10">—</span> no dia</div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Treasury de 30 anos</div>
+      <div class="di-tile-num" data-draw="eua-taxa" data-item="t30">—</div>
+      <div class="di-tile-sub"><span data-draw="eua-var" data-item="t30">—</span> no dia</div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Spread 10 anos − 2 anos</div>
+      <div class="di-tile-num" data-draw="eua-spread">—</div>
+      <div class="di-tile-sub"><span data-draw="eua-var" data-item="spread">—</span> no dia</div>
+    </div>
+  </section>
+
+  <section class="di-block" id="eua-curva">
+    <h2 class="di-h2">Curva dos Treasuries, hoje e há 3 meses</h2>
+    <p class="di-note">Rendimento ao par, em % ao ano, por prazo. Os pontos são os prazos publicados pelo Tesouro americano; a linha entre eles é uma interpolação suave, não um dado.</p>
+    <div class="di-chart" data-draw="eua-grafico-curva" data-source="eua_curva"></div>
+    <ul class="di-legend">
+      <li><span class="di-sw di-sw-line"></span>Curva de <span class="di-legend-data" data-draw="eua-ust-data">—</span></li>
+      <li><span class="di-sw di-sw-3m"></span>Curva de 3 meses atrás, de <span class="di-legend-data" data-draw="eua-ust-data-3m">—</span></li>
+    </ul>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr>
+          <th>Prazo</th><th class="di-num">Taxa</th><th class="di-num">Dia anterior</th><th class="di-num">Variação no dia</th><th class="di-num">3 meses atrás</th><th class="di-num">Variação em 3 meses</th>
+        </tr></thead>
+        <tbody data-draw="eua-tabela-curva"></tbody>
+      </table>
+    </div>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="treasuries fed_funds">—</p>
+  </section>
+
+  <section class="di-block" id="eua-real">
+    <h2 class="di-h2">Juro real e inflação implícita</h2>
+    <p class="di-note">O juro real é o rendimento dos títulos indexados à inflação (TIPS). A inflação implícita é a diferença entre o Treasury nominal e o TIPS de mesmo prazo: é uma conta desta página, não um número publicado, e inclui prêmios de risco e de liquidez.</p>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr>
+          <th>Prazo</th><th class="di-num">Treasury nominal</th><th class="di-num">Juro real (TIPS)</th><th class="di-num">Inflação implícita</th><th class="di-num">Inflação implícita há 3 meses</th>
+        </tr></thead>
+        <tbody data-draw="eua-tabela-real"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="di-block vc-aviso-bloco" id="eua-leitura">
+    <h2 class="di-h2">Duas leituras diferentes do caminho dos juros</h2>
+    <p class="di-note">Os dois gráficos abaixo usam a mesma escala para permitir a comparação, mas não medem a mesma coisa. O dot plot mostra o que cada membro do Fed projeta. A trajetória de mercado mostra o que os preços dos futuros embutem, com prêmio de risco incluído. Nenhuma das duas é uma probabilidade, e a taxa embutida nos preços não é uma projeção do Fed.</p>
+  </section>
+
+  <section class="di-block" id="eua-dotplot">
+    <h2 class="di-h2">O que os membros do Fed projetam: dot plot de <span data-draw="eua-sep-data">—</span></h2>
+    <p class="di-note">Cada ponto é a projeção de um participante do FOMC para o ponto médio da faixa-alvo dos Fed funds no fim de cada ano, no Resumo de Projeções Econômicas (SEP) publicado nessa reunião. O traço marca a mediana. A faixa clara é a faixa-alvo de hoje.</p>
+    <div class="di-chart" data-draw="eua-grafico-dots" data-source="eua_dots eua_mediana"></div>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Fim de</th><th class="di-num">Mediana</th><th class="di-num">Menor projeção</th><th class="di-num">Maior projeção</th><th class="di-num">Participantes</th></tr></thead>
+        <tbody data-draw="eua-tabela-mediana"></tbody>
+      </table>
+    </div>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="fomc">—</p>
+  </section>
+
+  <section class="di-block" id="eua-mercado">
+    <h2 class="di-h2">O que o mercado embute: trajetória dos futuros de Fed funds</h2>
+    <p class="di-note">Taxa efetiva média esperada depois de cada reunião do FOMC, tirada dos futuros de Fed funds de 30 dias (CBOT), cotados em <span data-draw="eua-zq-data">—</span>. Taxa esperada em pontos-base não é probabilidade. Probabilidades por reunião: indisponível nesta página, porque a fonte adequada (CME FedWatch) é paga.</p>
+    <div class="di-chart" data-draw="eua-grafico-mercado" data-source="eua_trajetoria"></div>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Decisão do FOMC</th><th class="di-num">Taxa embutida antes</th><th class="di-num">Taxa embutida depois</th><th class="di-num">Mudança embutida</th><th class="di-num">Acumulado</th></tr></thead>
+        <tbody data-draw="eua-tabela-mercado"></tbody>
+      </table>
+    </div>
+    <p class="di-note">Limitações: os futuros carregam prêmio de risco; os contratos mais distantes têm pouca liquidez e alguns meses não têm cotação; a taxa efetiva pode oscilar no fim do mês; quando falta contrato para separar duas reuniões seguidas, a mudança é repartida entre elas.</p>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="futuros_fed">—</p>
+  </section>
+
+  <section class="di-block" id="eua-macro">
+    <h2 class="di-h2">Inflação e emprego, os dados que movem o Fed</h2>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Indicador</th><th>Mês de referência</th><th class="di-num">Valor</th><th class="di-num">Mês anterior</th></tr></thead>
+        <tbody data-draw="eua-tabela-macro"></tbody>
+      </table>
+    </div>
+    <p class="di-note" data-draw="eua-pce">—</p>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="macro_eua">—</p>
+  </section>
+
+  <section class="di-block" id="eua-calendario">
+    <h2 class="di-h2">Próximas decisões do FOMC</h2>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Decisão em</th><th>Projeções e dot plot novos</th></tr></thead>
+        <tbody data-draw="eua-tabela-fomc"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <details class="di-details" id="eua-metodo">
+    <summary>Fontes e fórmulas</summary>
+    <p>Fed funds: faixa-alvo e taxa efetiva (EFFR) da API de mercados do Federal Reserve Bank de Nova York. Treasuries e TIPS: curvas diárias de rendimento ao par do Tesouro americano. Dot plot e calendário: site do Federal Reserve (materiais de projeção e calendário do FOMC). Futuros de Fed funds: cotações do Yahoo Finance, por um endereço não oficial. Inflação e emprego: API pública do Bureau of Labor Statistics.</p>
+    <p>Variações em pontos-base: taxa da data de referência menos a taxa da data comparada, vezes 100. A curva de 3 meses atrás é a da mesma data três meses antes ou, se não houver dado nesse dia, a do dia útil anterior mais próximo. Spread: Treasury de 10 anos menos o de 2 anos.</p>
+    <p>Mediana do dot plot: a projeção do meio quando os participantes são ordenados; com número par, a média das duas do meio.</p>
+    <p>Trajetória de mercado: cada futuro de Fed funds de 30 dias liquida pela média da taxa efetiva no mês do contrato, então 100 menos o preço é a taxa média esperada naquele mês. A página supõe que a taxa só muda no dia seguinte a cada decisão do FOMC e procura os níveis que melhor reproduzem as médias mensais de todos os contratos cotados (mínimos quadrados, com uma penalidade pequena para saltos entre reuniões seguidas). O resultado é uma taxa esperada, não uma probabilidade.</p>
+    <p>Inflação ao consumidor (CPI) em 12 meses: índice do mês dividido pelo índice do mesmo mês do ano anterior, menos 1. Quando o BLS não publicou o índice do mesmo mês do ano anterior, o valor aparece como indisponível. Vagas criadas: nível de emprego do mês menos o do mês anterior. Sem chave de acesso, a API do BLS tem cota diária pequena; quando a cota acaba, a página mantém o dado anterior. Núcleo do PCE: índice mensal da série PCEPILFE do FRED (Federal Reserve Bank de St. Louis), que só responde com chave de acesso; a variação em 12 meses é o índice do mês dividido pelo do mesmo mês do ano anterior, menos 1.</p>
+  </details>

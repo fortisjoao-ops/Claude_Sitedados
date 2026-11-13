@@ -1,0 +1,39 @@
+  <header class="di-head">
+    <h1 class="di-title" id="rs-titulo">Resumo do dia</h1>
+    <p class="di-lede" id="rs-resumo">O DI de 5 anos varia <b data-draw="rs-valor" data-item="di5" data-campo="mudanca">—</b> frente ao ajuste anterior, o Ibovespa <b data-draw="rs-valor" data-item="ibov" data-campo="mudanca">—</b> no dia e o IFIX <b data-draw="rs-valor" data-item="ifix" data-campo="mudanca">—</b>. O dólar PTAX está em <b data-draw="rs-valor" data-item="dolar" data-campo="valor">—</b>.</p>
+    <p class="di-stamp" id="rs-carimbo">Cada número traz a data do próprio dado, porque as fontes fecham em horários diferentes. Os dados de mercado são buscados três vezes por dia nos dias úteis, às 10h20, 14h20 e 18h20; fontes e fórmulas estão na aba de cada tema.</p>
+  </header>
+
+  <section class="di-tiles vc-tiles-resumo" id="rs-destaques" aria-label="Principais números do dia" data-draw="rs-tiles"></section>
+
+  <section class="di-block" id="rs-dia">
+    <h2 class="di-h2">O que mudou no dia</h2>
+    <p class="di-note">Mudança de cada indicador contra o dado anterior da mesma fonte. Juros em pontos-base; bolsa e câmbio em %.</p>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Indicador</th><th class="di-num">Valor</th><th class="di-num">Mudança</th><th>Comparado com</th><th>Data do dado</th></tr></thead>
+        <tbody data-draw="rs-tabela" data-janela="dia"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="di-block" id="rs-longo">
+    <h2 class="di-h2">O que mudou em janelas mais longas</h2>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Indicador</th><th class="di-num">Valor</th><th class="di-num">Mudança</th><th>Comparado com</th><th>Data do dado</th></tr></thead>
+        <tbody data-draw="rs-tabela" data-janela="longa"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="di-block" id="rs-manchetes">
+    <h2 class="di-h2">Manchetes</h2>
+    <p class="di-note">A primeira matéria de cada seção da aba Notícias, na seleção de <span data-draw="not-montagem">—</span>.</p>
+    <ul class="vc-noticias vc-manchetes" data-draw="rs-manchetes"></ul>
+  </section>
+
+  <section class="di-block" id="rs-fontes">
+    <h2 class="di-h2">Situação das fontes</h2>
+    <p class="di-note" data-draw="rs-fontes">—</p>
+  </section>

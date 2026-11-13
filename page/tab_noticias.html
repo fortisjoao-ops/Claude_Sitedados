@@ -1,0 +1,29 @@
+  <header class="di-head">
+    <h1 class="di-title" id="noticias-titulo">Principais notícias</h1>
+    <p class="di-lede" id="noticias-resumo">Seleção montada em <b data-draw="not-montagem">—</b>, a partir dos feeds de veículos brasileiros e americanos.</p>
+    <p class="di-stamp" id="noticias-carimbo">A montagem roda todo dia pouco antes das 9h, no horário de Brasília. Cada item leva ao texto original; esta página mostra só título, veículo e data.</p>
+  </header>
+
+  <p class="di-note vc-alerta vc-aviso-noticias" hidden>A montagem de hoje ainda não rodou ou falhou. A seleção abaixo é a de <span data-draw="not-montagem">—</span>.</p>
+
+  <section class="di-block" id="noticias-brasil">
+    <h2 class="di-h2">Brasil</h2>
+    <ol class="vc-noticias" data-draw="noticias" data-secao="brasil"></ol>
+  </section>
+  <section class="di-block" id="noticias-mundo">
+    <h2 class="di-h2">Mundo</h2>
+    <ol class="vc-noticias" data-draw="noticias" data-secao="mundo"></ol>
+  </section>
+  <section class="di-block" id="noticias-imobiliario">
+    <h2 class="di-h2">Mercado imobiliário brasileiro</h2>
+    <ol class="vc-noticias" data-draw="noticias" data-secao="imobiliario"></ol>
+  </section>
+  <p class="di-note vc-fonte" data-draw="fonte" data-bloco="noticias">—</p>
+
+  <details class="di-details" id="noticias-metodo">
+    <summary>Fontes e método de seleção</summary>
+    <p>Veículos consultados, pelos feeds RSS públicos de cada um. Brasil: Agência Brasil, G1, Folha de S.Paulo, InfoMoney e Money Times. Mundo: BBC, The Washington Post, NPR e a editoria Mundo do G1. Mercado imobiliário: o feed de mercado imobiliário do InfoMoney, o feed de fundos imobiliários do Money Times e as matérias dos feeds brasileiros cujo título trata de imóveis, aluguel, construtoras, crédito imobiliário ou fundos imobiliários.</p>
+    <p>Ranking: entram matérias das últimas 36 horas (10 dias no mercado imobiliário, que tem menos publicações). Cada história ganha 3 pontos por veículo adicional que a publicou, até 2 pontos por ser recente e até 1 ponto pela posição no feed de origem. As 8 histórias de maior nota entram em cada seção, com no máximo 3 por veículo (5 no mercado imobiliário, que tem menos veículos).</p>
+    <p>Duplicatas: dois títulos contam como a mesma história quando têm pelo menos metade das palavras em comum, ou pelo menos 4 palavras em comum e um quarto do total. De cada história fica uma matéria só, a do veículo que vem primeiro na ordem acima. Títulos em português e em inglês não são comparados entre si.</p>
+    <p>Se um feed falha, a seleção é montada com os demais. Se a montagem inteira falha ou não roda, a página mantém a seleção anterior e mostra um aviso com a data dela.</p>
+  </details>

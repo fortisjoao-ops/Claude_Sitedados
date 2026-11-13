@@ -1,0 +1,85 @@
+  <header class="di-head">
+    <h1 class="di-title" id="fx-titulo">Expectativas do Focus</h1>
+    <p class="di-lede" id="fx-resumo">Na mediana dos economistas consultados pelo Banco Central, o IPCA de <b data-draw="fx-ano" data-idx="0">—</b> fica em <b data-draw="fx-num" data-ind="IPCA" data-idx="0">—</b> e a Selic termina o ano em <b data-draw="fx-num" data-ind="Selic" data-idx="0">—</b>. Para <b data-draw="fx-ano" data-idx="1">—</b>: IPCA de <b data-draw="fx-num" data-ind="IPCA" data-idx="1">—</b> e Selic de <b data-draw="fx-num" data-ind="Selic" data-idx="1">—</b>.</p>
+    <p class="di-stamp" id="fx-carimbo">Medianas das expectativas de mercado coletadas pelo Banco Central até <span data-draw="fx-data">—</span>. O Banco Central divulga os números às segundas-feiras, com as coletas até a sexta-feira anterior.</p>
+  </header>
+
+  <section class="di-tiles" id="fx-destaques" aria-label="Medianas do Focus">
+    <div class="di-tile">
+      <div class="di-tile-label">IPCA em <span data-draw="fx-ano" data-idx="0">—</span></div>
+      <div class="di-tile-num" data-draw="fx-num" data-ind="IPCA" data-idx="0">—</div>
+      <div class="di-tile-sub">há 4 semanas: <span data-draw="fx-4s" data-ind="IPCA" data-idx="0">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">IPCA em <span data-draw="fx-ano" data-idx="1">—</span></div>
+      <div class="di-tile-num" data-draw="fx-num" data-ind="IPCA" data-idx="1">—</div>
+      <div class="di-tile-sub">há 4 semanas: <span data-draw="fx-4s" data-ind="IPCA" data-idx="1">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Selic no fim de <span data-draw="fx-ano" data-idx="0">—</span></div>
+      <div class="di-tile-num" data-draw="fx-num" data-ind="Selic" data-idx="0">—</div>
+      <div class="di-tile-sub">há 4 semanas: <span data-draw="fx-4s" data-ind="Selic" data-idx="0">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Selic no fim de <span data-draw="fx-ano" data-idx="1">—</span></div>
+      <div class="di-tile-num" data-draw="fx-num" data-ind="Selic" data-idx="1">—</div>
+      <div class="di-tile-sub">há 4 semanas: <span data-draw="fx-4s" data-ind="Selic" data-idx="1">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">PIB em <span data-draw="fx-ano" data-idx="0">—</span></div>
+      <div class="di-tile-num" data-draw="fx-num" data-ind="PIB Total" data-idx="0">—</div>
+      <div class="di-tile-sub">há 4 semanas: <span data-draw="fx-4s" data-ind="PIB Total" data-idx="0">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Dólar em <span data-draw="fx-ano" data-idx="0">—</span></div>
+      <div class="di-tile-num" data-draw="fx-num" data-ind="Câmbio" data-idx="0">—</div>
+      <div class="di-tile-sub">há 4 semanas: <span data-draw="fx-4s" data-ind="Câmbio" data-idx="0">—</span></div>
+    </div>
+  </section>
+
+  <section class="di-block" id="fx-tabela">
+    <h2 class="di-h2">Medianas para este ano e o próximo</h2>
+    <p class="di-note">A coluna "há 4 semanas" traz a mediana da coleta mais recente com pelo menos 28 dias de distância; a data dela está na última coluna.</p>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Indicador</th><th>Ano</th><th class="di-num">Mediana</th><th class="di-num">Há 4 semanas</th><th class="di-num">Mudança</th><th class="di-num">Respondentes</th><th>Coletas comparadas</th></tr></thead>
+        <tbody data-draw="fx-tabela"></tbody>
+      </table>
+    </div>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="focus">—</p>
+  </section>
+
+  <section class="di-block vc-aviso-bloco" id="fx-leitura">
+    <h2 class="di-h2">Economistas e preços de mercado não medem a mesma coisa</h2>
+    <p class="di-note">O Focus é uma pesquisa: a mediana do que os economistas projetam. A curva de juros e as NTN-B são preços: embutem o que o mercado espera mais um prêmio de risco. Quando os dois divergem, a diferença pode ser prêmio, e não uma aposta diferente sobre o Copom ou a inflação.</p>
+  </section>
+
+  <section class="di-block" id="fx-selic">
+    <h2 class="di-h2">Selic no fim do ano: Focus e curva de juros</h2>
+    <p class="di-note">A coluna da curva usa o CDI que a curva DI embute depois da última reunião do Copom de cada ano, calculado na aba Curva DI Futuro, somado à distância de hoje entre a meta da Selic e o CDI, de <span data-draw="fx-spread">—</span>.</p>
+    <div class="di-scroll">
+      <table class="di-table vc-cab-quebra">
+        <thead><tr><th>Fim de</th><th class="di-num">Selic no Focus</th><th>Última reunião do Copom no ano</th><th class="di-num">CDI embutido na curva depois dela</th><th class="di-num">Selic equivalente na curva</th><th class="di-num">Curva menos Focus</th></tr></thead>
+        <tbody data-draw="fx-tabela-selic"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="di-block" id="fx-inflacao">
+    <h2 class="di-h2">Inflação: Focus e inflação implícita</h2>
+    <p class="di-note">Os horizontes são diferentes e os números não são diretamente comparáveis: o Focus projeta o IPCA de cada ano-calendário; a inflação implícita é uma média anual de hoje até o vencimento do título, calculada na aba Juro real BR, com prêmio de risco incluído.</p>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Medida</th><th>Horizonte</th><th class="di-num">Inflação ao ano</th></tr></thead>
+        <tbody data-draw="fx-tabela-inflacao"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <details class="di-details" id="fx-metodo">
+    <summary>Fontes e fórmulas</summary>
+    <p>Fonte: Expectativas de Mercado do Banco Central (Sistema de Expectativas, recurso de expectativas anuais), medianas calculadas com todas as projeções válidas dos últimos 30 dias. Indicadores: IPCA, Selic, PIB Total e Câmbio, para o ano corrente e o seguinte.</p>
+    <p>IPCA e PIB: variação no ano-calendário, em %. Selic: meta no fim do ano, em % ao ano. Câmbio: reais por dólar, na definição anual do Banco Central; para a definição exata de cada indicador vale o Relatório Focus.</p>
+    <p>Há 4 semanas: a mediana da coleta mais recente que tenha pelo menos 28 dias de distância da coleta atual. Mudança: mediana atual menos a de 4 semanas atrás, as duas arredondadas em duas casas, em pontos percentuais (em reais, no câmbio).</p>
+    <p>Selic equivalente na curva: CDI médio embutido na curva DI depois da última reunião do Copom do ano, sem arredondar, mais a diferença de hoje entre a meta da Selic e o CDI. Curva menos Focus: Selic equivalente menos a mediana do Focus, em pontos-base. A curva embute prêmio de risco, então essa diferença não é uma previsão.</p>
+  </details>
