@@ -1,0 +1,25 @@
+# Temporário: confere, a partir de um servidor do GitHub, o formato de duas fontes de datas. Sai antes da entrega.
+name: Diagnóstico de fontes (temporário)
+on:
+  push:
+    branches: [claude/historico-agenda]
+    paths: ['.github/workflows/diagnostico.yml']
+permissions:
+  contents: read
+jobs:
+  diagnostico:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Calendário de divulgações do IBGE e do FRED
+        shell: bash
+        env:
+          FRED_KEY: ${{ secrets.FRED_KEY }}
+        run: |
+          set +e
+          ver() { echo "== $1"; curl -sS -m 40 -A 'curva-dashboard-updater/1.0' -o r.txt -w '%{http_code} %{size_download} %{content_type}\n' "$2"; head -c "$3" r.txt; echo; }
+          ver "IBGE calendario, proximos" "https://servicodados.ibge.gov.br/api/v3/calendario/?qtd=60&de=$(date -u +%m-%d-%Y)" 6000
+          for id in 50 10 54; do
+            ver "FRED release $id" "https://api.stlouisfed.org/fred/release/dates?release_id=$id&include_release_dates_with_no_data=true&sort_order=desc&limit=6&file_type=json&api_key=$FRED_KEY" 700
+            ver "FRED release $id nome" "https://api.stlouisfed.org/fred/release?release_id=$id&file_type=json&api_key=$FRED_KEY" 400
+          done
