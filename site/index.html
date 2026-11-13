@@ -3,6 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Curva DI, juro real, juros dos Estados Unidos, inflação, Focus, ações, fundos imobiliários e notícias, atualizados automaticamente.">
+<meta name="theme-color" content="#1C466C">
+<link rel="icon" type="image/png" href="icone.png">
+<link rel="apple-touch-icon" href="icone.png">
+<link rel="canonical" href="https://veracruzdata.netlify.app/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Vera Cruz">
+<meta property="og:title" content="Dash Vera Cruz">
+<meta property="og:description" content="Curva DI, juro real, juros dos Estados Unidos, inflação, Focus, ações, fundos imobiliários e notícias, atualizados automaticamente.">
+<meta property="og:url" content="https://veracruzdata.netlify.app/">
+<meta property="og:image" content="https://veracruzdata.netlify.app/previa.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
 <title>Dash Vera Cruz</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap">
@@ -431,6 +446,47 @@ body { border-top: 4px solid var(--vc-navy); }
   .di-page .di-title { font-size: 1.625rem; }
   .di-page .di-tile-num { font-size: 1.6rem; }
 }
+
+/* Seletor de horizonte do gráfico (5 ou 10 anos) */
+.vc-seg { display: inline-flex; align-self: flex-start; border: 1px solid var(--vc-navy); border-radius: 2px; overflow: hidden; }
+.vc-seg-botao { min-height: 34px; padding: 6px 14px; border: 0; background: var(--vc-branco); color: var(--vc-navy); font: inherit; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.01em; cursor: pointer; }
+.vc-seg-botao + .vc-seg-botao { border-left: 1px solid var(--vc-navy); }
+.vc-seg-botao:hover { background: var(--vc-azul-gelo); }
+.vc-seg-botao[aria-pressed="true"] { background: var(--vc-navy); color: var(--vc-branco); }
+.vc-seg-botao:focus-visible { outline: 2px solid var(--vc-azul-aco); outline-offset: -3px; }
+.vc-seg-botao:disabled { opacity: .5; cursor: default; }
+
+/* Controles da aba Histórico */
+.vc-controles { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+.di-page .vc-select { max-width: 100%; padding-right: 28px; border-radius: 2px; cursor: pointer; }
+.di-page .vc-controles .di-field { color: var(--vc-navy); }
+
+/* Impressão e "salvar como PDF": só a aba aberta, sem navegação nem botões */
+@media print {
+  @page { margin: 14mm 12mm; }
+  body { border-top: 0; }
+  .di-wrap { max-width: none; padding: 0; }
+  .vc-top { padding-top: 0; }
+  .vc-tabs, .vc-baixar, .vc-seg, .vc-controles, .di-tip, .di-query .di-field { display: none !important; }
+  .di-page .di-head, .di-page .di-tile, .di-page .di-query, .vc-aviso-bloco, .vc-alerta, .di-chart svg { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .di-page .di-head { margin-top: 16px; padding: 22px 26px; }
+  .di-page .di-head::after { display: none; }
+  .di-page { gap: 22px; font-size: 10pt; }
+  .di-tiles { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+  .vc-tiles-resumo { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .di-page .di-tile-num { font-size: 15pt; }
+  .di-page .di-tile-num.vc-num-menor { font-size: 10.5pt; line-height: 1.9; }
+  .di-tile, .di-chart, .di-legend, .di-table tr, .vc-noticias li { break-inside: avoid; }
+  .di-h2, .di-h2 + .di-note { break-after: avoid; }
+  .di-scroll { overflow: visible; }
+  .di-page .di-table { font-size: 8.5pt; }
+  .di-page .di-table th, .di-page .di-table td { padding: 4px 6px; white-space: normal; }
+  .di-page .di-table .di-num { white-space: nowrap; }
+  .di-details:not([open]) { display: none; }
+  .vc-noticias a { color: var(--vc-navy-profundo); }
+}
+.vc-controles .di-field { flex: 0 1 260px; min-width: 0; max-width: 100%; }
+.di-page .vc-select { width: 100%; min-width: 0; }
 </style>
 </head>
 <body>
@@ -446,6 +502,7 @@ body { border-top: 4px solid var(--vc-navy); }
       <a class="vc-tab" href="#focus">Focus</a>
       <a class="vc-tab" href="#acoes-br">Ações BR</a>
       <a class="vc-tab" href="#fiis">FIIs</a>
+      <a class="vc-tab" href="#historico">Histórico</a>
       <a class="vc-tab" href="#noticias">Notícias</a>
     </nav>
   </div>
@@ -458,6 +515,19 @@ body { border-top: 4px solid var(--vc-navy); }
   </header>
 
   <section class="di-tiles vc-tiles-resumo" id="rs-destaques" aria-label="Principais números do dia" data-draw="rs-tiles"></section>
+
+  <section class="di-block" id="rs-agenda">
+    <h2 class="di-h2">Agenda</h2>
+    <p class="di-note">Próximas decisões de juros e divulgações que costumam mexer com as curvas. As datas podem ser alteradas por quem as publica.</p>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Data</th><th>Evento</th><th class="di-num">Faltam</th><th>Fonte da data</th></tr></thead>
+        <tbody data-draw="rs-agenda"></tbody>
+      </table>
+    </div>
+    <p class="di-note">Data de divulgação do IPCA: indisponível, porque o calendário do IBGE não responde aos servidores que atualizam esta página.</p>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="agenda fomc">—</p>
+  </section>
 
   <section class="di-block" id="rs-dia">
     <h2 class="di-h2">O que mudou no dia</h2>
@@ -547,8 +617,12 @@ body { border-top: 4px solid var(--vc-navy); }
   </section>
 
   <section class="di-block" id="curva">
-    <h2 class="di-h2" id="curva-titulo">Taxa DI por prazo, de hoje até 5 anos</h2>
+    <h2 class="di-h2" id="curva-titulo">Taxa DI por prazo, de hoje até <span data-draw="di-horizonte">5</span> anos</h2>
     <p class="di-note">Em % ao ano, base 252 dias úteis. A linha é uma spline cúbica natural que passa por todos os vértices; entre dois vértices a taxa é interpolada, não negociada.</p>
+    <div class="vc-seg" role="group" aria-label="Horizonte do gráfico">
+      <button type="button" class="vc-seg-botao" data-draw="di-horizonte-botao" data-anos="5" aria-pressed="true">5 anos</button>
+      <button type="button" class="vc-seg-botao" data-draw="di-horizonte-botao" data-anos="10" aria-pressed="false">10 anos</button>
+    </div>
     <div class="di-chart" id="grafico" data-draw="grafico" data-source="di1 di1_3m curva cdi_por_data"></div>
     <ul class="di-legend" id="legenda">
       <li><span class="di-sw di-sw-line"></span>Curva interpolada agora</li>
@@ -558,6 +632,7 @@ body { border-top: 4px solid var(--vc-navy); }
       <li><span class="di-sw di-sw-ring"></span>Vértice sem negócio hoje</li>
       <li><span class="di-sw di-sw-ref"></span>Data consultada</li>
     </ul>
+    <p class="di-note" data-draw="di-horizonte-nota" hidden>No gráfico de 10 anos a spline passa também pelos vértices além de 5 anos, onde há menos contratos e menos negócios. Por isso a linha pode diferir em frações de ponto-base da de 5 anos. As tabelas, o CDI projetado e o resumo continuam vindo da curva de 5 anos.</p>
     <p class="di-note vc-baixar"><button type="button" class="vc-botao" data-draw="csv" data-csv="curva-di">Baixar as curvas em CSV</button><span>Separado por ponto e vírgula, com vírgula decimal, para abrir direto no Excel.</span></p>
   </section>
 
@@ -643,6 +718,7 @@ body { border-top: 4px solid var(--vc-navy); }
     <p>Os vértices são os contratos futuros de DI de 1 dia (DI1) da B3 com vencimento dentro de 5 anos, mais o primeiro contrato depois desse prazo, que ancora o trecho final.</p>
     <p>O prazo de cada vértice é contado em dias úteis entre a data da cotação e o vencimento, descontando fins de semana e feriados nacionais.</p>
     <p>A interpolação é uma spline cúbica natural da taxa em função dos dias úteis: passa exatamente por todos os vértices e tem curvatura zero nas duas pontas. A curva não é extrapolada para antes do primeiro vértice.</p>
+    <p>O gráfico pode ser estendido a 10 anos. Nesse caso a spline é refeita com os contratos de até 10 anos, mais o primeiro depois desse prazo; a curva de 5 anos, de onde saem os números da página, não muda.</p>
     <p>O CDI médio projetado até uma data é a taxa da curva interpolada no número de dias úteis até essa data. O CDI acumulado é essa taxa capitalizada pelo período: (1 + taxa) elevado a dias úteis ÷ 252, menos 1. São taxas embutidas nos preços de mercado, não uma previsão.</p>
     <p>As mudanças por reunião do Copom são lidas na curva interpolada: para cada reunião, a página calcula o CDI médio embutido entre o dia em que a decisão passa a valer e o dia em que vale a decisão seguinte, e compara com o trecho anterior. Depois da última reunião com data divulgada, o trecho usado é de 30 dias úteis. O arredondamento em passos de 0,25 ponto é feito no nível acumulado, para a soma das barras não se afastar do que a curva embute.</p>
     <p>NTN-B: preços e taxas do Tesouro Direto, publicados pelo Tesouro Nacional (arquivo de preços e taxas dos títulos ofertados). O PU é o "PU base" da manhã de cada dia e a taxa é a de venda. NTN-B é o Tesouro IPCA+ com Juros Semestrais e NTN-B Principal é o Tesouro IPCA+. Variação em R$: PU da data de referência menos o PU da data comparada. Variação em %: PU da data de referência dividido pelo PU da data comparada, menos 1. A data comparada de 3 meses é a mesma data três meses antes ou, se não houver dado nesse dia, o dia anterior mais próximo com dado. Compara-se sempre o mesmo título, com o mesmo vencimento; sem dado numa das datas, a célula mostra "indisponível".</p>
@@ -1184,6 +1260,65 @@ body { border-top: 4px solid var(--vc-navy); }
   </details>
 </div>
 
+<div class="di-page vc-painel" id="historico" hidden>
+  <header class="di-head">
+    <h1 class="di-title" id="hist-titulo">Histórico</h1>
+    <p class="di-lede" id="hist-resumo">Como as curvas e os principais indicadores mudaram ao longo do tempo. O histórico vai de <b data-draw="hist-estado" data-campo="inicio">—</b> a <b data-draw="hist-estado" data-campo="fim">—</b>.</p>
+    <p class="di-stamp" id="hist-carimbo">A página grava um registro por dia útil: o ajuste oficial de cada contrato de DI na B3, a taxa de cada NTN-B no Tesouro Direto e a curva dos Treasuries. São dados de fechamento do dia anterior, não cotações do momento.</p>
+  </header>
+
+  <p class="di-note vc-alerta" data-draw="hist-estado" data-campo="aviso" hidden></p>
+
+  <section class="di-block" id="hist-curvas">
+    <h2 class="di-h2">Curva DI em duas datas</h2>
+    <p class="di-note">Taxa de ajuste de cada contrato de DI, em % ao ano, pelo prazo em anos de 252 dias úteis contado a partir de cada data. As curvas são comparadas pelo mesmo prazo, e não pelo mesmo contrato. Os pontos são os contratos; a linha entre eles é só uma ligação suave.</p>
+    <div class="vc-controles">
+      <label class="di-field"><span>Data</span><select class="di-date vc-select" data-draw="hist-data" data-qual="a" aria-label="Primeira data da comparação"></select></label>
+      <label class="di-field"><span>Comparar com</span><select class="di-date vc-select" data-draw="hist-data" data-qual="b" aria-label="Segunda data da comparação"></select></label>
+    </div>
+    <div class="di-chart" data-draw="hist-grafico-curvas"></div>
+    <ul class="di-legend">
+      <li><span class="di-sw di-sw-line"></span>Ajuste de <span class="di-legend-data" data-draw="hist-rotulo" data-qual="a">—</span></li>
+      <li><span class="di-sw di-sw-3m"></span>Ajuste de <span class="di-legend-data" data-draw="hist-rotulo" data-qual="b">—</span></li>
+    </ul>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Prazo</th><th class="di-num">Taxa em <span data-draw="hist-rotulo" data-qual="a">—</span></th><th class="di-num">Taxa em <span data-draw="hist-rotulo" data-qual="b">—</span></th><th class="di-num">Diferença</th></tr></thead>
+        <tbody data-draw="hist-tabela-curvas"></tbody>
+      </table>
+    </div>
+    <p class="di-note">As datas disponíveis para o DI: um ponto por dia útil a partir de 12/11/2026; antes disso, um por semana nos três meses anteriores e um por mês nos doze meses anteriores, lidos do Boletim Diário do Mercado da B3. Na tabela, a taxa de cada prazo é interpolada em linha reta entre os dois contratos vizinhos.</p>
+  </section>
+
+  <section class="di-block" id="hist-serie">
+    <h2 class="di-h2">Evolução de um indicador</h2>
+    <p class="di-note">Escolha o indicador e o período. Quando há poucos pontos no período, cada um aparece marcado, para ficar claro onde há dado e onde há só a linha que os liga.</p>
+    <div class="vc-controles">
+      <label class="di-field"><span>Indicador</span><select class="di-date vc-select" data-draw="hist-serie" aria-label="Indicador"></select></label>
+      <label class="di-field"><span>Período</span><select class="di-date vc-select" data-draw="hist-periodo" aria-label="Período">
+        <option value="3">3 meses</option><option value="6">6 meses</option><option value="12" selected>12 meses</option><option value="0">Tudo</option>
+      </select></label>
+    </div>
+    <div class="di-chart" data-draw="hist-grafico-serie"></div>
+    <div class="di-scroll">
+      <table class="di-table vc-cab-quebra">
+        <thead><tr><th>Indicador</th><th class="di-num">Primeiro dado do período</th><th class="di-num">Último dado</th><th class="di-num">Variação no período</th><th class="di-num">Mínimo</th><th class="di-num">Máximo</th><th class="di-num">Pontos</th></tr></thead>
+        <tbody data-draw="hist-tabela-serie"></tbody>
+      </table>
+    </div>
+    <p class="di-note vc-baixar"><button type="button" class="vc-botao" data-draw="csv" data-csv="historico-serie">Baixar a série em CSV</button><span>Separado por ponto e vírgula, com vírgula decimal, para abrir direto no Excel.</span></p>
+  </section>
+
+  <details class="di-details" id="hist-metodo">
+    <summary>Fontes e fórmulas</summary>
+    <p>DI: taxa de ajuste de cada contrato futuro de DI de 1 dia, do pregão indicado. A partir de 12/11/2026 vem das cotações da B3 (o ajuste do pregão anterior, lido a cada dia); as datas anteriores vêm do Boletim Diário do Mercado da B3. O prazo de cada contrato é contado em dias úteis a partir da data do pregão.</p>
+    <p>DI em prazo fixo (1, 2, 5 e 10 anos): interpolação em linha reta, por dias úteis, entre os dois contratos vizinhos daquele pregão. É uma conta mais simples que a spline da aba Curva DI Futuro, então pode diferir dela em frações de ponto-base.</p>
+    <p>Juro real: taxa de venda da manhã de cada NTN-B no Tesouro Direto, um dado por dia útil. Inflação implícita: (1 + DI no vencimento do título) dividido por (1 + juro real), menos 1, com o DI interpolado em linha reta pelo calendário; só existe nas datas em que há curva de DI gravada.</p>
+    <p>Treasuries: curva diária de rendimento ao par do Tesouro americano. IFIX: fechamentos da B3. Ibovespa: fechamentos do Yahoo Finance. Dólar: PTAX de venda do Banco Central. Esses três cobrem cerca de 13 meses.</p>
+    <p>Variação no período: para taxas, último dado menos o primeiro, em pontos-base; para índices e dólar, último dividido pelo primeiro, menos 1.</p>
+  </details>
+</div>
+
 <div class="di-page vc-painel" id="noticias" hidden>
   <header class="di-head">
     <h1 class="di-title" id="noticias-titulo">Principais notícias</h1>
@@ -1471,11 +1606,8 @@ const BASE = 252;
 
 // ---------- Cálculos (cada um aparece em Fontes com a própria fórmula) ----------
 
-dash.calc('curva', {
-  title: 'Curva interpolada por spline cúbica',
-  description: 'Taxa para cada dia útil entre o primeiro vértice e 5 anos, por spline cúbica natural sobre os vértices DI1: agora, no ajuste anterior e três meses atrás.',
-  inputs: ['di1', 'di1_3m'],
-  fn: (vertices, vertices3m) => {
+// A mesma conta serve à curva de 5 anos, de onde saem todos os números da página, e à de 10 anos, usada só no gráfico.
+const calcularCurva = (anos) => (vertices, vertices3m) => {
     const num = (c) => (c === null || c === undefined || c === '' ? NaN : +c);
     const pontos = vertices
       .map((v) => ({ du: num(v.du), agora: num(v.taxa), ant: num(v.ajuste_ant) }))
@@ -1518,7 +1650,7 @@ dash.calc('curva', {
       .sort((a, b) => a.du - b.du);
     const tresMeses = pontos3m.length >= 3 ? spline(pontos3m.map((p) => p.du), pontos3m.map((p) => p.taxa)) : null;
     const dentro3m = (du) => tresMeses && du >= pontos3m[0].du && du <= pontos3m[pontos3m.length - 1].du;
-    const fim = Math.min(5 * 252, dus[dus.length - 1]); // 5 anos de 252 dias úteis
+    const fim = Math.min(anos * 252, dus[dus.length - 1]); // anos de 252 dias úteis
     const linhas = [];
     for (let du = dus[0]; du <= fim; du++) {
       linhas.push({
@@ -1530,7 +1662,30 @@ dash.calc('curva', {
       });
     }
     return linhas;
+  };
+dash.calc('curva', {
+  title: 'Curva interpolada por spline cúbica',
+  description: 'Taxa para cada dia útil entre o primeiro vértice e 5 anos, por spline cúbica natural sobre os vértices DI1: agora, no ajuste anterior e três meses atrás.',
+  inputs: ['di1', 'di1_3m'],
+  fn: calcularCurva(ANOS),
+});
+dash.calc('di1_dez', {
+  title: 'Vértices DI1 até 10 anos',
+  description: 'Contratos DI1 com vencimento dentro de 10 anos, mais o primeiro depois desse prazo, para o gráfico de 10 anos.',
+  inputs: ['di1_longo', 'di1'],
+  fn: (longos, curtos) => {
+    if (!longos.length || !curtos.length) return [];
+    const detalhe = new Map(curtos.map((v) => [v.ticker, v]));
+    const ordenados = longos.map((v) => ({ ...v, ...(detalhe.get(v.ticker) || {}), cotacao_em: curtos[0].cotacao_em })).sort((a, b) => +a.du - +b.du);
+    const fim = ordenados.findIndex((v) => +v.du >= 10 * BASE);
+    return fim < 0 ? ordenados : ordenados.slice(0, fim + 1);
   },
+});
+dash.calc('curva_dez', {
+  title: 'Curva interpolada até 10 anos',
+  description: 'A mesma spline cúbica natural, passando também pelos vértices entre 5 e 10 anos. Serve só ao gráfico de 10 anos.',
+  inputs: ['di1_dez', 'di1_3m_longo'],
+  fn: calcularCurva(10),
 });
 
 dash.calc('prazos', {
@@ -1573,11 +1728,7 @@ dash.calc('variacao', {
     .map((v) => ({ ticker: v.ticker, var_bps: +((+v.taxa - +v.ajuste_ant) * 100).toFixed(1) })),
 });
 
-dash.calc('cdi_por_data', {
-  title: 'CDI médio projetado até cada data',
-  description: 'Para cada dia dos próximos 5 anos: dias úteis desde a cotação, CDI médio anualizado lido na curva interpolada e CDI acumulado no período.',
-  inputs: ['di1', 'curva'],
-  fn: (vertices, curva) => {
+const calcularCdiPorData = (vertices, curva) => {
     if (!vertices.length || !curva || !curva.length) return [];
     const dia = 86400000;
     const iso = (t) => new Date(t).toISOString().slice(0, 10);
@@ -1610,7 +1761,7 @@ dash.calc('cdi_por_data', {
     const linhas = [];
     let t = Date.UTC(ano0, mes0 - 1, dia0);
     let du = 0; // dias úteis da data da cotação (inclusive) até a data da linha (exclusive)
-    while (linhas.length < 4000) {
+    while (linhas.length < 6000) {
       if (util(t)) du++;
       t += dia;
       if (du > ultimoDu) break;
@@ -1626,7 +1777,18 @@ dash.calc('cdi_por_data', {
       });
     }
     return linhas;
-  },
+  };
+dash.calc('cdi_por_data', {
+  title: 'CDI médio projetado até cada data',
+  description: 'Para cada dia dos próximos 5 anos: dias úteis desde a cotação, CDI médio anualizado lido na curva interpolada e CDI acumulado no período.',
+  inputs: ['di1', 'curva'],
+  fn: calcularCdiPorData,
+});
+dash.calc('cdi_por_data_dez', {
+  title: 'Datas da curva de 10 anos',
+  description: 'A mesma conta sobre a curva de 10 anos; dá a data de cada prazo no arquivo CSV do gráfico de 10 anos.',
+  inputs: ['di1_dez', 'curva_dez'],
+  fn: calcularCdiPorData,
 });
 
 dash.calc('copom_implicito', {
@@ -2006,9 +2168,27 @@ dash.draw('tabela-vertices', (corpo) => {
 
 // ---------- Gráfico ----------
 
+// Horizonte do gráfico: 5 anos (padrão) ou 10. As tabelas e os demais números usam sempre a curva de 5 anos.
+let horizonte = ANOS;
+const temDezAnos = () => { const g = dash.data('curva_dez'); return g.status === 'ok' && !!g.data && g.data.length > 1 && g.data[g.data.length - 1].du > ANOS * BASE; };
+const horizonteEmUso = () => (horizonte === 10 && temDezAnos() ? 10 : ANOS);
+VC.horizonteDI = horizonteEmUso;
+dash.draw('di-horizonte', (el) => { el.textContent = String(horizonteEmUso()); });
+dash.draw('di-horizonte-nota', (el) => { el.hidden = horizonteEmUso() !== 10; });
+dash.draw('di-horizonte-botao', (botao) => {
+  const anos = +botao.dataset.anos;
+  botao.disabled = anos === 10 && !temDezAnos();
+  botao.setAttribute('aria-pressed', String(horizonteEmUso() === anos));
+  botao.onclick = () => {
+    horizonte = anos;
+    ['grafico', 'di-horizonte', 'di-horizonte-nota', 'di-horizonte-botao'].forEach((nome) => dash.draw(nome));
+  };
+});
+
 dash.draw('grafico', (el) => {
-  const v = dash.data('di1');
-  const c = dash.data('curva');
+  const ANOS = horizonteEmUso();   // dentro do gráfico, o horizonte escolhido
+  const v = dash.data(ANOS === 10 ? 'di1_dez' : 'di1');
+  const c = dash.data(ANOS === 10 ? 'curva_dez' : 'curva');
   const pronto = v.status === 'ok' && c.status === 'ok' && c.data && c.data.length > 1;
   if (!pronto) {
     const aviso = document.createElement('p');
@@ -3157,11 +3337,31 @@ dash.draw('grafico', (el) => {
     lista.replaceChildren(...nos);
   });
 
+  // Agenda: decisões do Copom e do FOMC (já usadas nas outras abas) e divulgações dos EUA pelo calendário do FRED.
+  dash.draw('rs-agenda', (corpo) => {
+    const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());   // AAAA-MM-DD em Brasília
+    const EVENTOS = {
+      payroll: ['Payroll: emprego nos Estados Unidos', 'FRED (divulgação do BLS)'],
+      cpi: ['CPI: inflação ao consumidor nos Estados Unidos', 'FRED (divulgação do BLS)'],
+      pce: ['PCE: renda e gastos pessoais nos Estados Unidos, com o núcleo do PCE', 'FRED (divulgação do BEA)'],
+    };
+    const itens = [];
+    linhas('copom').map((r) => String(r.data)).filter((d) => d >= hoje).sort().slice(0, 2)
+      .forEach((d) => itens.push({ chave: 'copom ' + d, data: d, evento: 'Copom: decisão da taxa Selic', fonte: 'Banco Central' }));
+    linhas('eua_fomc').filter((r) => r.data >= hoje).sort((a, b) => (a.data < b.data ? -1 : 1)).slice(0, 2)
+      .forEach((r) => itens.push({ chave: 'fomc ' + r.data, data: r.data, evento: 'FOMC: decisão dos Fed funds' + (r.sep ? ', com projeções e dot plot novos' : ''), fonte: 'Federal Reserve' }));
+    linhas('agenda').filter((r) => r.data >= hoje && EVENTOS[r.evento])
+      .forEach((r) => itens.push({ chave: r.chave, data: r.data, evento: EVENTOS[r.evento][0], fonte: EVENTOS[r.evento][1] }));
+    itens.sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0));
+    const faltam = (d) => { const n = Math.round((VC.ms(d) - VC.ms(hoje)) / 86400000); return n === 0 ? 'hoje' : n === 1 ? '1 dia' : n + ' dias'; };
+    tabela(corpo, itens, 'chave', [[(r) => data(r.data), 'di-strong'], [(r) => r.evento, ''], [(r) => faltam(r.data), 'di-num'], [(r) => r.fonte, '']]);
+  });
+
   const BLOCOS = {
     curva_di: 'curva DI (B3)', ntnb: 'NTN-B (Tesouro Direto)', fed_funds: 'Fed funds (NY Fed)', treasuries: 'Treasuries (Tesouro americano)', fomc: 'dot plot e calendário do Fed',
     futuros_fed: 'futuros de Fed funds (Yahoo Finance)', macro_eua: 'inflação e emprego dos EUA (BLS)', inflacao_br: 'inflação brasileira (Banco Central)', ibovespa: 'Ibovespa (B3)',
     papeis_br: 'ações do Ibovespa (B3)', historico_br: 'dólar e histórico do Ibovespa', ifix: 'IFIX (B3)', fiis: 'fundos do IFIX (B3)', historico_fii: 'CDI e histórico do IFIX',
-    focus: 'Focus (Banco Central)', noticias: 'notícias',
+    focus: 'Focus (Banco Central)', agenda: 'agenda de divulgações (FRED)', noticias: 'notícias',
   };
   dash.draw('rs-fontes', (el) => {
     const status = valor('status') || {}, nomes = Object.keys(BLOCOS).filter((n) => status[n]);
@@ -3206,6 +3406,194 @@ dash.draw('grafico', (el) => {
 
 </script>
 <script>
+// ---------- Aba Histórico ----------
+// O histórico fica num arquivo à parte (historico.json), lido só quando a aba é aberta.
+(() => {
+  const { num, nf, ok, fmt, pct, bps, varPct, reais, data, ms, linhas, tabela, aviso, grafico, MESES, INDISPONIVEL } = VC;
+  const BASE = 252, DIA = 86400000;
+  const pct3 = (v) => (ok(v) ? nf(3).format(v) + '%' : INDISPONIVEL);
+  const NOMES = ['hist-estado', 'hist-data', 'hist-rotulo', 'hist-grafico-curvas', 'hist-tabela-curvas', 'hist-serie', 'hist-grafico-serie', 'hist-tabela-serie', 'csv'];
+  const redesenhar = () => NOMES.forEach((n) => dash.draw(n));
+
+  let H = null, estado = 'ocioso';   // ocioso, carregando, pronto ou falhou
+  const carregar = () => {
+    if (estado !== 'ocioso') return;
+    estado = 'carregando';
+    redesenhar();
+    fetch('historico.json', { cache: 'no-cache' })
+      .then((r) => { if (!r.ok) throw new Error('resposta ' + r.status); return r.json(); })
+      .then((j) => { H = { di: j.di || {}, ntnb: j.ntnb || {}, ust: j.ust || {} }; estado = 'pronto'; })
+      .catch(() => { estado = 'falhou'; })
+      .then(redesenhar);
+  };
+  const conferir = () => { const p = document.getElementById('historico'); if (p && !p.hidden) carregar(); };
+  window.addEventListener('hashchange', () => setTimeout(conferir, 0));
+  dash.onData(() => setTimeout(conferir, 0));
+  const mensagem = () => (estado === 'falhou' ? 'indisponível: o arquivo de histórico não pôde ser lido' : 'Carregando o histórico…');
+
+  // ----- Curvas de DI por data -----
+  const datasDI = () => (H ? Object.keys(H.di).sort() : []);
+  const curvaDe = (d) => ((H && H.di[d]) || []).map(([venc, du, taxa]) => ({ venc, du: +du, taxa: +taxa, t: ms(venc) }))
+    .filter((p) => isFinite(p.du) && isFinite(p.taxa)).sort((a, b) => a.du - b.du);
+  // Interpolação em linha reta entre dois pontos vizinhos, pelo campo indicado (dias úteis ou data do vencimento). Fora do intervalo não há valor.
+  const interpolar = (curva, campo, alvo) => {
+    if (curva.length < 2 || alvo < curva[0][campo] || alvo > curva[curva.length - 1][campo]) return null;
+    const i = curva.findIndex((p) => p[campo] >= alvo);
+    if (curva[i][campo] === alvo) return curva[i].taxa;
+    const a = curva[i - 1], b = curva[i];
+    return a.taxa + ((b.taxa - a.taxa) * (alvo - a[campo])) / (b[campo] - a[campo]);
+  };
+  const escolha = { a: null, b: null };
+  const escolhida = (qual) => {
+    const ds = datasDI();
+    if (!ds.length) return null;
+    if (escolha[qual] && H.di[escolha[qual]]) return escolha[qual];
+    if (qual === 'a') return ds[ds.length - 1];
+    // padrão da comparação: a data gravada mais próxima de um mês antes da primeira
+    const alvo = ms(escolhida('a')) - 30 * DIA;
+    const antes = ds.filter((d) => ms(d) <= alvo);
+    return antes.length ? antes[antes.length - 1] : ds[0];
+  };
+
+  dash.draw('hist-estado', (el) => {
+    const campo = el.dataset.campo;
+    if (campo === 'aviso') { el.hidden = estado !== 'falhou'; el.textContent = estado === 'falhou' ? 'O arquivo de histórico não pôde ser lido agora. As outras abas não dependem dele.' : ''; return; }
+    if (estado !== 'pronto') { el.textContent = estado === 'falhou' ? INDISPONIVEL : '…'; return; }
+    const todas = [...Object.keys(H.di), ...Object.keys(H.ntnb), ...Object.keys(H.ust)].sort();
+    el.textContent = todas.length ? data(campo === 'inicio' ? todas[0] : todas[todas.length - 1]) : INDISPONIVEL;
+  });
+
+  dash.draw('hist-data', (sel) => {
+    const ds = datasDI().slice().reverse(), qual = sel.dataset.qual;
+    sel.disabled = estado !== 'pronto' || !ds.length;
+    if (sel.disabled) { sel.replaceChildren(); return; }
+    if (sel.options.length !== ds.length) sel.replaceChildren(...ds.map((d) => { const o = document.createElement('option'); o.value = d; o.textContent = data(d); return o; }));
+    if (document.activeElement !== sel) sel.value = escolhida(qual);
+    sel.onchange = () => { escolha[qual] = sel.value; ['hist-rotulo', 'hist-grafico-curvas', 'hist-tabela-curvas'].forEach((n) => dash.draw(n)); };
+  });
+  dash.draw('hist-rotulo', (el) => { const d = estado === 'pronto' ? escolhida(el.dataset.qual) : null; el.textContent = d ? data(d) : '—'; });
+
+  dash.draw('hist-grafico-curvas', (el) => {
+    if (estado !== 'pronto') return aviso(el, mensagem());
+    const dA = escolhida('a'), dB = escolhida('b');
+    if (!dA) return aviso(el, INDISPONIVEL);
+    const A = curvaDe(dA), B = dB ? curvaDe(dB) : [];   // a leitura por ponteiro interpola na curva inteira; o desenho vai até 10 anos
+    const pontos = (c) => c.filter((p) => p.du <= 10 * BASE).map((p) => ({ x: p.du / BASE, y: p.taxa }));
+    grafico(el, {
+      rotulo: `Curva de ajuste do DI em ${data(dA)}` + (dB ? ` e em ${data(dB)}` : '') + ', por prazo, até 10 anos.',
+      x: { dominio: [0, 10], marcas: d3.range(0, 11).map((a) => ({ v: a, rotulo: a === 0 ? '0' : a === 1 ? '1 ano' : a + ' anos', curto: a === 0 ? '0' : a + 'a' })) },
+      y: { sufixo: '%', folgaMin: 0.05 },
+      series: [
+        { classe: 'di-line-3m', pontos: pontos(B), curva: 'monotona' },
+        { classe: 'di-line', pontos: pontos(A), curva: 'monotona', marcadores: true },
+      ],
+      dica: (xv) => {
+        const du = Math.round(xv * BASE), a = interpolar(A, 'du', du), b = interpolar(B, 'du', du);
+        if (a === null && b === null) return null;
+        return {
+          x: du / BASE, titulo: `${nf(2).format(du / BASE)} anos`, sub: `${nf(0).format(du)} dias úteis · interpolado`,
+          pontos: [{ y: a }, { y: b, classe: 'di-focus-3m' }],
+          linhas: [[data(dA), pct3(a)], [dB ? data(dB) : '—', pct3(b)], ['Diferença', a === null || b === null ? INDISPONIVEL : bps((a - b) * 100, 1)]],
+        };
+      },
+    });
+  });
+
+  dash.draw('hist-tabela-curvas', (corpo) => {
+    const dA = estado === 'pronto' ? escolhida('a') : null, dB = dA ? escolhida('b') : null;
+    if (!dA) return tabela(corpo, [], 'prazo', [[() => '', ''], [() => '', ''], [() => '', ''], [() => '', '']]);
+    const A = curvaDe(dA), B = dB ? curvaDe(dB) : [];
+    const registros = [[0.5, '6 meses'], [1, '1 ano'], [2, '2 anos'], [3, '3 anos'], [5, '5 anos'], [7, '7 anos'], [10, '10 anos']].map(([anos, nome]) => {
+      const a = interpolar(A, 'du', anos * BASE), b = interpolar(B, 'du', anos * BASE);
+      return { prazo: nome, a, b, dif: a === null || b === null ? null : +((a - b) * 100).toFixed(1) };
+    });
+    tabela(corpo, registros, 'prazo', [[(r) => r.prazo, ''], [(r) => pct3(r.a), 'di-num di-strong'], [(r) => pct3(r.b), 'di-num'], [(r) => bps(r.dif, 1), 'di-num di-strong']]);
+  });
+
+  // ----- Evolução de um indicador -----
+  // Cada série devolve pontos {data, v}. tipo "taxa": variação em pontos-base; "indice": variação em %.
+  const series = () => {
+    const lista = [];
+    const por = (id, grupo, nome, tipo, formato, pontos) => lista.push({ id, grupo, nome, tipo, formato, pontos });
+    [[1, '1 ano'], [2, '2 anos'], [5, '5 anos'], [10, '10 anos']].forEach(([anos, nome]) => por('di-' + anos, 'Juros no Brasil', `DI de ${nome} (ajuste)`, 'taxa', pct3,
+      () => datasDI().map((d) => ({ data: d, v: interpolar(curvaDe(d), 'du', anos * BASE) }))));
+    linhas('br_real').forEach((t) => {
+      const rotulo = `${t.titulo} ${t.vencimento.slice(0, 4)}`;
+      por('real-' + t.chave, 'Juro real (NTN-B)', `Juro real, ${rotulo}`, 'taxa', pct,
+        () => Object.keys(H.ntnb).sort().map((d) => ({ data: d, v: H.ntnb[d][t.chave] === undefined ? null : +H.ntnb[d][t.chave] })));
+      por('impl-' + t.chave, 'Inflação implícita (NTN-B)', `Inflação implícita até ${t.vencimento.slice(0, 4)}, ${t.titulo}`, 'taxa', pct,
+        () => datasDI().filter((d) => H.ntnb[d] && H.ntnb[d][t.chave] !== undefined).map((d) => {
+          const nominal = interpolar(curvaDe(d).sort((a, b) => a.t - b.t), 't', ms(t.vencimento)), real = +H.ntnb[d][t.chave];
+          return { data: d, v: nominal === null ? null : +(((1 + nominal / 100) / (1 + real / 100) - 1) * 100).toFixed(2) };
+        }));
+    });
+    [['2 Yr', '2 anos'], ['10 Yr', '10 anos'], ['30 Yr', '30 anos']].forEach(([prazo, nome]) => por('ust-' + prazo, 'Juros nos Estados Unidos', `Treasury de ${nome}`, 'taxa', pct,
+      () => Object.keys(H.ust).sort().map((d) => ({ data: d, v: H.ust[d][prazo] === undefined ? null : +H.ust[d][prazo] }))));
+    por('ifix', 'Bolsa e câmbio', 'IFIX (fechamento)', 'indice', (v) => (ok(v) ? nf(2).format(v) : INDISPONIVEL), () => linhas('br_ifix_hist').map((p) => ({ data: p.data, v: num(p.fechamento) })));
+    por('ibov', 'Bolsa e câmbio', 'Ibovespa (fechamento)', 'indice', (v) => (ok(v) ? nf(0).format(v) : INDISPONIVEL), () => linhas('br_ibov_hist').map((p) => ({ data: p.data, v: num(p.fechamento) })));
+    por('dolar', 'Bolsa e câmbio', 'Dólar PTAX, venda', 'indice', (v) => reais(v, 4), () => linhas('br_dolar').map((p) => ({ data: p.data, v: num(p.valor) })));
+    return lista;
+  };
+  let serieEscolhida = 'di-5', meses = 12;
+  const atual = () => {
+    if (estado !== 'pronto') return null;
+    const lista = series(), s = lista.find((x) => x.id === serieEscolhida) || lista[0];
+    let pontos = s.pontos().filter((p) => ok(p.v));
+    if (meses && pontos.length) { const corte = ms(pontos[pontos.length - 1].data) - meses * 30.44 * DIA; pontos = pontos.filter((p) => ms(p.data) >= corte); }
+    return { ...s, pontos };
+  };
+  VC.historicoSerie = atual;
+
+  dash.draw('hist-serie', (sel) => {
+    sel.disabled = estado !== 'pronto';
+    if (sel.disabled) { sel.replaceChildren(); return; }
+    const lista = series();
+    if (sel.querySelectorAll('option').length !== lista.length) {
+      const grupos = new Map();
+      lista.forEach((s) => {
+        if (!grupos.has(s.grupo)) { const g = document.createElement('optgroup'); g.label = s.grupo; grupos.set(s.grupo, g); }
+        const o = document.createElement('option'); o.value = s.id; o.textContent = s.nome; grupos.get(s.grupo).append(o);
+      });
+      sel.replaceChildren(...grupos.values());
+    }
+    if (document.activeElement !== sel) sel.value = (lista.find((x) => x.id === serieEscolhida) || lista[0]).id;
+    sel.onchange = () => { serieEscolhida = sel.value; ['hist-grafico-serie', 'hist-tabela-serie', 'csv'].forEach((n) => dash.draw(n)); };
+  });
+  dash.draw('hist-periodo', (sel) => {
+    sel.onchange = () => { meses = +sel.value; ['hist-grafico-serie', 'hist-tabela-serie', 'csv'].forEach((n) => dash.draw(n)); };
+  });
+
+  dash.draw('hist-grafico-serie', (el) => {
+    if (estado !== 'pronto') return aviso(el, mensagem());
+    const s = atual();
+    if (!s || s.pontos.length < 2) return aviso(el, 'indisponível: menos de dois pontos neste período');
+    const pts = s.pontos.map((p) => ({ x: ms(p.data), y: p.v, data: p.data }));
+    const marcas = [];
+    pts.forEach((p, i) => { if (i > 0 && p.data.slice(0, 7) !== pts[i - 1].data.slice(0, 7)) marcas.push({ v: ms(p.data.slice(0, 7) + '-01'), rotulo: MESES[+p.data.slice(5, 7) - 1] + '/' + p.data.slice(2, 4) }); });
+    grafico(el, {
+      rotulo: `${s.nome}, de ${data(pts[0].data)} a ${data(pts[pts.length - 1].data)}.`,
+      x: { dominio: [pts[0].x, pts[pts.length - 1].x], marcas },
+      y: s.tipo === 'taxa' ? { sufixo: '%', folgaMin: 0.05 } : { folgaMin: 0.01 },
+      series: [{ classe: 'di-line', pontos: pts, marcadores: pts.length <= 70 }],
+      encaixes: pts.map((p) => p.x),
+      dica: (xv) => { const p = pts.find((q) => q.x === xv); return p ? { x: p.x, titulo: data(p.data), pontos: [{ y: p.y }], linhas: [[s.nome, s.formato(p.y)]] } : null; },
+    });
+  });
+
+  dash.draw('hist-tabela-serie', (corpo) => {
+    const s = atual();
+    if (!s || !s.pontos.length) return tabela(corpo, [], 'id', new Array(7).fill([() => '', '']));
+    const p = s.pontos, a = p[0], u = p[p.length - 1], vs = p.map((x) => x.v);
+    const variacao = s.tipo === 'taxa' ? bps((u.v - a.v) * 100, 1) : varPct((u.v / a.v - 1) * 100);
+    tabela(corpo, [{ id: s.id }], 'id', [
+      [() => s.nome, ''], [() => `${s.formato(a.v)} em ${data(a.data)}`, 'di-num'], [() => `${s.formato(u.v)} em ${data(u.data)}`, 'di-num di-strong'],
+      [() => variacao, 'di-num di-strong'], [() => s.formato(Math.min(...vs)), 'di-num'], [() => s.formato(Math.max(...vs)), 'di-num'], [() => String(p.length), 'di-num'],
+    ]);
+  });
+})();
+
+</script>
+<script>
 // ---------- Botões "Baixar em CSV" ----------
 // O arquivo é montado no navegador com os mesmos dados e cálculos que a página mostra.
 // Formato para abrir direto no Excel em português: ponto e vírgula entre as colunas, vírgula decimal e UTF-8 com marca de ordem.
@@ -3218,13 +3606,14 @@ dash.draw('grafico', (el) => {
   const ARQUIVOS = {
     // Curva DI interpolada: uma linha por dia útil, com as três curvas do gráfico.
     'curva-di': () => {
-      const cot = linhas('di1')[0], tresMeses = linhas('di1_3m')[0];
-      const dataDoPrazo = new Map(linhas('cdi_por_data').map((l) => [l.du, l.data]));   // fica a última data de cada prazo, que é o dia útil
+      const dez = VC.horizonteDI && VC.horizonteDI() === 10;   // o arquivo acompanha o horizonte escolhido no gráfico
+      const cot = linhas('di1')[0], tresMeses = linhas(dez ? 'di1_3m_longo' : 'di1_3m')[0];
+      const dataDoPrazo = new Map(linhas(dez ? 'cdi_por_data_dez' : 'cdi_por_data').map((l) => [l.du, l.data]));   // fica a última data de cada prazo, que é o dia útil
       return {
-        nome: 'curva-di-' + (cot ? String(cot.cotacao_em).slice(0, 10) : 'sem-data') + '.csv',
+        nome: 'curva-di-' + (dez ? '10-anos-' : '') + (cot ? String(cot.cotacao_em).slice(0, 10) : 'sem-data') + '.csv',
         cabecalho: ['Dias úteis', 'Data', `Taxa agora, cotação de ${cot ? dataHora(cot.cotacao_em) : ''} (% a.a.)`, 'Ajuste anterior (% a.a.)',
           `Ajuste de ${dia(tresMeses && tresMeses.data_ref)}, mesmo prazo em dias úteis (% a.a.)`],
-        registros: linhas('curva').map((l) => [l.du, dia(dataDoPrazo.get(l.du)), dec(l.taxa), dec(l.taxa_ant), dec(l.taxa_3m)]),
+        registros: linhas(dez ? 'curva_dez' : 'curva').map((l) => [l.du, dia(dataDoPrazo.get(l.du)), dec(l.taxa), dec(l.taxa_ant), dec(l.taxa_3m)]),
       };
     },
     // Todos os vencimentos de DI cotados, inclusive os que passam de 5 anos.
@@ -3249,6 +3638,16 @@ dash.draw('grafico', (el) => {
           `DI no mesmo vencimento, ajuste de ${dia(d.di_ref)} (% a.a.)`, 'Inflação implícita (% a.a.)',
           `DI no mesmo vencimento, ajuste de ${dia(d.di_3m)} (% a.a.)`, 'Inflação implícita há 3 meses (% a.a.)'],
         registros: linhas('br_real').map((r) => [r.titulo, dia(r.vencimento), dec(r.real), dec(r.real_3m), dec(r.di), dec(r.implicita), dec(r.di_3m), dec(r.implicita_3m)]),
+      };
+    },
+    // Aba Histórico: a série escolhida, no período escolhido.
+    'historico-serie': () => {
+      const s = VC.historicoSerie ? VC.historicoSerie() : null;
+      if (!s) return { nome: 'historico.csv', cabecalho: [], registros: [] };
+      return {
+        nome: 'historico-' + s.id.replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.csv',
+        cabecalho: ['Data', s.nome + (s.tipo === 'taxa' ? ' (% a.a.)' : '')],
+        registros: s.pontos.map((p) => [dia(p.data), dec(p.v)]),
       };
     },
     // Treasuries: rendimento por prazo na data de referência, no dia anterior e três meses antes.

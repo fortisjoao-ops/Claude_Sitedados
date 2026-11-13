@@ -110,11 +110,31 @@
     lista.replaceChildren(...nos);
   });
 
+  // Agenda: decisões do Copom e do FOMC (já usadas nas outras abas) e divulgações dos EUA pelo calendário do FRED.
+  dash.draw('rs-agenda', (corpo) => {
+    const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());   // AAAA-MM-DD em Brasília
+    const EVENTOS = {
+      payroll: ['Payroll: emprego nos Estados Unidos', 'FRED (divulgação do BLS)'],
+      cpi: ['CPI: inflação ao consumidor nos Estados Unidos', 'FRED (divulgação do BLS)'],
+      pce: ['PCE: renda e gastos pessoais nos Estados Unidos, com o núcleo do PCE', 'FRED (divulgação do BEA)'],
+    };
+    const itens = [];
+    linhas('copom').map((r) => String(r.data)).filter((d) => d >= hoje).sort().slice(0, 2)
+      .forEach((d) => itens.push({ chave: 'copom ' + d, data: d, evento: 'Copom: decisão da taxa Selic', fonte: 'Banco Central' }));
+    linhas('eua_fomc').filter((r) => r.data >= hoje).sort((a, b) => (a.data < b.data ? -1 : 1)).slice(0, 2)
+      .forEach((r) => itens.push({ chave: 'fomc ' + r.data, data: r.data, evento: 'FOMC: decisão dos Fed funds' + (r.sep ? ', com projeções e dot plot novos' : ''), fonte: 'Federal Reserve' }));
+    linhas('agenda').filter((r) => r.data >= hoje && EVENTOS[r.evento])
+      .forEach((r) => itens.push({ chave: r.chave, data: r.data, evento: EVENTOS[r.evento][0], fonte: EVENTOS[r.evento][1] }));
+    itens.sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0));
+    const faltam = (d) => { const n = Math.round((VC.ms(d) - VC.ms(hoje)) / 86400000); return n === 0 ? 'hoje' : n === 1 ? '1 dia' : n + ' dias'; };
+    tabela(corpo, itens, 'chave', [[(r) => data(r.data), 'di-strong'], [(r) => r.evento, ''], [(r) => faltam(r.data), 'di-num'], [(r) => r.fonte, '']]);
+  });
+
   const BLOCOS = {
     curva_di: 'curva DI (B3)', ntnb: 'NTN-B (Tesouro Direto)', fed_funds: 'Fed funds (NY Fed)', treasuries: 'Treasuries (Tesouro americano)', fomc: 'dot plot e calendário do Fed',
     futuros_fed: 'futuros de Fed funds (Yahoo Finance)', macro_eua: 'inflação e emprego dos EUA (BLS)', inflacao_br: 'inflação brasileira (Banco Central)', ibovespa: 'Ibovespa (B3)',
     papeis_br: 'ações do Ibovespa (B3)', historico_br: 'dólar e histórico do Ibovespa', ifix: 'IFIX (B3)', fiis: 'fundos do IFIX (B3)', historico_fii: 'CDI e histórico do IFIX',
-    focus: 'Focus (Banco Central)', noticias: 'notícias',
+    focus: 'Focus (Banco Central)', agenda: 'agenda de divulgações (FRED)', noticias: 'notícias',
   };
   dash.draw('rs-fontes', (el) => {
     const status = valor('status') || {}, nomes = Object.keys(BLOCOS).filter((n) => status[n]);

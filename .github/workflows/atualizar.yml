@@ -35,20 +35,21 @@ jobs:
           BLS_KEY: ${{ secrets.BLS_KEY }}
           FRED_KEY: ${{ secrets.FRED_KEY }}
           MODO: ${{ (github.event.schedule == '45 11 * * *' || inputs.noticias) && 'noticias' || '' }}
+          HISTORICO: site/historico.json
         run: |
           python3 -I atualizar.py site/index.html site/index.html $MODO | tee saida.txt
           grep -qE '^(UPDATED|UNCHANGED)' saida.txt
           rm saida.txt
 
-      - name: Gravar a página atualizada no repositório
+      - name: Gravar a página e o histórico no repositório
         shell: bash
         run: |
-          if git diff --quiet -- site/index.html; then
+          if [ -z "$(git status --porcelain -- site/index.html site/historico.json)" ]; then
             echo "Nenhum dado mudou; nada a gravar."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/index.html
+          git add site/index.html site/historico.json
           git commit -m "Dados de $(TZ=America/Sao_Paulo date '+%d/%m/%Y %H:%M')"
           git push

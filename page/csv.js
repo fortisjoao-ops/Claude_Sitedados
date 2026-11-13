@@ -10,13 +10,14 @@
   const ARQUIVOS = {
     // Curva DI interpolada: uma linha por dia útil, com as três curvas do gráfico.
     'curva-di': () => {
-      const cot = linhas('di1')[0], tresMeses = linhas('di1_3m')[0];
-      const dataDoPrazo = new Map(linhas('cdi_por_data').map((l) => [l.du, l.data]));   // fica a última data de cada prazo, que é o dia útil
+      const dez = VC.horizonteDI && VC.horizonteDI() === 10;   // o arquivo acompanha o horizonte escolhido no gráfico
+      const cot = linhas('di1')[0], tresMeses = linhas(dez ? 'di1_3m_longo' : 'di1_3m')[0];
+      const dataDoPrazo = new Map(linhas(dez ? 'cdi_por_data_dez' : 'cdi_por_data').map((l) => [l.du, l.data]));   // fica a última data de cada prazo, que é o dia útil
       return {
-        nome: 'curva-di-' + (cot ? String(cot.cotacao_em).slice(0, 10) : 'sem-data') + '.csv',
+        nome: 'curva-di-' + (dez ? '10-anos-' : '') + (cot ? String(cot.cotacao_em).slice(0, 10) : 'sem-data') + '.csv',
         cabecalho: ['Dias úteis', 'Data', `Taxa agora, cotação de ${cot ? dataHora(cot.cotacao_em) : ''} (% a.a.)`, 'Ajuste anterior (% a.a.)',
           `Ajuste de ${dia(tresMeses && tresMeses.data_ref)}, mesmo prazo em dias úteis (% a.a.)`],
-        registros: linhas('curva').map((l) => [l.du, dia(dataDoPrazo.get(l.du)), dec(l.taxa), dec(l.taxa_ant), dec(l.taxa_3m)]),
+        registros: linhas(dez ? 'curva_dez' : 'curva').map((l) => [l.du, dia(dataDoPrazo.get(l.du)), dec(l.taxa), dec(l.taxa_ant), dec(l.taxa_3m)]),
       };
     },
     // Todos os vencimentos de DI cotados, inclusive os que passam de 5 anos.
@@ -41,6 +42,16 @@
           `DI no mesmo vencimento, ajuste de ${dia(d.di_ref)} (% a.a.)`, 'Inflação implícita (% a.a.)',
           `DI no mesmo vencimento, ajuste de ${dia(d.di_3m)} (% a.a.)`, 'Inflação implícita há 3 meses (% a.a.)'],
         registros: linhas('br_real').map((r) => [r.titulo, dia(r.vencimento), dec(r.real), dec(r.real_3m), dec(r.di), dec(r.implicita), dec(r.di_3m), dec(r.implicita_3m)]),
+      };
+    },
+    // Aba Histórico: a série escolhida, no período escolhido.
+    'historico-serie': () => {
+      const s = VC.historicoSerie ? VC.historicoSerie() : null;
+      if (!s) return { nome: 'historico.csv', cabecalho: [], registros: [] };
+      return {
+        nome: 'historico-' + s.id.replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.csv',
+        cabecalho: ['Data', s.nome + (s.tipo === 'taxa' ? ' (% a.a.)' : '')],
+        registros: s.pontos.map((p) => [dia(p.data), dec(p.v)]),
       };
     },
     // Treasuries: rendimento por prazo na data de referência, no dia anterior e três meses antes.
