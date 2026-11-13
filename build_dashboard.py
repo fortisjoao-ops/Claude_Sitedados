@@ -2,7 +2,9 @@
 # Uso: python3 build_dashboard.py <pagina-com-DADOS-atuais.html> <saida.html> [d3-local.js]
 import re, json, sys
 src, out = sys.argv[1], sys.argv[2]
-d3local = sys.argv[3] if len(sys.argv) > 3 else None
+# Terceiro argumento: 'site' gera um documento HTML completo (para hospedar fora do artifact); um caminho de d3 gera a página de teste local.
+site = len(sys.argv) > 3 and sys.argv[3] == 'site'
+d3local = sys.argv[3] if len(sys.argv) > 3 and not site else None
 P = lambda n: open('page/' + n, encoding='utf-8').read()
 
 antigo = open('build_public.py', encoding='utf-8').read()
@@ -105,5 +107,9 @@ scripts += '<script>\n' + abas_js + '\n</script>\n'
 html_final = head + '<style>\n' + tokens + P('style.css') + brand_css + P('tabs.css') + '</style>\n' + corpo + d3tag + '\n' + scripts
 if d3local:
     html_final = '<!doctype html><html><head><meta charset="utf8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style></head><body>' + html_final + '</body></html>'
+if site:
+    html_final = ('<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n'
+                  '<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>\n' + html_final.replace('<meta name="claude:viewport-fit-sides" content="cover">\n', '')
+                  .replace('<div class="di-wrap">', '</head>\n<body>\n<div class="di-wrap">', 1) + '</body>\n</html>\n')
 open(out, 'w', encoding='utf-8').write(html_final)
 print(len(html_final), 'bytes;', len(json.dumps(dados, ensure_ascii=False, separators=(',', ':'))), 'de dados')
