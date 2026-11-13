@@ -1,0 +1,69 @@
+  <header class="di-head">
+    <h1 class="di-title" id="inflacao-titulo">Inflação no Brasil</h1>
+    <p class="di-lede" id="inflacao-resumo">O IPCA de <b data-draw="inf-mes-ref">—</b> foi de <b data-draw="inf-valor" data-serie="ipca">—</b> no mês e acumula <b data-draw="inf-valor" data-serie="ipca_12m">—</b> em 12 meses. A meta de inflação é de <b data-draw="inf-meta">—</b> e a Selic está em <b data-draw="inf-selic">—</b>.</p>
+    <p class="di-stamp" id="inflacao-carimbo">Séries do Banco Central (SGS), com o último mês publicado de cada índice. Data em que o IBGE divulgou o IPCA: <span data-draw="inf-divulgacao">—</span>.</p>
+  </header>
+
+  <section class="di-tiles" id="inflacao-destaques" aria-label="Índices de inflação">
+    <div class="di-tile">
+      <div class="di-tile-label">IPCA no mês, <span data-draw="inf-mes" data-serie="ipca">—</span></div>
+      <div class="di-tile-num" data-draw="inf-valor" data-serie="ipca">—</div>
+      <div class="di-tile-sub">mês anterior: <span data-draw="inf-anterior" data-serie="ipca">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">IPCA em 12 meses, <span data-draw="inf-mes" data-serie="ipca_12m">—</span></div>
+      <div class="di-tile-num" data-draw="inf-valor" data-serie="ipca_12m">—</div>
+      <div class="di-tile-sub">mês anterior: <span data-draw="inf-anterior" data-serie="ipca_12m">—</span>. Origem: <span class="vc-quebra" data-draw="inf-12m-origem">—</span>.</div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">IPCA-15 no mês, <span data-draw="inf-mes" data-serie="ipca15">—</span></div>
+      <div class="di-tile-num" data-draw="inf-valor" data-serie="ipca15">—</div>
+      <div class="di-tile-sub">mês anterior: <span data-draw="inf-anterior" data-serie="ipca15">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">IGP-M no mês, <span data-draw="inf-mes" data-serie="igpm">—</span></div>
+      <div class="di-tile-num" data-draw="inf-valor" data-serie="igpm">—</div>
+      <div class="di-tile-sub">mês anterior: <span data-draw="inf-anterior" data-serie="igpm">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Meta de inflação</div>
+      <div class="di-tile-num" data-draw="inf-meta">—</div>
+      <div class="di-tile-sub">tolerância de <span data-draw="inf-tolerancia">—</span> para cima e para baixo</div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Selic, meta</div>
+      <div class="di-tile-num" data-draw="inf-selic">—</div>
+      <div class="di-tile-sub">vigente em <span data-draw="inf-selic-data">—</span></div>
+    </div>
+  </section>
+
+  <section class="di-block" id="inflacao-grafico">
+    <h2 class="di-h2">IPCA acumulado em 12 meses e a meta</h2>
+    <p class="di-note">Em %, mês a mês. A faixa clara é o intervalo de tolerância em torno da meta.</p>
+    <div class="di-chart" data-draw="inf-grafico" data-source="br_inflacao"></div>
+    <ul class="di-legend">
+      <li><span class="di-sw di-sw-line"></span>IPCA em 12 meses</li>
+      <li><span class="di-sw di-sw-dash"></span>Meta de inflação</li>
+    </ul>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="inflacao_br">—</p>
+  </section>
+
+  <section class="di-block" id="inflacao-tabela">
+    <h2 class="di-h2">Índices mês a mês</h2>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr>
+          <th>Mês</th><th class="di-num">IPCA no mês</th><th class="di-num">IPCA em 12 meses</th><th class="di-num">IPCA-15 no mês</th><th class="di-num">IPCA-15 em 12 meses</th><th class="di-num">IGP-M no mês</th><th class="di-num">IGP-M em 12 meses</th>
+        </tr></thead>
+        <tbody data-draw="inf-tabela"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <details class="di-details" id="inflacao-metodo">
+    <summary>Fontes e fórmulas</summary>
+    <p>Fonte: Sistema Gerenciador de Séries Temporais (SGS) do Banco Central. Séries: IPCA mensal (433), IPCA acumulado em 12 meses (13522), IPCA-15 mensal (7478), IGP-M mensal (189), meta de inflação (13521) e meta da Selic (432). O IPCA e o IPCA-15 são calculados pelo IBGE e o IGP-M, pela FGV; o Banco Central republica os números.</p>
+    <p>O IPCA em 12 meses vem pronto da série 13522. Quando essa série ainda não tem o mês mais recente, a página compõe os 12 últimos IPCAs mensais e marca o número como calculado; ele pode diferir em centésimos do oficial. O IPCA-15 e o IGP-M em 12 meses são sempre contas desta página: o produto de (1 + variação mensal) dos últimos 12 meses, menos 1.</p>
+    <p>O intervalo de tolerância da meta, de 1,5 ponto percentual para cima e para baixo, foi digitado à mão a partir da regra do Conselho Monetário Nacional; não vem da série.</p>
+    <p>A data de divulgação do IBGE não está na fonte usada. Quando um mês novo aparece, a página registra o dia em que o viu pela primeira vez.</p>
+  </details>

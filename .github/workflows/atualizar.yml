@@ -1,0 +1,54 @@
+name: Atualizar dados do dashboard
+
+on:
+  schedule:
+    # Horários em UTC. Brasília = UTC menos 3 horas.
+    - cron: '45 11 * * *'          # 8h45 de Brasília, todos os dias: notícias e dados
+    - cron: '20 13,17,21 * * 1-5'  # 10h20, 14h20 e 18h20 de Brasília, dias úteis: dados de mercado
+  workflow_dispatch:
+    inputs:
+      noticias:
+        description: Montar também a seleção de notícias
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: atualizar-dashboard
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar o leitor de PDF usado no boletim da B3
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+
+      - name: Buscar os dados nas fontes
+        shell: bash
+        env:
+          BLS_KEY: ${{ secrets.BLS_KEY }}
+          FRED_KEY: ${{ secrets.FRED_KEY }}
+          MODO: ${{ (github.event.schedule == '45 11 * * *' || inputs.noticias) && 'noticias' || '' }}
+        run: |
+          python3 -I atualizar.py site/index.html site/index.html $MODO | tee saida.txt
+          grep -qE '^(UPDATED|UNCHANGED)' saida.txt
+          rm saida.txt
+
+      - name: Gravar a página atualizada no repositório
+        shell: bash
+        run: |
+          if git diff --quiet -- site/index.html; then
+            echo "Nenhum dado mudou; nada a gravar."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/index.html
+          git commit -m "Dados de $(TZ=America/Sao_Paulo date '+%d/%m/%Y %H:%M')"
+          git push

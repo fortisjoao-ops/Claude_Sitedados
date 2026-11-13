@@ -1,0 +1,161 @@
+<meta name="dash-one-writer">
+<link rel="stylesheet" href="style.css">
+<div class="di-page">
+
+  <header class="di-head">
+    <h1 class="di-title" id="titulo">Curva DI Futuro</h1>
+    <p class="di-lede" id="resumo">A taxa interpolada vai de <b data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=1a">—</b> em 1 ano a <b data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=5a">—</b> em 5 anos. O ponto de 5 anos varia <b data-draw="var-prazo" data-source="prazos" data-field="var_bps" data-where="prazo=5a">—</b> frente ao ajuste anterior.</p>
+    <p class="di-stamp" id="carimbo">Cotações da B3 de <span data-draw="quando" data-source="di1" data-field="cotacao_em" data-row="0">—</span>, divulgadas com 15 minutos de atraso. Esta página mostra uma cópia dessas cotações e só muda quando o arquivo é atualizado.</p>
+  </header>
+
+  <section class="di-tiles" id="destaques" aria-label="Taxas interpoladas em prazos fixos">
+    <div class="di-tile" id="tile-1a">
+      <div class="di-tile-label">1 ano</div>
+      <div class="di-tile-num dash-skeleton" data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=1a">—</div>
+      <div class="di-tile-sub"><span data-draw="var-prazo" data-source="prazos" data-field="var_bps" data-where="prazo=1a">—</span> vs. ajuste anterior</div>
+    </div>
+    <div class="di-tile" id="tile-2a">
+      <div class="di-tile-label">2 anos</div>
+      <div class="di-tile-num dash-skeleton" data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=2a">—</div>
+      <div class="di-tile-sub"><span data-draw="var-prazo" data-source="prazos" data-field="var_bps" data-where="prazo=2a">—</span> vs. ajuste anterior</div>
+    </div>
+    <div class="di-tile" id="tile-5a">
+      <div class="di-tile-label">5 anos</div>
+      <div class="di-tile-num dash-skeleton" data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=5a">—</div>
+      <div class="di-tile-sub"><span data-draw="var-prazo" data-source="prazos" data-field="var_bps" data-where="prazo=5a">—</span> vs. ajuste anterior</div>
+    </div>
+    <div class="di-tile" id="tile-inclinacao">
+      <div class="di-tile-label">Inclinação 1–5 anos</div>
+      <div class="di-tile-num dash-skeleton" data-draw="inclinacao" data-source="inclinacao">—</div>
+      <div class="di-tile-sub">taxa de 5 anos menos a de 1 ano</div>
+    </div>
+  </section>
+
+  <section class="di-block di-query" id="cdi-projetado">
+    <h2 class="di-h2" id="cdi-projetado-titulo">CDI médio projetado até uma data</h2>
+    <p class="di-note">A taxa de um DI futuro é o CDI médio que o mercado embute entre a data da cotação e o vencimento. Escolha uma data dentro dos próximos 5 anos e a página lê essa taxa na curva interpolada.</p>
+    <div class="di-query-row">
+      <label class="di-field" for="data-alvo">
+        <span>Data final</span>
+        <input type="date" id="data-alvo" class="di-date" data-draw="data-alvo" data-source="cdi_por_data">
+      </label>
+      <div class="di-result">
+        <div class="di-result-item" id="cdi-medio">
+          <div class="di-tile-label">CDI médio até <span data-draw="cdi-data">—</span></div>
+          <div class="di-tile-num" data-draw="cdi-medio" data-source="cdi_por_data" data-field="cdi_medio">—</div>
+          <div class="di-tile-sub">ao ano, base 252 dias úteis</div>
+        </div>
+        <div class="di-result-item" id="cdi-acumulado">
+          <div class="di-tile-label">CDI acumulado no período</div>
+          <div class="di-tile-num" data-draw="cdi-acum" data-source="cdi_por_data" data-field="cdi_acumulado">—</div>
+          <div class="di-tile-sub">em <span data-draw="cdi-du" data-source="cdi_por_data" data-field="du">—</span> dias úteis</div>
+        </div>
+      </div>
+    </div>
+    <p class="di-note di-nota-curto" hidden>Essa data cai antes do primeiro vértice da curva. Nesse trecho não há cotação, e a página repete a taxa do primeiro vértice.</p>
+  </section>
+
+  <section class="di-block" id="curva">
+    <h2 class="di-h2" id="curva-titulo">Taxa DI por prazo, de hoje até 5 anos</h2>
+    <p class="di-note">Em % ao ano, base 252 dias úteis. A linha é uma spline cúbica natural que passa por todos os vértices; entre dois vértices a taxa é interpolada, não negociada.</p>
+    <div class="di-chart" id="grafico" data-draw="grafico" data-source="di1 di1_3m curva cdi_por_data"></div>
+    <ul class="di-legend" id="legenda">
+      <li><span class="di-sw di-sw-line"></span>Curva interpolada agora</li>
+      <li><span class="di-sw di-sw-dash"></span>Curva do ajuste anterior</li>
+      <li><span class="di-sw di-sw-3m"></span>Curva de 3 meses atrás, no ajuste de <span class="di-legend-data" data-draw="data-3m" data-source="di1_3m" data-field="data_ref" data-row="0">—</span></li>
+      <li><span class="di-sw di-sw-dot"></span>Vértice com negócio hoje</li>
+      <li><span class="di-sw di-sw-ring"></span>Vértice sem negócio hoje</li>
+      <li><span class="di-sw di-sw-ref"></span>Data consultada</li>
+    </ul>
+  </section>
+
+  <section class="di-block" id="copom">
+    <h2 class="di-h2" id="copom-titulo">Mudanças de juros embutidas na curva, por reunião do Copom</h2>
+    <p class="di-note">Em pontos percentuais, arredondadas em passos de 0,25. Cada barra compara o CDI médio embutido depois da reunião com o do trecho anterior. É o que os preços dos contratos embutem, com prêmio de risco incluído, e não uma previsão.</p>
+    <div class="di-chart di-chart-copom" id="grafico-copom" data-draw="copom" data-source="copom_implicito"></div>
+    <p class="di-note di-soma">Partindo do CDI de <span data-draw="copom-base" data-source="copom_implicito" data-field="cdi_antes">—</span>, as mudanças somam <span data-draw="copom-acumulado" data-source="copom_implicito" data-field="acumulado_arredondado">—</span> até a reunião de <span data-draw="copom-ultima">—</span>, a última com data já divulgada.</p>
+    <p class="di-note vc-alerta" data-draw="copom-calendario" hidden></p>
+  </section>
+
+  <section class="di-block" id="prazos">
+    <h2 class="di-h2" id="prazos-titulo">Taxa interpolada em prazos fixos</h2>
+    <div class="di-scroll">
+      <table class="di-table" data-source="prazos" data-row-key="prazo">
+        <thead>
+          <tr>
+            <th data-field="nome">Prazo</th>
+            <th data-field="du" class="di-num">Dias úteis</th>
+            <th data-field="taxa" class="di-num">Taxa agora</th>
+            <th data-field="taxa_ant" class="di-num">Ajuste anterior</th>
+            <th data-field="var_bps" class="di-num">Variação no dia</th>
+            <th data-field="taxa_3m" class="di-num">3 meses atrás</th>
+            <th data-field="var_3m_bps" class="di-num">Variação em 3 meses</th>
+          </tr>
+        </thead>
+        <tbody data-draw="tabela-prazos"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="di-block" id="ntnb">
+    <h2 class="di-h2" id="ntnb-titulo">Preço das NTN-B no Tesouro Direto</h2>
+    <p class="di-note">Preço unitário (PU, em R$) de referência do Tesouro Direto em <span data-draw="ntnb-ref">—</span>, o último dia útil com dado publicado. É um preço defasado, não intradiário, e não é o fechamento da ANBIMA. Variação no dia: contra <span data-draw="ntnb-ant">—</span>. Variação em 3 meses: contra <span data-draw="ntnb-3m">—</span>, o dado disponível mais próximo de <span data-draw="ntnb-alvo">—</span>.</p>
+    <div class="di-scroll">
+      <table class="di-table vc-cab-quebra" data-source="ntnb_var" data-row-key="chave">
+        <thead>
+          <tr>
+            <th data-field="titulo">Título</th>
+            <th data-field="vencimento">Vencimento</th>
+            <th data-field="pu" class="di-num">PU (R$)</th>
+            <th data-field="var_dia_rs" class="di-num">Variação do PU no dia (R$)</th>
+            <th data-field="var_dia_pct" class="di-num">Variação do PU no dia (%)</th>
+            <th data-field="var_3m_rs" class="di-num">Variação do PU em 3 meses (R$)</th>
+            <th data-field="var_3m_pct" class="di-num">Variação do PU em 3 meses (%)</th>
+            <th data-field="taxa_venda" class="di-num">Taxa de venda (% a.a.)</th>
+          </tr>
+        </thead>
+        <tbody data-draw="tabela-ntnb"></tbody>
+      </table>
+    </div>
+    <p class="di-note">A variação do PU não é retorno total: o PU cai quando o título paga cupom e sobe com a atualização do valor nominal pelo IPCA, e a variação mostrada não ajusta esses efeitos. A taxa de venda é uma taxa, não um preço, e fica em coluna separada.</p>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="ntnb">—</p>
+  </section>
+
+  <section class="di-block" id="vertices">
+    <h2 class="di-h2" id="vertices-titulo">Vértices usados na interpolação</h2>
+    <p class="di-note">Cada vértice é um contrato DI1. A taxa do vértice é a média entre a melhor compra e a melhor venda; o último negócio fica ao lado para conferência.</p>
+    <div class="di-scroll">
+      <table class="di-table" data-source="di1" data-row-key="ticker">
+        <thead>
+          <tr>
+            <th data-field="ticker">Contrato</th>
+            <th data-field="vencimento">Vencimento</th>
+            <th data-field="du" class="di-num">Dias úteis</th>
+            <th data-field="taxa" class="di-num">Taxa</th>
+            <th data-field="ultimo" class="di-num">Último</th>
+            <th data-field="compra" class="di-num">Compra</th>
+            <th data-field="venda" class="di-num">Venda</th>
+            <th data-field="ajuste_ant" class="di-num">Ajuste anterior</th>
+            <th data-source="variacao" data-field="var_bps" class="di-num">Variação</th>
+            <th data-field="negociados" class="di-num">Contratos negociados</th>
+          </tr>
+        </thead>
+        <tbody data-draw="tabela-vertices"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <details class="di-details" id="metodo">
+    <summary>Como a curva é calculada</summary>
+    <p>Os vértices são os contratos futuros de DI de 1 dia (DI1) da B3 com vencimento dentro de 5 anos, mais o primeiro contrato depois desse prazo, que ancora o trecho final.</p>
+    <p>O prazo de cada vértice é contado em dias úteis entre a data da cotação e o vencimento, descontando fins de semana e feriados nacionais.</p>
+    <p>A interpolação é uma spline cúbica natural da taxa em função dos dias úteis: passa exatamente por todos os vértices e tem curvatura zero nas duas pontas. A curva não é extrapolada para antes do primeiro vértice.</p>
+    <p>O CDI médio projetado até uma data é a taxa da curva interpolada no número de dias úteis até essa data. O CDI acumulado é essa taxa capitalizada pelo período: (1 + taxa) elevado a dias úteis ÷ 252, menos 1. São taxas embutidas nos preços de mercado, não uma previsão.</p>
+    <p>As mudanças por reunião do Copom são lidas na curva interpolada: para cada reunião, a página calcula o CDI médio embutido entre o dia em que a decisão passa a valer e o dia em que vale a decisão seguinte, e compara com o trecho anterior. Depois da última reunião com data divulgada, o trecho usado é de 30 dias úteis. O arredondamento em passos de 0,25 ponto é feito no nível acumulado, para a soma das barras não se afastar do que a curva embute.</p>
+    <p>NTN-B: preços e taxas do Tesouro Direto, publicados pelo Tesouro Nacional (arquivo de preços e taxas dos títulos ofertados). O PU é o "PU base" da manhã de cada dia e a taxa é a de venda. NTN-B é o Tesouro IPCA+ com Juros Semestrais e NTN-B Principal é o Tesouro IPCA+. Variação em R$: PU da data de referência menos o PU da data comparada. Variação em %: PU da data de referência dividido pelo PU da data comparada, menos 1. A data comparada de 3 meses é a mesma data três meses antes ou, se não houver dado nesse dia, o dia anterior mais próximo com dado. Compara-se sempre o mesmo título, com o mesmo vencimento; sem dado numa das datas, a célula mostra "indisponível".</p>
+    <p>A curva do ajuste anterior usa os mesmos prazos com a taxa de ajuste do pregão anterior. A variação é a diferença entre as duas, em pontos-base.</p>
+    <p>A curva de 3 meses atrás usa as taxas de ajuste dos contratos DI1 daquele pregão, publicadas no Boletim Diário do Mercado da B3, com os dias úteis contados a partir daquela data. As curvas são comparadas pelo mesmo prazo, e não pelo mesmo contrato.</p>
+  </details>
+
+</div>
+<script src="app.js"></script>

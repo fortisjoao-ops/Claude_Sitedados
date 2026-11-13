@@ -1,0 +1,81 @@
+  <header class="di-head">
+    <h1 class="di-title" id="jr-titulo">Juro real e inflação implícita no Brasil</h1>
+    <p class="di-lede" id="jr-resumo">A <b data-draw="jr-rotulo" data-alvo="10">—</b> paga <b data-draw="jr-num" data-alvo="10" data-campo="real">—</b> ao ano acima da inflação. Com o DI do mesmo vencimento, isso embute uma inflação média de <b data-draw="jr-num" data-alvo="10" data-campo="implicita">—</b> ao ano até lá.</p>
+    <p class="di-stamp" id="jr-carimbo">Taxas das NTN-B da manhã de <span data-draw="jr-data" data-campo="td_ref">—</span> (Tesouro Direto) e taxas de ajuste do DI de <span data-draw="jr-data" data-campo="di_ref">—</span> (B3). São dados defasados, não intradiários.</p>
+  </header>
+
+  <section class="di-tiles" id="jr-destaques" aria-label="Juro real e inflação implícita em prazos de referência">
+    <div class="di-tile">
+      <div class="di-tile-label">Juro real, <span data-draw="jr-rotulo" data-alvo="5">—</span></div>
+      <div class="di-tile-num" data-draw="jr-num" data-alvo="5" data-campo="real">—</div>
+      <div class="di-tile-sub"><span data-draw="jr-var" data-alvo="5" data-campo="var_dia_bps">—</span> no dia, <span data-draw="jr-var" data-alvo="5" data-campo="var_3m_bps">—</span> em 3 meses</div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Juro real, <span data-draw="jr-rotulo" data-alvo="10">—</span></div>
+      <div class="di-tile-num" data-draw="jr-num" data-alvo="10" data-campo="real">—</div>
+      <div class="di-tile-sub"><span data-draw="jr-var" data-alvo="10" data-campo="var_dia_bps">—</span> no dia, <span data-draw="jr-var" data-alvo="10" data-campo="var_3m_bps">—</span> em 3 meses</div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Juro real, <span data-draw="jr-rotulo" data-alvo="longo">—</span></div>
+      <div class="di-tile-num" data-draw="jr-num" data-alvo="longo" data-campo="real">—</div>
+      <div class="di-tile-sub"><span data-draw="jr-var" data-alvo="longo" data-campo="var_dia_bps">—</span> no dia, <span data-draw="jr-var" data-alvo="longo" data-campo="var_3m_bps">—</span> em 3 meses</div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Inflação implícita até <span data-draw="jr-venc" data-alvo="5">—</span></div>
+      <div class="di-tile-num" data-draw="jr-num" data-alvo="5" data-campo="implicita">—</div>
+      <div class="di-tile-sub">há 3 meses: <span data-draw="jr-num" data-alvo="5" data-campo="implicita_3m">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Inflação implícita até <span data-draw="jr-venc" data-alvo="10">—</span></div>
+      <div class="di-tile-num" data-draw="jr-num" data-alvo="10" data-campo="implicita">—</div>
+      <div class="di-tile-sub">há 3 meses: <span data-draw="jr-num" data-alvo="10" data-campo="implicita_3m">—</span></div>
+    </div>
+  </section>
+
+  <section class="di-block" id="jr-curva">
+    <h2 class="di-h2">Juro real das NTN-B por vencimento, hoje e há 3 meses</h2>
+    <p class="di-note">Taxa de venda no Tesouro Direto, em % ao ano acima do IPCA. Cada ponto é um título; a linha liga as NTN-B com juros semestrais e não é um dado entre os pontos.</p>
+    <div class="di-chart" data-draw="jr-grafico-real" data-source="br_real"></div>
+    <ul class="di-legend">
+      <li><span class="di-sw di-sw-line"></span>NTN-B em <span class="di-legend-data" data-draw="jr-data" data-campo="td_ref">—</span></li>
+      <li><span class="di-sw di-sw-3m"></span>NTN-B há 3 meses, em <span class="di-legend-data" data-draw="jr-data" data-campo="td_3m">—</span></li>
+      <li><span class="di-sw di-sw-ring"></span>NTN-B Principal (sem cupom), na data mais recente</li>
+    </ul>
+  </section>
+
+  <section class="di-block" id="jr-implicita">
+    <h2 class="di-h2">Inflação implícita por vencimento, hoje e há 3 meses</h2>
+    <p class="di-note">Inflação média ao ano, até o vencimento de cada NTN-B, que iguala o DI futuro do mesmo vencimento ao juro real do título. É uma conta desta página, não um número publicado, e carrega prêmio de risco: não é a inflação que o mercado espera. Só há conta até o último vencimento de DI negociado.</p>
+    <div class="di-chart" data-draw="jr-grafico-implicita" data-source="br_real"></div>
+    <ul class="di-legend">
+      <li><span class="di-sw di-sw-line"></span>Implícita nas NTN-B hoje</li>
+      <li><span class="di-sw di-sw-3m"></span>Implícita há 3 meses</li>
+      <li><span class="di-sw di-sw-ring"></span>Implícita nas NTN-B Principal hoje</li>
+      <li><span class="di-sw di-sw-dash"></span>Meta de inflação, de <span class="di-legend-data" data-draw="inf-meta">—</span></li>
+    </ul>
+  </section>
+
+  <section class="di-block" id="jr-tabela">
+    <h2 class="di-h2">Título a título</h2>
+    <p class="di-note">Variação no dia: contra <span data-draw="jr-data" data-campo="td_ant">—</span>. Três meses atrás: NTN-B em <span data-draw="jr-data" data-campo="td_3m">—</span> e DI no ajuste de <span data-draw="jr-data" data-campo="di_3m">—</span>.</p>
+    <div class="di-scroll">
+      <table class="di-table vc-cab-quebra">
+        <thead><tr>
+          <th>Título</th><th>Vencimento</th><th class="di-num">Juro real</th><th class="di-num">Variação no dia</th><th class="di-num">Juro real há 3 meses</th><th class="di-num">Variação em 3 meses</th>
+          <th class="di-num">DI no mesmo vencimento</th><th class="di-num">Inflação implícita</th><th class="di-num">Implícita há 3 meses</th><th class="di-num">Variação da implícita</th>
+        </tr></thead>
+        <tbody data-draw="jr-tabela"></tbody>
+      </table>
+    </div>
+    <p class="di-note">Limitações: as taxas das NTN-B são as da manhã no Tesouro Direto e as do DI são as de ajuste do fim do pregão, então há horas de diferença entre elas, e às vezes um dia. A NTN-B com juros semestrais paga cupons no caminho; comparar a taxa dela com o DI do vencimento final é uma aproximação, mais limpa na NTN-B Principal, que não paga cupom.</p>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="ntnb curva_di">—</p>
+  </section>
+
+  <details class="di-details" id="jr-metodo">
+    <summary>Fontes e fórmulas</summary>
+    <p>Juro real: taxa de venda da manhã de cada NTN-B (Tesouro IPCA+ com Juros Semestrais) e NTN-B Principal (Tesouro IPCA+), no arquivo de preços e taxas do Tesouro Direto publicado pelo Tesouro Nacional. Não é a taxa indicativa da ANBIMA.</p>
+    <p>DI no mesmo vencimento: taxas de ajuste dos contratos futuros de DI de 1 dia da B3 no pregão anterior ao da cotação, incluindo os vencimentos além de 5 anos. Para a data de vencimento de cada título, a página interpola em linha reta, pelo calendário, entre os dois vencimentos de DI vizinhos. Depois do último vencimento de DI a conta aparece como indisponível.</p>
+    <p>Inflação implícita: (1 + taxa do DI) dividido por (1 + juro real), menos 1. As duas taxas são anuais, na base de 252 dias úteis.</p>
+    <p>Três meses atrás: a taxa de cada título na data mais próxima de três meses antes com dado no Tesouro Direto, e as taxas de ajuste do DI do pregão de três meses antes, do Boletim Diário do Mercado da B3. Compara-se sempre o mesmo título, que naquela data estava três meses mais longe do vencimento.</p>
+    <p>Variações em pontos-base: taxa da data de referência menos a taxa da data comparada, vezes 100.</p>
+  </details>

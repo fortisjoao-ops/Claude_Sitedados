@@ -1,0 +1,3 @@
+# O site é a pasta "site", já pronta: não há etapa de montagem no Netlify.
+[build]
+  publish = "site"
