@@ -78,7 +78,7 @@ abas_js = '''(() => {
   window.iniciarCurvaDI();
 })();'''
 
-head = '''<title>Curva DI Futuro</title>
+head = '''<title>Dash Vera Cruz</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 ''' + ('' if d3local else '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap">\n')
 nav = '\n'.join('      <a class="vc-tab" href="#%s">%s</a>' % (i, t) for i, t, _ in ABAS)
