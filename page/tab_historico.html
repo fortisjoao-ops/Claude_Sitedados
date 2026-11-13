@@ -24,7 +24,7 @@
         <tbody data-draw="hist-tabela-curvas"></tbody>
       </table>
     </div>
-    <p class="di-note">As datas disponíveis para o DI: um ponto por dia útil a partir de 12/11/2026; antes disso, um por semana nos três meses anteriores e um por mês nos doze meses anteriores, lidos do Boletim Diário do Mercado da B3. Na tabela, a taxa de cada prazo é interpolada em linha reta entre os dois contratos vizinhos.</p>
+    <p class="di-note">As datas disponíveis para o DI: um ponto por dia útil a partir de 12/11/2026; antes disso, datas avulsas lidas do Boletim Diário do Mercado da B3, cerca de uma por semana desde agosto de 2026 e uma por mês desde dezembro de 2025. Na tabela, a taxa de cada prazo é interpolada em linha reta entre os dois contratos vizinhos.</p>
   </section>
 
   <section class="di-block" id="hist-serie">
@@ -48,7 +48,7 @@
 
   <details class="di-details" id="hist-metodo">
     <summary>Fontes e fórmulas</summary>
-    <p>DI: taxa de ajuste de cada contrato futuro de DI de 1 dia, do pregão indicado. A partir de 12/11/2026 vem das cotações da B3 (o ajuste do pregão anterior, lido a cada dia); as datas anteriores vêm do Boletim Diário do Mercado da B3. O prazo de cada contrato é contado em dias úteis a partir da data do pregão.</p>
+    <p>DI: taxa de ajuste de cada contrato futuro de DI de 1 dia, do pregão indicado. A partir de 12/11/2026 vem das cotações da B3 (o ajuste do pregão anterior, lido a cada dia); as datas anteriores vêm do Boletim Diário do Mercado da B3, e algumas ficaram de fora porque a B3 não entregou o boletim do dia. O prazo de cada contrato é contado em dias úteis a partir da data do pregão.</p>
     <p>DI em prazo fixo (1, 2, 5 e 10 anos): interpolação em linha reta, por dias úteis, entre os dois contratos vizinhos daquele pregão. É uma conta mais simples que a spline da aba Curva DI Futuro, então pode diferir dela em frações de ponto-base.</p>
     <p>Juro real: taxa de venda da manhã de cada NTN-B no Tesouro Direto, um dado por dia útil. Inflação implícita: (1 + DI no vencimento do título) dividido por (1 + juro real), menos 1, com o DI interpolado em linha reta pelo calendário; só existe nas datas em que há curva de DI gravada.</p>
     <p>Treasuries: curva diária de rendimento ao par do Tesouro americano. IFIX: fechamentos da B3. Ibovespa: fechamentos do Yahoo Finance. Dólar: PTAX de venda do Banco Central. Esses três cobrem cerca de 13 meses.</p>
