@@ -361,6 +361,76 @@ body { background: var(--color-bg); color: var(--color-fg); font-family: var(--f
 .vc-botao:hover { background: var(--vc-azul-gelo); }
 .vc-botao:focus-visible { outline: 2px solid var(--vc-azul-aco); outline-offset: 2px; }
 .vc-botao:disabled { opacity: .5; cursor: default; }
+
+/* ---- Refino visual ----
+   Réguas finas no lugar de caixas preenchidas, cantos retos e navegação sublinhada.
+   Nada aqui alcança os gráficos, as legendas nem as dicas dos gráficos (.di-chart, .di-legend, .di-sw, .di-tip). */
+body { border-top: 4px solid var(--vc-navy); }
+.di-wrap { padding-block: 0 56px; }
+
+/* Cabeçalho: logotipo e abas sobre uma régua */
+.vc-top { align-items: flex-end; gap: 10px 32px; margin-bottom: 0; padding-top: 24px; border-bottom: 1px solid var(--vc-azul-gelo); }
+.vc-brand { padding-bottom: 16px; }
+.vc-logo { height: 54px; }
+.vc-tabs {
+  gap: 0 2px; margin-bottom: -1px; padding: 0 22px 0 0; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+}
+.vc-tabs::-webkit-scrollbar { display: none; }
+.vc-tab { padding: 12px 11px 13px; border-radius: 0; border-bottom: 2px solid transparent; color: var(--vc-ardosia); font-size: 0.875rem; font-weight: 500; letter-spacing: 0.01em; }
+.vc-tab:hover { background: none; color: var(--vc-navy); border-bottom-color: var(--vc-cinza-claro); }
+.vc-tab[aria-current="page"] { background: none; color: var(--vc-navy); border-bottom-color: var(--vc-navy); }
+.vc-tab:focus-visible { outline-offset: -2px; }
+
+/* Faixa do título */
+.di-page .di-head { margin-top: 28px; gap: 12px; padding: 38px 40px 34px; border-radius: 2px; }
+.di-page .di-head::before { content: ""; position: absolute; z-index: 1; left: 40px; top: 0; width: 56px; height: 3px; background: var(--vc-azul-aco); }
+.di-page .di-title { font-size: 2.125rem; font-weight: 500; letter-spacing: -0.02em; }
+.di-page .di-lede { font-size: 1rem; line-height: 1.55; }
+.di-page .di-lede b { font-weight: 600; }
+
+/* Destaques: bloco azul-gelo com régua Navy em cima, sem cantos arredondados */
+.di-tiles { gap: 14px; }
+.di-page .di-tile { gap: 5px; padding: 14px 16px 16px; border: 0; border-top: 2px solid var(--vc-navy); border-radius: 0; }
+.di-page .di-tile-label { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.01em; }
+.di-page .di-tile-num { font-size: 1.75rem; font-weight: 500; letter-spacing: -0.02em; }
+.di-page .di-tile-num.vc-num-menor { font-size: 1.3rem; line-height: 1.6; }
+.di-page .di-tile-sub { font-size: 0.78rem; }
+.di-page a.di-tile { transition: background-color .15s ease; }
+.di-page a.di-tile:hover { outline: 0; background: var(--vc-branco); box-shadow: inset 0 0 0 1px var(--vc-azul-gelo); }
+
+/* Seções separadas por régua */
+.di-page > .di-block:not(.di-query):not(.vc-aviso-bloco), .di-page > .di-details { padding-top: 26px; border-top: 1px solid var(--vc-azul-gelo); }
+.di-page .di-h2 { font-size: 1.25rem; letter-spacing: -0.01em; }
+.di-page .di-query, .vc-aviso-bloco { border-radius: 0; }
+.di-page .di-query { border: 0; border-top: 2px solid var(--vc-navy); padding: 18px 20px 20px; }
+.vc-aviso-bloco { border-left: 3px solid var(--vc-azul-aco); padding: 18px 20px; }
+.vc-alerta { border-radius: 0; border-left: 3px solid var(--vc-navy); }
+.di-page .di-date { border-radius: 2px; }
+
+/* Tabelas: cabeçalho sem fundo, com régua Navy; primeira e última colunas alinhadas ao texto da página */
+.di-page .di-table th { padding: 10px 12px 9px; background: none; color: var(--vc-navy); border-bottom: 2px solid var(--vc-navy); }
+.di-page .di-table th:first-child, .di-page .di-table th:last-child { border-radius: 0; }
+.di-page .di-table td { padding: 9px 12px; }
+.di-page .di-table th:first-child, .di-page .di-table td:first-child { padding-left: 0; }
+.di-page .di-table th:last-child, .di-page .di-table td:last-child { padding-right: 0; }
+
+/* Botões, notícias e rodapé */
+.vc-botao { border-radius: 2px; font-size: 0.8125rem; letter-spacing: 0.01em; }
+.vc-noticias li { padding: 13px 0; }
+.di-wrap > .di-foot { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--vc-navy); }
+
+@media (max-width: 720px) {
+  .vc-top { padding-top: 16px; }
+  .vc-brand { padding-bottom: 6px; }
+  .vc-logo { height: 46px; }
+  .vc-tab { padding: 10px 10px 11px; }
+  .di-page .di-head { margin-top: 20px; padding: 28px 20px 24px; }
+  .di-page .di-head::before { left: 20px; }
+  .di-page .di-title { font-size: 1.625rem; }
+  .di-page .di-tile-num { font-size: 1.6rem; }
+}
 </style>
 </head>
 <body>
