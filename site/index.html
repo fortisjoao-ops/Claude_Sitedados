@@ -510,8 +510,8 @@ body { border-top: 4px solid var(--vc-navy); }
 <div class="di-page vc-painel" id="visao-geral">
   <header class="di-head">
     <h1 class="di-title" id="rs-titulo">Resumo do dia</h1>
-    <p class="di-lede" id="rs-resumo">O DI de 5 anos varia <b data-draw="rs-valor" data-item="di5" data-campo="mudanca">—</b> frente ao ajuste anterior, o Ibovespa <b data-draw="rs-valor" data-item="ibov" data-campo="mudanca">—</b> no dia e o IFIX <b data-draw="rs-valor" data-item="ifix" data-campo="mudanca">—</b>. O dólar PTAX está em <b data-draw="rs-valor" data-item="dolar" data-campo="valor">—</b>.</p>
-    <p class="di-stamp" id="rs-carimbo">Cada número traz a data do próprio dado, porque as fontes fecham em horários diferentes. Os dados de mercado são buscados três vezes por dia nos dias úteis, às 10h20, 14h20 e 18h20; fontes e fórmulas estão na aba de cada tema.</p>
+    <p class="di-lede" id="rs-resumo">O DI de 5 anos varia <b data-draw="rs-valor" data-item="di5" data-campo="mudanca">—</b> frente ao ajuste anterior, o Ibovespa <b data-draw="rs-valor" data-item="ibov" data-campo="mudanca">—</b> no dia e o IFIX <b data-draw="rs-valor" data-item="ifix" data-campo="mudanca">—</b>. O <span data-draw="rs-valor" data-item="dolar" data-campo="rotuloMinusculo">dólar</span> está em <b data-draw="rs-valor" data-item="dolar" data-campo="valor">—</b>.</p>
+    <p class="di-stamp" id="rs-carimbo">Cada número traz a data do próprio dado, porque as fontes fecham em horários diferentes. Os dados de mercado são buscados três vezes por dia nos dias úteis, a partir de 10h20, 14h20 e 18h20, com atraso de até cerca de meia hora; fontes e fórmulas estão na aba de cada tema.</p>
   </header>
 
   <section class="di-tiles vc-tiles-resumo" id="rs-destaques" aria-label="Principais números do dia" data-draw="rs-tiles"></section>
@@ -566,7 +566,7 @@ body { border-top: 4px solid var(--vc-navy); }
   <header class="di-head">
     <h1 class="di-title" id="titulo">Curva DI Futuro</h1>
     <p class="di-lede" id="resumo">A taxa interpolada vai de <b data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=1a">—</b> em 1 ano a <b data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=5a">—</b> em 5 anos. O ponto de 5 anos varia <b data-draw="var-prazo" data-source="prazos" data-field="var_bps" data-where="prazo=5a">—</b> frente ao ajuste anterior.</p>
-    <p class="di-stamp" id="carimbo">Cotações da B3 de <span data-draw="quando" data-source="di1" data-field="cotacao_em" data-row="0">—</span>, divulgadas com 15 minutos de atraso. Esta página busca novas cotações três vezes por dia nos dias úteis: às 10h20, 14h20 e 18h20.</p>
+    <p class="di-stamp" id="carimbo">Cotações da B3 de <span data-draw="quando" data-source="di1" data-field="cotacao_em" data-row="0">—</span>, divulgadas com 15 minutos de atraso. Esta página busca novas cotações três vezes por dia nos dias úteis, a partir de 10h20, 14h20 e 18h20; o agendamento costuma atrasar cerca de meia hora.</p>
   </header>
 
   <section class="di-tiles" id="destaques" aria-label="Taxas interpoladas em prazos fixos">
@@ -1108,8 +1108,8 @@ body { border-top: 4px solid var(--vc-navy); }
 <div class="di-page vc-painel" id="acoes-br" hidden>
   <header class="di-head">
     <h1 class="di-title" id="acoes-titulo">Mercado de ações brasileiro</h1>
-    <p class="di-lede" id="acoes-resumo">O Ibovespa está em <b data-draw="ac-nivel">—</b> pontos: <b data-draw="ac-var" data-campo="dia">—</b> no dia, <b data-draw="ac-var" data-campo="mes">—</b> no mês e <b data-draw="ac-var" data-campo="ano">—</b> no ano. O dólar PTAX fechou a <b data-draw="ac-dolar">—</b>.</p>
-    <p class="di-stamp" id="acoes-carimbo">Ibovespa cotado na B3 em <span data-draw="ac-cotado">—</span>, com 15 minutos de atraso. Dólar PTAX de venda de <span data-draw="ac-dolar-data">—</span> (Banco Central), que é um fechamento e não a cotação do momento.</p>
+    <p class="di-lede" id="acoes-resumo">O Ibovespa está em <b data-draw="ac-nivel">—</b> pontos: <b data-draw="ac-var" data-campo="dia">—</b> no dia, <b data-draw="ac-var" data-campo="mes">—</b> no mês e <b data-draw="ac-var" data-campo="ano">—</b> no ano. O dólar futuro está em <b data-draw="dol-preco">—</b> e a PTAX fechou a <b data-draw="ac-dolar">—</b>.</p>
+    <p class="di-stamp" id="acoes-carimbo">Ibovespa cotado na B3 em <span data-draw="ac-cotado">—</span>, com 15 minutos de atraso. Dólar futuro (contrato <span data-draw="dol-simbolo">—</span>) cotado na B3 em <span data-draw="dol-quando">—</span>, também com 15 minutos de atraso e relido a cada minuto enquanto esta página fica aberta. Dólar PTAX de venda de <span data-draw="ac-dolar-data">—</span> (Banco Central), que é um fechamento e não a cotação do momento.</p>
   </header>
 
   <section class="di-tiles" id="acoes-destaques" aria-label="Ibovespa e dólar">
@@ -1134,6 +1134,11 @@ body { border-top: 4px solid var(--vc-navy); }
       <div class="di-tile-sub">contra o fechamento de <span data-draw="ac-base" data-campo="ano">—</span></div>
     </div>
     <div class="di-tile">
+      <div class="di-tile-label">Dólar futuro, <span data-draw="dol-venc">—</span></div>
+      <div class="di-tile-num" data-draw="dol-preco">—</div>
+      <div class="di-tile-sub"><span data-draw="dol-var">—</span> no dia; mínima <span data-draw="dol-campo" data-campo="minimo">—</span>, máxima <span data-draw="dol-campo" data-campo="maximo">—</span></div>
+    </div>
+    <div class="di-tile">
       <div class="di-tile-label">Dólar PTAX, venda</div>
       <div class="di-tile-num" data-draw="ac-dolar">—</div>
       <div class="di-tile-sub"><span data-draw="ac-dolar-var" data-campo="dia">—</span> no dia, <span data-draw="ac-dolar-var" data-campo="mes">—</span> no mês, <span data-draw="ac-dolar-var" data-campo="ano">—</span> no ano</div>
@@ -1144,7 +1149,7 @@ body { border-top: 4px solid var(--vc-navy); }
     <h2 class="di-h2">Ibovespa nos últimos 12 meses</h2>
     <p class="di-note">Fechamentos diários, em pontos. O último ponto é a cotação mais recente da B3, não um fechamento.</p>
     <div class="di-chart" data-draw="ac-grafico" data-source="br_ibov_hist"></div>
-    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="ibovespa historico_br">—</p>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="ibovespa dolar_futuro historico_br">—</p>
   </section>
 
   <section class="di-block" id="acoes-altas">
@@ -1171,6 +1176,7 @@ body { border-top: 4px solid var(--vc-navy); }
     <summary>Fontes e fórmulas</summary>
     <p>Ibovespa e ações: cotações da B3 com 15 minutos de atraso; a lista de ações é a carteira teórica do índice publicada pela B3. Fechamentos diários do Ibovespa: Yahoo Finance, por um endereço não oficial. Dólar: PTAX de venda, série 1 do SGS do Banco Central.</p>
     <p>Variação no dia do Ibovespa e das ações: a oscilação informada pela B3 contra o fechamento anterior. Variação no mês: cotação atual dividida pelo último fechamento do mês anterior, menos 1. Variação no ano: cotação atual dividida pelo último fechamento do ano anterior, menos 1. Como a cotação atual vem da B3 e os fechamentos vêm do Yahoo Finance, pode haver diferença de centésimos.</p>
+    <p>Dólar futuro: primeiro vencimento do contrato de dólar comercial da B3 (o que vence no primeiro dia útil do mês seguinte), em reais por dólar; a variação no dia é a informada pela B3 contra o ajuste anterior. É a referência de preço do dólar ao longo do pregão, mas não é o dólar à vista: o futuro negocia um pouco acima, pela diferença de juros até o vencimento. A cotação gravada na atualização do site é relida direto da B3 pelo navegador a cada minuto, em dias úteis das 9h às 18h50, enquanto a página está aberta; se a B3 não responder, fica o dado gravado.</p>
     <p>Dólar: as variações comparam a PTAX mais recente com a do dia útil anterior, com a última do mês anterior e com a última do ano anterior.</p>
   </details>
 </div>
@@ -1323,7 +1329,7 @@ body { border-top: 4px solid var(--vc-navy); }
   <header class="di-head">
     <h1 class="di-title" id="noticias-titulo">Principais notícias</h1>
     <p class="di-lede" id="noticias-resumo">Seleção montada em <b data-draw="not-montagem">—</b>, a partir dos feeds de veículos brasileiros e americanos.</p>
-    <p class="di-stamp" id="noticias-carimbo">A montagem roda todo dia pouco antes das 9h, no horário de Brasília. Cada item leva ao texto original; esta página mostra só título, veículo e data.</p>
+    <p class="di-stamp" id="noticias-carimbo">A montagem roda todo dia por volta das 8h45, no horário de Brasília; se esse disparo falhar, a atualização seguinte monta a seleção. Cada item leva ao texto original; esta página mostra só título, veículo e data.</p>
   </header>
 
   <p class="di-note vc-alerta vc-aviso-noticias" hidden>A montagem de hoje ainda não rodou ou falhou. A seleção abaixo é a de <span data-draw="not-montagem">—</span>.</p>
@@ -3225,6 +3231,59 @@ dash.draw('grafico', (el) => {
 
 </script>
 <script>
+// ---------- Dólar futuro (B3), com releitura enquanto a página está aberta ----------
+// A atualização do site grava a cotação do primeiro vencimento do dólar futuro. Com a página aberta, o navegador relê
+// essa mesma cotação direto da B3 a cada minuto, em horário de pregão. A B3 já entrega o dado com 15 minutos de atraso.
+(() => {
+  const { num, ok, reais, varPct, dataHora, linhas, MESES, INDISPONIVEL } = VC;
+  const gravado = () => linhas('br_dolar_fut')[0] || null;
+  let aoVivo = null;
+  const atual = () => {
+    const g = gravado();
+    return aoVivo && g && aoVivo.simbolo === g.simbolo && aoVivo.cotado_em > g.cotado_em ? aoVivo : g;
+  };
+  VC.dolarFuturo = atual;
+  VC.mesDoContrato = (c) => (c ? MESES[+c.vencimento.slice(5, 7) - 1] + '/' + c.vencimento.slice(2, 4) : '');
+
+  dash.draw('dol-preco', (el) => { const c = atual(); el.textContent = c ? reais(num(c.preco), 4) : INDISPONIVEL; });
+  dash.draw('dol-var', (el) => { const c = atual(); el.textContent = c ? varPct(num(c.var_dia)) : INDISPONIVEL; });
+  dash.draw('dol-campo', (el) => { const c = atual(); el.textContent = c && ok(num(c[el.dataset.campo])) ? reais(num(c[el.dataset.campo]), 4) : INDISPONIVEL; });
+  dash.draw('dol-venc', (el) => { const c = atual(); el.textContent = c ? VC.mesDoContrato(c) : INDISPONIVEL; });
+  dash.draw('dol-simbolo', (el) => { const c = atual(); el.textContent = c ? c.simbolo : INDISPONIVEL; });
+  dash.draw('dol-quando', (el) => { const c = atual(); el.textContent = c ? dataHora(c.cotado_em) : INDISPONIVEL; });
+
+  const DESENHOS = ['dol-preco', 'dol-var', 'dol-campo', 'dol-quando', 'rs-valor', 'rs-tiles', 'rs-tabela'];
+  const reler = () => {
+    const g = gravado();
+    if (!g || !/^DOL[A-Z]\d\d$/.test(g.simbolo)) return;
+    fetch('https://cotacao.b3.com.br/mds/api/v1/instrumentQuotation/' + g.simbolo, { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('resposta ' + r.status))))
+      .then((j) => {
+        const q = j && j.BizSts && j.BizSts.cd === 'OK' && j.Trad && j.Trad[0] && j.Trad[0].scty && j.Trad[0].scty.SctyQtn;
+        if (!q || !ok(q.curPrc) || !j.Msg || !j.Msg.dtTm) return;   // sem cotação nova, fica o dado gravado
+        const mil = (v) => (ok(v) ? +(v / 1000).toFixed(4) : null);
+        aoVivo = { ...g, preco: mil(q.curPrc), var_dia: ok(q.prcFlcn) ? q.prcFlcn : null, abertura: mil(q.opngPric), minimo: mil(q.minPric), maximo: mil(q.maxPric),
+          cotado_em: String(j.Msg.dtTm).replace(' ', 'T') + '-03:00' };
+        DESENHOS.forEach((n) => dash.draw(n));
+      })
+      .catch(() => {});   // falha de rede ou recusa da B3: fica o dado gravado, sem aviso
+  };
+  // Pregão do dólar futuro: dias úteis, das 9h às 18h30 de Brasília (com folga para o atraso de 15 minutos).
+  const emPregao = () => {
+    const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: 'America/Sao_Paulo', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false })
+      .formatToParts(new Date()).map((x) => [x.type, x.value]));
+    const minutos = +p.hour * 60 + +p.minute;
+    return p.weekday !== 'Sat' && p.weekday !== 'Sun' && minutos >= 9 * 60 && minutos <= 18 * 60 + 50;
+  };
+  dash.onData(() => {
+    setTimeout(reler, 0);   // uma leitura ao abrir a página, mesmo fora do pregão
+    setInterval(() => { if (document.visibilityState === 'visible' && emPregao()) reler(); }, 60000);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && emPregao()) reler(); });
+  });
+})();
+
+</script>
+<script>
 // ---------- Aba Resumo ----------
 (() => {
   const { num, nf, ok, fmt, pct, sinal, bps, varPct, reais, data, dataHora, diaHora, mes, linhas, valor, tabela, INDISPONIVEL } = VC;
@@ -3292,14 +3351,22 @@ dash.draw('grafico', (el) => {
     });
 
     const ptax = linhas('br_dolar'), dolar = ptax[ptax.length - 1], vd = (campo) => linhas('dolar_variacoes').find((x) => x.campo === campo);
-    por({ id: 'dolar', rotulo: 'Dólar PTAX, venda', aba: 'acoes-br', janela: 'dia', tile: true, menor: true, valor: dolar ? reais(num(dolar.valor), 4) : INDISPONIVEL, mudanca: vd('dia') ? varPct(vd('dia').variacao) : INDISPONIVEL,
+    // Dólar: o destaque é o futuro da B3 (relido enquanto a página está aberta); sem ele, volta a ser a PTAX.
+    const fut = VC.dolarFuturo ? VC.dolarFuturo() : null;
+    if (fut) por({ id: 'dolar', rotulo: 'Dólar futuro, ' + VC.mesDoContrato(fut), aba: 'acoes-br', janela: 'dia', tile: true, menor: true, valor: reais(num(fut.preco), 4), mudanca: varPct(num(fut.var_dia)),
+      comparado: 'ajuste anterior', ref: dataHora(fut.cotado_em), sub: 'no dia' });
+    por({ id: fut ? 'ptax' : 'dolar', rotulo: 'Dólar PTAX, venda', aba: 'acoes-br', janela: 'dia', tile: !fut, menor: true, valor: dolar ? reais(num(dolar.valor), 4) : INDISPONIVEL, mudanca: vd('dia') ? varPct(vd('dia').variacao) : INDISPONIVEL,
       comparado: 'PTAX de ' + d(vd('dia') && vd('dia').base_data), ref: dolar ? d(dolar.data) : INDISPONIVEL, sub: 'no dia' });
     por({ id: 'dolar_ano', rotulo: 'Dólar PTAX, venda', aba: 'acoes-br', janela: 'longa', valor: dolar ? reais(num(dolar.valor), 4) : INDISPONIVEL, mudanca: vd('ano') ? varPct(vd('ano').variacao) : INDISPONIVEL,
       comparado: 'PTAX de ' + d(vd('ano') && vd('ano').base_data), ref: dolar ? d(dolar.data) : INDISPONIVEL });
     return lista;
   };
 
-  dash.draw('rs-valor', (el) => { const i = itens().find((x) => x.id === el.dataset.item); el.textContent = i ? i[el.dataset.campo] || INDISPONIVEL : INDISPONIVEL; });
+  dash.draw('rs-valor', (el) => {
+    const i = itens().find((x) => x.id === el.dataset.item), campo = el.dataset.campo;
+    if (campo === 'rotuloMinusculo') { el.textContent = i ? (i.rotulo.charAt(0).toLowerCase() + i.rotulo.slice(1)).replace(', ', ' de ') : 'dólar'; return; }
+    el.textContent = i ? i[campo] || INDISPONIVEL : INDISPONIVEL;
+  });
 
   dash.draw('rs-tiles', (el) => {
     const no = (tag, classe, texto) => { const n = document.createElement(tag); if (classe) n.className = classe; if (texto !== undefined) n.textContent = texto; return n; };
@@ -3361,7 +3428,7 @@ dash.draw('grafico', (el) => {
     curva_di: 'curva DI (B3)', ntnb: 'NTN-B (Tesouro Direto)', fed_funds: 'Fed funds (NY Fed)', treasuries: 'Treasuries (Tesouro americano)', fomc: 'dot plot e calendário do Fed',
     futuros_fed: 'futuros de Fed funds (Yahoo Finance)', macro_eua: 'inflação e emprego dos EUA (BLS)', inflacao_br: 'inflação brasileira (Banco Central)', ibovespa: 'Ibovespa (B3)',
     papeis_br: 'ações do Ibovespa (B3)', historico_br: 'dólar e histórico do Ibovespa', ifix: 'IFIX (B3)', fiis: 'fundos do IFIX (B3)', historico_fii: 'CDI e histórico do IFIX',
-    focus: 'Focus (Banco Central)', agenda: 'agenda de divulgações (FRED)', noticias: 'notícias',
+    dolar_futuro: 'dólar futuro (B3)', focus: 'Focus (Banco Central)', agenda: 'agenda de divulgações (FRED)', noticias: 'notícias',
   };
   dash.draw('rs-fontes', (el) => {
     const status = valor('status') || {}, nomes = Object.keys(BLOCOS).filter((n) => status[n]);

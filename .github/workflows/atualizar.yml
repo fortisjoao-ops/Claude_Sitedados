@@ -3,8 +3,10 @@ name: Atualizar dados do dashboard
 on:
   schedule:
     # Horários em UTC. Brasília = UTC menos 3 horas.
-    - cron: '45 11 * * *'          # 8h45 de Brasília, todos os dias: notícias e dados
-    - cron: '20 13,17,21 * * 1-5'  # 10h20, 14h20 e 18h20 de Brasília, dias úteis: dados de mercado
+    # O GitHub costuma disparar com cerca de meia hora de atraso e às vezes pula um disparo.
+    - cron: '15 11 * * *'          # 8h15 de Brasília, todos os dias: notícias e dados (na prática, perto de 8h45)
+    - cron: '20 13,17,21 * * 1-5'  # 10h20, 14h20 e 18h20 de Brasília, dias úteis: dados de mercado; monta as notícias se a rodada da manhã falhou
+    - cron: '50 13 * * 0,6'        # 10h50 de Brasília, sábado e domingo: só monta as notícias se a rodada da manhã falhou
   workflow_dispatch:
     inputs:
       noticias:
@@ -34,7 +36,7 @@ jobs:
         env:
           BLS_KEY: ${{ secrets.BLS_KEY }}
           FRED_KEY: ${{ secrets.FRED_KEY }}
-          MODO: ${{ (github.event.schedule == '45 11 * * *' || inputs.noticias) && 'noticias' || '' }}
+          MODO: ${{ (github.event.schedule == '15 11 * * *' || inputs.noticias) && 'noticias' || (github.event.schedule == '50 13 * * 0,6' && 'recuperar' || '') }}
           HISTORICO: site/historico.json
         run: |
           python3 -I atualizar.py site/index.html site/index.html $MODO | tee saida.txt

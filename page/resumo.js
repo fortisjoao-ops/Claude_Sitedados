@@ -65,14 +65,22 @@
     });
 
     const ptax = linhas('br_dolar'), dolar = ptax[ptax.length - 1], vd = (campo) => linhas('dolar_variacoes').find((x) => x.campo === campo);
-    por({ id: 'dolar', rotulo: 'Dólar PTAX, venda', aba: 'acoes-br', janela: 'dia', tile: true, menor: true, valor: dolar ? reais(num(dolar.valor), 4) : INDISPONIVEL, mudanca: vd('dia') ? varPct(vd('dia').variacao) : INDISPONIVEL,
+    // Dólar: o destaque é o futuro da B3 (relido enquanto a página está aberta); sem ele, volta a ser a PTAX.
+    const fut = VC.dolarFuturo ? VC.dolarFuturo() : null;
+    if (fut) por({ id: 'dolar', rotulo: 'Dólar futuro, ' + VC.mesDoContrato(fut), aba: 'acoes-br', janela: 'dia', tile: true, menor: true, valor: reais(num(fut.preco), 4), mudanca: varPct(num(fut.var_dia)),
+      comparado: 'ajuste anterior', ref: dataHora(fut.cotado_em), sub: 'no dia' });
+    por({ id: fut ? 'ptax' : 'dolar', rotulo: 'Dólar PTAX, venda', aba: 'acoes-br', janela: 'dia', tile: !fut, menor: true, valor: dolar ? reais(num(dolar.valor), 4) : INDISPONIVEL, mudanca: vd('dia') ? varPct(vd('dia').variacao) : INDISPONIVEL,
       comparado: 'PTAX de ' + d(vd('dia') && vd('dia').base_data), ref: dolar ? d(dolar.data) : INDISPONIVEL, sub: 'no dia' });
     por({ id: 'dolar_ano', rotulo: 'Dólar PTAX, venda', aba: 'acoes-br', janela: 'longa', valor: dolar ? reais(num(dolar.valor), 4) : INDISPONIVEL, mudanca: vd('ano') ? varPct(vd('ano').variacao) : INDISPONIVEL,
       comparado: 'PTAX de ' + d(vd('ano') && vd('ano').base_data), ref: dolar ? d(dolar.data) : INDISPONIVEL });
     return lista;
   };
 
-  dash.draw('rs-valor', (el) => { const i = itens().find((x) => x.id === el.dataset.item); el.textContent = i ? i[el.dataset.campo] || INDISPONIVEL : INDISPONIVEL; });
+  dash.draw('rs-valor', (el) => {
+    const i = itens().find((x) => x.id === el.dataset.item), campo = el.dataset.campo;
+    if (campo === 'rotuloMinusculo') { el.textContent = i ? (i.rotulo.charAt(0).toLowerCase() + i.rotulo.slice(1)).replace(', ', ' de ') : 'dólar'; return; }
+    el.textContent = i ? i[campo] || INDISPONIVEL : INDISPONIVEL;
+  });
 
   dash.draw('rs-tiles', (el) => {
     const no = (tag, classe, texto) => { const n = document.createElement(tag); if (classe) n.className = classe; if (texto !== undefined) n.textContent = texto; return n; };
@@ -134,7 +142,7 @@
     curva_di: 'curva DI (B3)', ntnb: 'NTN-B (Tesouro Direto)', fed_funds: 'Fed funds (NY Fed)', treasuries: 'Treasuries (Tesouro americano)', fomc: 'dot plot e calendário do Fed',
     futuros_fed: 'futuros de Fed funds (Yahoo Finance)', macro_eua: 'inflação e emprego dos EUA (BLS)', inflacao_br: 'inflação brasileira (Banco Central)', ibovespa: 'Ibovespa (B3)',
     papeis_br: 'ações do Ibovespa (B3)', historico_br: 'dólar e histórico do Ibovespa', ifix: 'IFIX (B3)', fiis: 'fundos do IFIX (B3)', historico_fii: 'CDI e histórico do IFIX',
-    focus: 'Focus (Banco Central)', agenda: 'agenda de divulgações (FRED)', noticias: 'notícias',
+    dolar_futuro: 'dólar futuro (B3)', focus: 'Focus (Banco Central)', agenda: 'agenda de divulgações (FRED)', noticias: 'notícias',
   };
   dash.draw('rs-fontes', (el) => {
     const status = valor('status') || {}, nomes = Object.keys(BLOCOS).filter((n) => status[n]);

@@ -16,7 +16,7 @@ aba1 = P('index.html').replace('<meta name="dash-one-writer">\n', '').replace('<
 aba1 = aba1.replace(' dash-skeleton', '')
 velho = 'Esta página mostra uma cópia dessas cotações e só muda quando o arquivo é atualizado.'
 assert velho in aba1
-aba1 = aba1.replace(velho, 'Esta página busca novas cotações três vezes por dia nos dias úteis: às 10h20, 14h20 e 18h20.')
+aba1 = aba1.replace(velho, 'Esta página busca novas cotações três vezes por dia nos dias úteis, a partir de 10h20, 14h20 e 18h20; o agendamento costuma atrasar cerca de meia hora.')
 assert aba1.lstrip().startswith('<div class="di-page">')
 aba1 = aba1.strip()[len('<div class="di-page">'):]
 aba1 = aba1[:aba1.rindex('</div>')].strip('\n')
@@ -102,7 +102,7 @@ corpo = '''<div class="di-wrap">
 ''' % (nav, paineis)
 d3tag = ('<script>' + open(d3local, encoding='utf-8').read() + '</script>') if d3local else '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>'
 scripts = '<script>\n' + shim + '\n</script>\n<script>\n' + P('vc.js') + '\n</script>\n<script>\n(() => {\n' + P('app.js') + '\n})();\n</script>\n'
-for n in ('ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'resumo.js', 'extras.js', 'historico.js', 'csv.js'):
+for n in ('ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'dolar.js', 'resumo.js', 'extras.js', 'historico.js', 'csv.js'):
     scripts += '<script>\n' + P(n) + '\n</script>\n'
 scripts += '<script>\n' + abas_js + '\n</script>\n'
 html_final = head + '<style>\n' + tokens + P('style.css') + brand_css + P('tabs.css') + P('refino.css') + '</style>\n' + corpo + d3tag + '\n' + scripts
