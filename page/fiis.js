@@ -57,6 +57,58 @@
     },
   });
 
+  dash.calc('fiis_indicadores', {
+    title: 'Indicadores dos fundos do IFIX',
+    description: 'Cota de agora contra o valor patrimonial do informe mensal da CVM, tipo de carteira pelo balanço e dividend yield informado pelo fundo.',
+    inputs: ['br_fiis', 'br_fiis_cvm'],
+    fn: (fundos, cvm) => {
+      const porTicker = new Map(cvm.map((c) => [c.ticker, c]));
+      const n = (v) => (v === null || v === undefined || v === '' ? null : +v);
+      return fundos.map((f) => {
+        const c = porTicker.get(f.ticker) || {}, preco = n(f.preco), vp = n(c.vp_cota), qtd = n(f.qtd), cotas = n(c.cotas);
+        // com mais de 20% de diferença entre as cotas do informe e as do índice, a cota e o valor patrimonial estão em bases diferentes
+        const mesmaBase = qtd === null || cotas === null || Math.abs(qtd / cotas - 1) <= 0.2;
+        return {
+          ticker: f.ticker, nome: f.nome, peso: n(f.peso), preco, mes: c.mes || null, tipo: c.tipo || null, vp_cota: vp,
+          pvp: preco !== null && vp && mesmaBase ? +(preco / vp).toFixed(2) : null, pl_milhoes: n(c.pl) === null ? null : +(n(c.pl) / 1e6).toFixed(0),
+          dy_mes: n(c.dy_mes), dy_12m: n(c.dy_12m),
+        };
+      }).sort((a, b) => (b.peso || 0) - (a.peso || 0));
+    },
+  });
+
+  dash.calc('fiis_por_tipo', {
+    title: 'Fundos do IFIX por tipo de carteira',
+    description: 'Número de fundos, peso no índice, P/VP ponderado pelo peso e mediana do dividend yield em 12 meses de cada tipo de carteira.',
+    inputs: ['fiis_indicadores'],
+    fn: (fundos) => {
+      const mediana = (l) => { const o = l.slice().sort((a, b) => a - b); return o.length ? (o.length % 2 ? o[(o.length - 1) / 2] : (o[o.length / 2 - 1] + o[o.length / 2]) / 2) : null; };
+      const grupo = (chave, lista) => {
+        const comPvp = lista.filter((f) => f.pvp !== null && f.peso), pesoPvp = comPvp.reduce((s, f) => s + f.peso, 0), dys = lista.map((f) => f.dy_12m).filter((v) => v !== null);
+        return { tipo: chave, fundos: lista.length, peso: +lista.reduce((s, f) => s + (f.peso || 0), 0).toFixed(2),
+          pvp: pesoPvp > 0 ? +(comPvp.reduce((s, f) => s + f.peso * f.pvp, 0) / pesoPvp).toFixed(2) : null,
+          dy_12m: dys.length ? +mediana(dys).toFixed(2) : null, com_dy: dys.length };
+      };
+      const tipos = ['tijolo', 'papel', 'fundo de fundos', 'hibrido'].map((t) => grupo(t, fundos.filter((f) => f.tipo === t))).filter((g) => g.fundos);
+      const semTipo = fundos.filter((f) => !f.tipo);
+      return [...tipos, ...(semTipo.length ? [grupo('sem informe', semTipo)] : []), grupo('todos', fundos)];
+    },
+  });
+  const TIPOS = { tijolo: 'Tijolo', papel: 'Papel', 'fundo de fundos': 'Fundo de fundos', hibrido: 'Híbrido', 'sem informe': 'Sem informe localizado', todos: 'IFIX inteiro' };
+  VC.tipoDeFundo = (t) => TIPOS[t] || INDISPONIVEL;
+  const vezes = (v) => (ok(v) ? nf(2).format(v) : INDISPONIVEL);
+  dash.draw('fii-cvm-mes', (el) => { const m = linhas('br_fiis_cvm').map((c) => c.mes).sort().pop(); el.textContent = m ? VC.mes(m) : INDISPONIVEL; });
+  dash.draw('fii-cvm-n', (el) => { const c = linhas('br_fiis_cvm').length, t = linhas('br_fiis').length; el.textContent = c ? `${c} dos ${t} fundos com cotação foram localizados na CVM` : 'Informes da CVM indisponíveis'; });
+  dash.draw('fii-tabela-tipos', (corpo) => tabela(corpo, linhas('br_fiis_cvm').length ? linhas('fiis_por_tipo') : [], 'tipo', [
+    [(r) => TIPOS[r.tipo] || r.tipo, 'di-strong'], [(r) => String(r.fundos), 'di-num'], [(r) => pct(r.peso), 'di-num'], [(r) => vezes(r.pvp), 'di-num di-strong'],
+    [(r) => (r.dy_12m === null ? INDISPONIVEL : `${pct(r.dy_12m)} (${r.com_dy} fundos)`), 'di-num'],
+  ]));
+  dash.draw('fii-tabela-indicadores', (corpo) => tabela(corpo, linhas('br_fiis_cvm').length ? linhas('fiis_indicadores') : [], 'ticker', [
+    [(r) => r.ticker, 'di-strong'], [(r) => r.nome, ''], [(r) => VC.tipoDeFundo(r.tipo), ''], [(r) => pct(r.peso), 'di-num'], [(r) => reais(r.preco), 'di-num'],
+    [(r) => reais(r.vp_cota), 'di-num'], [(r) => vezes(r.pvp), 'di-num di-strong'], [(r) => (r.pl_milhoes === null ? INDISPONIVEL : nf(0).format(r.pl_milhoes)), 'di-num'],
+    [(r) => pct(r.dy_mes), 'di-num'], [(r) => pct(r.dy_12m), 'di-num'],
+  ]));
+
   const ifix = () => linhas('br_ifix')[0] || null;
   const pontos = (v) => (ok(v) ? nf(2).format(v) : INDISPONIVEL);
   const variacao = (campo) => linhas('ifix_variacoes').find((x) => x.campo === campo);

@@ -401,6 +401,28 @@ def bloco_dolar_futuro(dados,tmp,notes):
         if sem(linha)!=sem(dados.get('br_dolar_fut',[])): dados['br_dolar_fut']=linha; notes.append('dolar futuro %s de %s'%(simbolo,quando))
         return
     raise RuntimeError('dolar futuro sem cotacao na B3')
+def bloco_dolar_curva(dados,tmp,notes):
+    # Todos os vencimentos do dolar futuro (B3): ajuste do pregao anterior e, onde ha oferta ou negocio, a cotacao de agora. Precos por US$ 1.000.
+    path=baixar('https://cotacao.b3.com.br/mds/api/v1/DerivativeQuotation/DOL',os.path.join(tmp,'dol.json'),90)
+    d=json.load(open(path))
+    if d['BizSts']['cd']!='OK': raise RuntimeError('B3 sem cotacoes de dolar futuro')
+    stamp=d['Msg']['dtTm']; hoje=date.fromisoformat(stamp[:10]); quando=stamp.replace(' ','T')+'-03:00'
+    ant=hoje-timedelta(1)
+    while not bd(ant): ant-=timedelta(1)
+    mil=lambda v: None if v is None else s(round(v/1000,4))
+    linhas=[]
+    for x in d['Scty']:
+        if x['mkt']['cd']!='FUT' or not re.fullmatch(r'DOL[FGHJKMNQUVXZ]\d\d',x.get('symb','')): continue
+        q=x.get('SctyQtn',{}); a=x['asset']['AsstSummry']; venc=date.fromisoformat(a['mtrtyCode'])
+        if venc<=hoje or q.get('prvsDayAdjstmntPric') is None: continue
+        compra=x.get('buyOffer',{}).get('price'); venda=x.get('sellOffer',{}).get('price')
+        linhas.append(dict(ticker=x['symb'],vencimento=venc.isoformat(),du=s(du(hoje,venc)),du_ajuste=s(du(ant,venc)),dc_ajuste=s((venc-ant).days),
+            ajuste_ant=mil(q['prvsDayAdjstmntPric']),ultimo=mil(q.get('curPrc')),compra=mil(compra),venda=mil(venda),
+            negociados=s(a.get('traddCtrctsQty') or 0),em_aberto=s(a.get('opnCtrcts')),data_ajuste_ant=ant.isoformat(),cotacao_em=quando))
+    linhas.sort(key=lambda r:r['vencimento'])
+    if len(linhas)<6: raise RuntimeError('curva do dolar futuro com poucos vencimentos (%d)'%len(linhas))
+    sem=lambda l:[{k:v for k,v in r.items() if k!='cotacao_em'} for r in l]
+    if sem(linhas)!=sem(dados.get('br_dolar_curva',[])): dados['br_dolar_curva']=linhas; notes.append('curva do dolar futuro (%d vencimentos)'%len(linhas))
 def cotacoes_da_carteira(tmp,cart):
     # Uma cotacao por papel, com pausa entre os pedidos para pesar pouco na B3. A B3 as vezes recusa pedidos (403 ou 429):
     # o pedido recusado nao e repetido; com 3 recusas seguidas a rotina para de pedir; e se as recusas deixarem menos de
@@ -460,7 +482,8 @@ def bloco_ifix(dados,tmp,notes):
 def bloco_fiis(dados,tmp,notes):
     cart=carteira_b3(tmp,'IFIX')
     quando,lidos=cotacoes_da_carteira(tmp,cart)
-    fundos=[dict(ticker=c['cod'],nome=c['asset'].strip(),preco=s(qq['curPrc']),var_dia=s(qq['prcFlcn']),peso=(c.get('part') or '').replace(',','.')) for c,qq in lidos]
+    fundos=[dict(ticker=c['cod'],nome=c['asset'].strip(),preco=s(qq['curPrc']),var_dia=s(qq['prcFlcn']),peso=(c.get('part') or '').replace(',','.'),
+        qtd=(c.get('theoricalQty') or '').replace('.','').replace(',','.') or None) for c,qq in lidos]
     if len(fundos)<30: raise RuntimeError('so %d fundos do IFIX com cotacao'%len(fundos))
     if fundos!=dados.get('br_fiis'):
         dados['br_fiis']=fundos; dados['br_fiis_ref']=[dict(cotado_em=quando,fundos=str(len(fundos)),carteira=str(len(cart)))]; notes.append('%d fundos do IFIX'%len(fundos))
@@ -486,6 +509,71 @@ def bloco_historico_fii(dados,tmp,notes):
     hist=sorted((h for h in hist if h['data']<hoje.isoformat()),key=lambda h:h['data'])[-275:]   # so pregoes encerrados
     if len(hist)<200: raise RuntimeError('historico do IFIX curto (%d pregoes)'%len(hist))
     if hist!=dados.get('br_ifix_hist'): dados['br_ifix_hist']=hist; notes.append('historico do IFIX ate '+hist[-1]['data'])
+
+# ---------------------------------------------------------------- FIIs: informes mensais (CVM)
+CVM_FII='https://dados.cvm.gov.br/dados/FII/DOC/INF_MENSAL/DADOS/inf_mensal_fii_%d.zip'
+def bloco_fiis_cvm(dados,tmp,notes):
+    # Patrimonio, valor patrimonial da cota, composicao da carteira e dividend yield informado por cada fundo do IFIX.
+    import zipfile, io
+    fundos=dados.get('br_fiis') or []
+    if not fundos: raise RuntimeError('sem a carteira do IFIX para cruzar com a CVM')
+    ano=agora_br().year; tabelas={'geral':{},'complemento':{},'ativo_passivo':{}}; lidos=0
+    for a_ in (ano-1,ano):
+        try: caminho=baixar(CVM_FII%a_,os.path.join(tmp,'cvm_fii_%d.zip'%a_),240)
+        except RuntimeError:
+            if a_==ano: continue   # em janeiro o arquivo do ano pode ainda nao existir
+            raise
+        lidos+=1
+        with zipfile.ZipFile(caminho) as z:
+            for parte,t in tabelas.items():
+                with z.open('inf_mensal_fii_%s_%d.csv'%(parte,a_)) as f:
+                    for r in csv.DictReader(io.TextIOWrapper(f,encoding='latin-1',newline=''),delimiter=';'):
+                        k=(r['CNPJ_Fundo_Classe'],r['Data_Referencia'][:7])
+                        if k not in t or int(r['Versao'] or 0)>int(t[k]['Versao'] or 0): t[k]=r   # fica a versao mais nova de cada mes
+    if not lidos or not tabelas['complemento']: raise RuntimeError('arquivos da CVM sem dados')
+    geral,comp,ap=tabelas['geral'],tabelas['complemento'],tabelas['ativo_passivo']
+    f=lambda v: float(v) if v not in ('',None) else None
+    ultimo={}
+    for (cnpj,mes),r in geral.items():
+        if cnpj not in ultimo or mes>ultimo[cnpj][0]: ultimo[cnpj]=(mes,r)
+    por_raiz={}
+    for cnpj,(mes,r) in ultimo.items():
+        isin=(r.get('Codigo_ISIN') or '').strip().upper()
+        if re.fullmatch(r'BR[A-Z0-9]{4}CTF\w{3}',isin): por_raiz.setdefault(isin[2:6],[]).append(cnpj)
+    def escolher(ticker,nome):
+        # O fundo e achado pelo codigo ISIN (as 4 letras do codigo de negociacao). Com mais de um candidato, vale o nome parecido com o da B3.
+        cands=por_raiz.get(ticker[:4],[])
+        if len(cands)<=1: return cands[0] if cands else None
+        chaves=[p for p in re.findall(r'[A-Z0-9]{3,}',nome.upper()) if p!='FII']
+        nota=lambda c: sum(1 for p in chaves if any(w.startswith(p) for w in re.findall(r'[A-Z0-9]+',ultimo[c][1]['Nome_Fundo_Classe'].upper())))
+        ordem=sorted(cands,key=nota,reverse=True)
+        return ordem[0] if nota(ordem[0])>nota(ordem[1]) else None
+    linhas=[]
+    for fd in fundos:
+        cnpj=escolher(fd['ticker'],fd.get('nome',''))
+        if not cnpj: continue
+        meses=sorted(m for (c,m) in comp if c==cnpj)
+        if not meses: continue
+        mes=meses[-1]; k=comp[(cnpj,mes)]; b=ap.get((cnpj,mes))
+        tipo=None; partes=(None,None,None)
+        if b:
+            tijolo=sum(f(b.get(x)) or 0 for x in ('Direitos_Bens_Imoveis','Acoes_Sociedades_Atividades_FII','Cotas_Sociedades_Atividades_FII'))
+            papel=sum(f(b.get(x)) or 0 for x in ('CRI','CRI_CRA','LCI','LCI_LCA','LIG','Letras_Hipotecarias','Debentures','Titulos_Privados','Outros_Valores_Mobliarios'))
+            fof=f(b.get('FII')) or 0; total=tijolo+papel+fof
+            if total>0:
+                partes=(tijolo/total,papel/total,fof/total); maior=max(partes)
+                tipo='hibrido' if maior<0.6 else ('tijolo','papel','fundo de fundos')[partes.index(maior)]
+        ult12=meses[-12:]; dys=[f(comp[(cnpj,m)].get('Percentual_Dividend_Yield_Mes')) for m in ult12]
+        completo=len(ult12)==12 and all(x is not None and x>0 for x in dys)   # soma de 12 meses so com os 12 informados e positivos
+        dy_mes=f(k.get('Percentual_Dividend_Yield_Mes'))
+        pct=lambda v: None if v is None else s(round(v*100,2))
+        linhas.append(dict(ticker=fd['ticker'],mes=mes,tipo=tipo,parte_tijolo=pct(partes[0]),parte_papel=pct(partes[1]),parte_fof=pct(partes[2]),
+            vp_cota=None if f(k.get('Valor_Patrimonial_Cotas')) is None else s(round(f(k['Valor_Patrimonial_Cotas']),4)),
+            cotas=None if f(k.get('Cotas_Emitidas')) is None else s(round(f(k['Cotas_Emitidas']))),
+            pl=None if f(k.get('Patrimonio_Liquido')) is None else s(round(f(k['Patrimonio_Liquido']))),
+            dy_mes=pct(dy_mes) if dy_mes is not None and dy_mes>=0 else None,dy_12m=pct(sum(dys)) if completo else None))
+    if len(linhas)<30: raise RuntimeError('so %d fundos do IFIX encontrados na CVM'%len(linhas))
+    if linhas!=dados.get('br_fiis_cvm'): dados['br_fiis_cvm']=linhas; notes.append('CVM: %d fundos do IFIX, informes ate %s'%(len(linhas),max(l['mes'] for l in linhas)))
 
 # ---------------------------------------------------------------- Focus (Banco Central)
 FOCUS=['IPCA','Selic','PIB Total','Câmbio']
@@ -621,7 +709,7 @@ def montar_noticias(dados,tmp,notes):
 
 # ---------------------------------------------------------------- execução
 BLOCOS=[('curva_di',bloco_curva_di),('ntnb',bloco_ntnb),('fed_funds',bloco_fed_funds),('treasuries',bloco_treasuries),('fomc',bloco_fomc),
-        ('historico_br',bloco_historico_br),('futuros_fed',bloco_futuros_fed),('inflacao_br',bloco_inflacao_br),('ibovespa',bloco_acoes_br),('dolar_futuro',bloco_dolar_futuro),('papeis_br',bloco_papeis_br),
+        ('historico_br',bloco_historico_br),('futuros_fed',bloco_futuros_fed),('inflacao_br',bloco_inflacao_br),('ibovespa',bloco_acoes_br),('dolar_futuro',bloco_dolar_futuro),('dolar_curva',bloco_dolar_curva),('papeis_br',bloco_papeis_br),
         ('ifix',bloco_ifix),('fiis',bloco_fiis),('historico_fii',bloco_historico_fii),('focus',bloco_focus)]
 def main():
     src,out=sys.argv[1],sys.argv[2]; modo=sys.argv[3] if len(sys.argv)>3 else ''
@@ -650,7 +738,7 @@ def main():
         if hist is not None:
             for k in HIST: hist.setdefault(k,{})
             UST_ANO_ANTERIOR=len(hist['ust'])<200
-    blocos=list(BLOCOS)+([('macro_eua',bloco_macro_eua),('agenda',bloco_agenda),('noticias',montar_noticias)] if modo=='noticias' else [])
+    blocos=list(BLOCOS)+([('macro_eua',bloco_macro_eua),('agenda',bloco_agenda),('fiis_cvm',bloco_fiis_cvm),('noticias',montar_noticias)] if modo=='noticias' else [])
     with tempfile.TemporaryDirectory() as tmp:
         for nome,fn in blocos:
             if so and nome not in so: continue

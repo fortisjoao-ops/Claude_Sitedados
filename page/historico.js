@@ -121,6 +121,9 @@
     });
     [['2 Yr', '2 anos'], ['10 Yr', '10 anos'], ['30 Yr', '30 anos']].forEach(([prazo, nome]) => por('ust-' + prazo, 'Juros nos Estados Unidos', `Treasury de ${nome}`, 'taxa', pct,
       () => Object.keys(H.ust).sort().map((d) => ({ data: d, v: H.ust[d][prazo] === undefined ? null : +H.ust[d][prazo] }))));
+    [[2, '2 Yr', '2 anos'], [5, '5 Yr', '5 anos'], [10, '10 Yr', '10 anos']].forEach(([anos, prazo, nome]) => por('dif-' + anos, 'Brasil e Estados Unidos', `Diferencial DI menos Treasury, ${nome}`, 'taxa',
+      (v) => (ok(v) ? nf(2).format(v) + ' p.p.' : INDISPONIVEL),
+      () => datasDI().filter((d) => H.ust[d] && H.ust[d][prazo] !== undefined).map((d) => { const di = interpolar(curvaDe(d), 'du', anos * BASE); return { data: d, v: di === null ? null : +(di - +H.ust[d][prazo]).toFixed(3) }; })));
     por('ifix', 'Bolsa e câmbio', 'IFIX (fechamento)', 'indice', (v) => (ok(v) ? nf(2).format(v) : INDISPONIVEL), () => linhas('br_ifix_hist').map((p) => ({ data: p.data, v: num(p.fechamento) })));
     por('ibov', 'Bolsa e câmbio', 'Ibovespa (fechamento)', 'indice', (v) => (ok(v) ? nf(0).format(v) : INDISPONIVEL), () => linhas('br_ibov_hist').map((p) => ({ data: p.data, v: num(p.fechamento) })));
     por('dolar', 'Bolsa e câmbio', 'Dólar PTAX, venda', 'indice', (v) => reais(v, 4), () => linhas('br_dolar').map((p) => ({ data: p.data, v: num(p.valor) })));
@@ -165,7 +168,7 @@
     grafico(el, {
       rotulo: `${s.nome}, de ${data(pts[0].data)} a ${data(pts[pts.length - 1].data)}.`,
       x: { dominio: [pts[0].x, pts[pts.length - 1].x], marcas },
-      y: s.tipo === 'taxa' ? { sufixo: '%', folgaMin: 0.05 } : { folgaMin: 0.01 },
+      y: s.tipo === 'taxa' ? { sufixo: s.id.startsWith('dif-') ? '' : '%', folgaMin: 0.05 } : { folgaMin: 0.01 },
       series: [{ classe: 'di-line', pontos: pts, marcadores: pts.length <= 70 }],
       encaixes: pts.map((p) => p.x),
       dica: (xv) => { const p = pts.find((q) => q.x === xv); return p ? { x: p.x, titulo: data(p.data), pontos: [{ y: p.y }], linhas: [[s.nome, s.formato(p.y)]] } : null; },

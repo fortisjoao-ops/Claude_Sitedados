@@ -1,0 +1,85 @@
+  <header class="di-head">
+    <h1 class="di-title" id="cb-titulo">Dólar</h1>
+    <p class="di-lede" id="cb-resumo">O dólar futuro de <b data-draw="dol-venc">—</b> está em <b data-draw="dol-preco">—</b>, <b data-draw="dol-var">—</b> no dia. A PTAX de <b data-draw="ac-dolar-data">—</b> fechou a <b data-draw="ac-dolar">—</b>.</p>
+    <p class="di-stamp" id="cb-carimbo">Dólar futuro (contrato <span data-draw="dol-simbolo">—</span>) cotado na B3 em <span data-draw="dol-quando">—</span>, com 15 minutos de atraso e relido a cada minuto enquanto esta página fica aberta. A PTAX é a taxa de fechamento do Banco Central, não a cotação do momento.</p>
+  </header>
+
+  <section class="di-tiles" id="cb-destaques" aria-label="Dólar">
+    <div class="di-tile">
+      <div class="di-tile-label">Dólar futuro, <span data-draw="dol-venc">—</span></div>
+      <div class="di-tile-num" data-draw="dol-preco">—</div>
+      <div class="di-tile-sub"><span data-draw="dol-var">—</span> no dia; mínima <span data-draw="dol-campo" data-campo="minimo">—</span>, máxima <span data-draw="dol-campo" data-campo="maximo">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Dólar PTAX, venda</div>
+      <div class="di-tile-num" data-draw="ac-dolar">—</div>
+      <div class="di-tile-sub"><span data-draw="ac-dolar-var" data-campo="dia">—</span> no dia, em <span data-draw="ac-dolar-data">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">PTAX no mês</div>
+      <div class="di-tile-num" data-draw="ac-dolar-var" data-campo="mes">—</div>
+      <div class="di-tile-sub">contra a última PTAX do mês anterior</div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">PTAX no ano</div>
+      <div class="di-tile-num" data-draw="ac-dolar-var" data-campo="ano">—</div>
+      <div class="di-tile-sub">contra a última PTAX do ano anterior</div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Focus, dólar em <span data-draw="fx-ano" data-idx="0">—</span></div>
+      <div class="di-tile-num" data-draw="fx-num" data-ind="Câmbio" data-idx="0">—</div>
+      <div class="di-tile-sub">para <span data-draw="fx-ano" data-idx="1">—</span>: <span data-draw="fx-num" data-ind="Câmbio" data-idx="1">—</span></div>
+    </div>
+  </section>
+
+  <section class="di-block" id="cb-curva">
+    <h2 class="di-h2">Curva do dólar futuro</h2>
+    <p class="di-note">Preço de cada vencimento do dólar futuro na B3, em reais por dólar. A linha é o ajuste oficial do pregão de <span data-draw="cb-data" data-campo="ajuste">—</span>, que existe para todos os vencimentos; os círculos são a cotação de agora, onde há oferta ou negócio. A curva sobe com o prazo porque o juro em reais é maior que o juro em dólar: é a diferença de juros embutida, não uma previsão para o câmbio.</p>
+    <div class="di-chart" data-draw="cb-grafico-curva" data-source="dolar_curva"></div>
+    <ul class="di-legend">
+      <li><span class="di-sw di-sw-line"></span>Ajuste de <span class="di-legend-data" data-draw="cb-data" data-campo="ajuste">—</span></li>
+      <li><span class="di-sw di-sw-ring"></span>Cotação de agora (média entre compra e venda, ou último negócio)</li>
+    </ul>
+    <div class="di-scroll">
+      <table class="di-table vc-cab-quebra">
+        <thead><tr>
+          <th>Contrato</th><th>Vencimento</th><th class="di-num">Dias úteis</th><th class="di-num">Ajuste anterior</th><th class="di-num">Agora</th>
+          <th class="di-num">Prêmio sobre o 1º vencimento</th><th class="di-num">Prêmio ao ano</th><th class="di-num">Juro em dólar embutido</th><th class="di-num">Contratos em aberto</th>
+        </tr></thead>
+        <tbody data-draw="cb-tabela-curva"></tbody>
+      </table>
+    </div>
+    <p class="di-note vc-baixar"><button type="button" class="vc-botao" data-draw="csv" data-csv="dolar-curva">Baixar a curva em CSV</button><span>Separado por ponto e vírgula, com vírgula decimal, para abrir direto no Excel.</span></p>
+    <p class="di-note">Limitações: só o primeiro vencimento tem negócios todos os dias; nos demais o ajuste é um preço de referência calculado pela B3. O juro em dólar embutido (cupom cambial a termo) é uma conta desta página, sensível a pequenas diferenças de preço nos prazos curtos.</p>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="dolar_curva dolar_futuro">—</p>
+  </section>
+
+  <section class="di-block" id="cb-diferencial">
+    <h2 class="di-h2">Diferencial de juros entre Brasil e Estados Unidos</h2>
+    <p class="di-note">Taxa do DI futuro menos o rendimento do Treasury de mesmo prazo. É o ganho de juros de quem aplica em reais em vez de em dólares, antes do risco de câmbio. DI de <span data-draw="cb-data" data-campo="di">—</span> e Treasuries de <span data-draw="cb-data" data-campo="ust">—</span>.</p>
+    <div class="di-scroll">
+      <table class="di-table vc-cab-quebra">
+        <thead><tr>
+          <th>Prazo</th><th class="di-num">DI futuro</th><th class="di-num">Treasury</th><th class="di-num">Diferencial</th><th class="di-num">Diferencial há 3 meses</th><th class="di-num">Mudança em 3 meses</th>
+        </tr></thead>
+        <tbody data-draw="cb-tabela-dif"></tbody>
+      </table>
+    </div>
+    <p class="di-note">As duas taxas têm convenções diferentes: o DI é uma taxa composta em dias úteis, sem cupom; o Treasury é um rendimento ao par de um título com cupom semestral. O diferencial é uma aproximação, boa para acompanhar a direção e a ordem de grandeza. A evolução no tempo está na aba Histórico, no indicador "Diferencial DI menos Treasury".</p>
+  </section>
+
+  <section class="di-block" id="cb-ptax">
+    <h2 class="di-h2">Dólar PTAX nos últimos 12 meses</h2>
+    <p class="di-note">PTAX de venda de cada dia útil, em reais por dólar.</p>
+    <div class="di-chart" data-draw="cb-grafico-ptax" data-source="br_dolar"></div>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="historico_br">—</p>
+  </section>
+
+  <details class="di-details" id="cb-metodo">
+    <summary>Fontes e fórmulas</summary>
+    <p>Dólar futuro: contratos de dólar comercial da B3, cotados em reais por mil dólares e mostrados aqui em reais por dólar. O ajuste anterior é o preço de ajuste do pregão anterior; a cotação de agora é a média entre a melhor compra e a melhor venda ou, sem as duas, o último negócio. PTAX: taxa de venda, série 1 do SGS do Banco Central. Focus: mediana da expectativa anual para o câmbio.</p>
+    <p>Prêmio sobre o 1º vencimento: ajuste do vencimento dividido pelo ajuste do primeiro vencimento, menos 1. Prêmio ao ano: essa razão elevada a 252 dividido pelos dias úteis entre os dois vencimentos, menos 1.</p>
+    <p>Juro em dólar embutido (cupom cambial a termo, entre o primeiro vencimento e cada um dos seguintes): o fator de juros do DI entre as duas datas, dividido pela razão entre os dois preços de ajuste, menos 1, multiplicado por 360 e dividido pelos dias corridos entre as duas datas. O fator do DI usa as taxas de ajuste dos contratos de DI do mesmo pregão, interpoladas em linha reta por dias úteis.</p>
+    <p>Diferencial de juros: taxa do DI no prazo, lida na curva interpolada da aba Curva DI Futuro (de 10 anos, quando o prazo passa de 5), menos o rendimento do Treasury de mesmo prazo. Três meses atrás: as mesmas duas curvas nas datas de comparação de cada aba.</p>
+    <p>A cotação do primeiro vencimento é relida direto da B3 pelo navegador a cada minuto, em dias úteis das 9h às 18h50, enquanto a página está aberta. A curva dos demais vencimentos só muda nas atualizações do site.</p>
+  </details>

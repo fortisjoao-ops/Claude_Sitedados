@@ -44,6 +44,25 @@
         registros: linhas('br_real').map((r) => [r.titulo, dia(r.vencimento), dec(r.real), dec(r.real_3m), dec(r.di), dec(r.implicita), dec(r.di_3m), dec(r.implicita_3m)]),
       };
     },
+    // Aba Dólar: curva do dólar futuro.
+    'dolar-curva': () => {
+      const c = linhas('br_dolar_curva')[0] || {};
+      return {
+        nome: 'dolar-futuro-curva-' + (c.cotacao_em ? String(c.cotacao_em).slice(0, 10) : 'sem-data') + '.csv',
+        cabecalho: ['Contrato', 'Vencimento', 'Dias úteis', `Ajuste de ${dia(c.data_ajuste_ant)} (R$/US$)`, `Agora, cotação de ${c.cotacao_em ? dataHora(c.cotacao_em) : ''} (R$/US$)`,
+          'Prêmio sobre o 1º vencimento (%)', 'Prêmio ao ano (%)', 'Juro em dólar embutido (% a.a.)', 'Contratos em aberto'],
+        registros: linhas('dolar_curva').map((r) => [r.ticker, dia(r.vencimento), r.du, dec(r.ajuste), dec(r.agora), dec(r.premio), dec(r.premio_aa), dec(r.cupom), r.em_aberto === null ? '' : r.em_aberto]),
+      };
+    },
+    // Aba FIIs: indicadores dos fundos do IFIX.
+    'fiis-indicadores': () => {
+      const mes = linhas('br_fiis_cvm').map((c) => c.mes).sort().pop() || 'sem-data';
+      return {
+        nome: 'fiis-indicadores-' + mes + '.csv',
+        cabecalho: ['Código', 'Fundo', 'Tipo de carteira', 'Peso no IFIX (%)', 'Cota (R$)', 'Valor patrimonial da cota (R$)', 'Mês do informe', 'P/VP', 'Patrimônio (R$ milhões)', 'Dividend yield no mês (%)', 'Dividend yield em 12 meses (%)'],
+        registros: linhas('br_fiis_cvm').length ? linhas('fiis_indicadores').map((r) => [r.ticker, r.nome, r.tipo ? VC.tipoDeFundo(r.tipo) : '', dec(r.peso), dec(r.preco), dec(r.vp_cota), r.mes || '', dec(r.pvp), dec(r.pl_milhoes), dec(r.dy_mes), dec(r.dy_12m)]) : [],
+      };
+    },
     // Aba Histórico: a série escolhida, no período escolhido.
     'historico-serie': () => {
       const s = VC.historicoSerie ? VC.historicoSerie() : null;
