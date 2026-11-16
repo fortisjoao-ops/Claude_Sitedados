@@ -51,6 +51,16 @@ shim = '''(() => {
     calc(id, definicao) { calculos[id] = definicao; },
     draw(nome, fn) { if (fn) desenhos[nome] = fn; else if (desenhos[nome]) desenhar(nome); },
     onData(fn) { avisos.push(fn); },
+    // Troca um conjunto de dados com a página aberta e descarta os cálculos que dependem dele; quem chama redesenha o que precisar.
+    definir(id, linhas) {
+      DADOS[id] = linhas;
+      const sujos = new Set([id]);
+      for (let mudou = true; mudou;) {
+        mudou = false;
+        Object.entries(calculos).forEach(([nome, c]) => { if (!sujos.has(nome) && c.inputs.some((i) => sujos.has(i))) { sujos.add(nome); mudou = true; } });
+      }
+      sujos.forEach((nome) => { delete valores[nome]; });
+    },
   };
   window.iniciarCurvaDI = () => {
     avisos.forEach((fn) => { try { fn(); } catch (erro) { console.error(erro); } });
@@ -102,7 +112,7 @@ corpo = '''<div class="di-wrap">
 ''' % (nav, paineis)
 d3tag = ('<script>' + open(d3local, encoding='utf-8').read() + '</script>') if d3local else '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>'
 scripts = '<script>\n' + shim + '\n</script>\n<script>\n' + P('vc.js') + '\n</script>\n<script>\n(() => {\n' + P('app.js') + '\n})();\n</script>\n'
-for n in ('ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'dolar.js', 'resumo.js', 'extras.js', 'historico.js', 'csv.js'):
+for n in ('ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'aovivo.js', 'resumo.js', 'extras.js', 'historico.js', 'csv.js'):
     scripts += '<script>\n' + P(n) + '\n</script>\n'
 scripts += '<script>\n' + abas_js + '\n</script>\n'
 html_final = head + '<style>\n' + tokens + P('style.css') + brand_css + P('tabs.css') + P('refino.css') + '</style>\n' + corpo + d3tag + '\n' + scripts

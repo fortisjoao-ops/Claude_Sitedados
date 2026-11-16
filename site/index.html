@@ -511,7 +511,7 @@ body { border-top: 4px solid var(--vc-navy); }
   <header class="di-head">
     <h1 class="di-title" id="rs-titulo">Resumo do dia</h1>
     <p class="di-lede" id="rs-resumo">O DI de 5 anos varia <b data-draw="rs-valor" data-item="di5" data-campo="mudanca">—</b> frente ao ajuste anterior, o Ibovespa <b data-draw="rs-valor" data-item="ibov" data-campo="mudanca">—</b> no dia e o IFIX <b data-draw="rs-valor" data-item="ifix" data-campo="mudanca">—</b>. O <span data-draw="rs-valor" data-item="dolar" data-campo="rotuloMinusculo">dólar</span> está em <b data-draw="rs-valor" data-item="dolar" data-campo="valor">—</b>.</p>
-    <p class="di-stamp" id="rs-carimbo">Cada número traz a data do próprio dado, porque as fontes fecham em horários diferentes. Os dados de mercado são buscados três vezes por dia nos dias úteis, a partir de 10h20, 14h20 e 18h20, com atraso de até cerca de meia hora; fontes e fórmulas estão na aba de cada tema.</p>
+    <p class="di-stamp" id="rs-carimbo">Cada número traz a data do próprio dado, porque as fontes fecham em horários diferentes. O dólar futuro, o Ibovespa e o IFIX são relidos da B3 a cada minuto enquanto esta página fica aberta, com os 15 minutos de atraso da B3. Os outros dados de mercado são buscados três vezes por dia nos dias úteis, a partir de 10h20, 14h20 e 18h20, com atraso de até cerca de meia hora; fontes e fórmulas estão na aba de cada tema.</p>
   </header>
 
   <section class="di-tiles vc-tiles-resumo" id="rs-destaques" aria-label="Principais números do dia" data-draw="rs-tiles"></section>
@@ -1109,7 +1109,7 @@ body { border-top: 4px solid var(--vc-navy); }
   <header class="di-head">
     <h1 class="di-title" id="acoes-titulo">Mercado de ações brasileiro</h1>
     <p class="di-lede" id="acoes-resumo">O Ibovespa está em <b data-draw="ac-nivel">—</b> pontos: <b data-draw="ac-var" data-campo="dia">—</b> no dia, <b data-draw="ac-var" data-campo="mes">—</b> no mês e <b data-draw="ac-var" data-campo="ano">—</b> no ano. O dólar futuro está em <b data-draw="dol-preco">—</b> e a PTAX fechou a <b data-draw="ac-dolar">—</b>.</p>
-    <p class="di-stamp" id="acoes-carimbo">Ibovespa cotado na B3 em <span data-draw="ac-cotado">—</span>, com 15 minutos de atraso. Dólar futuro (contrato <span data-draw="dol-simbolo">—</span>) cotado na B3 em <span data-draw="dol-quando">—</span>, também com 15 minutos de atraso e relido a cada minuto enquanto esta página fica aberta. Dólar PTAX de venda de <span data-draw="ac-dolar-data">—</span> (Banco Central), que é um fechamento e não a cotação do momento.</p>
+    <p class="di-stamp" id="acoes-carimbo">Ibovespa cotado na B3 em <span data-draw="ac-cotado">—</span> e dólar futuro (contrato <span data-draw="dol-simbolo">—</span>) em <span data-draw="dol-quando">—</span>, os dois com 15 minutos de atraso e relidos a cada minuto enquanto esta página fica aberta. Dólar PTAX de venda de <span data-draw="ac-dolar-data">—</span> (Banco Central), que é um fechamento e não a cotação do momento.</p>
   </header>
 
   <section class="di-tiles" id="acoes-destaques" aria-label="Ibovespa e dólar">
@@ -1174,7 +1174,7 @@ body { border-top: 4px solid var(--vc-navy); }
 
   <details class="di-details" id="acoes-metodo">
     <summary>Fontes e fórmulas</summary>
-    <p>Ibovespa e ações: cotações da B3 com 15 minutos de atraso; a lista de ações é a carteira teórica do índice publicada pela B3. Fechamentos diários do Ibovespa: Yahoo Finance, por um endereço não oficial. Dólar: PTAX de venda, série 1 do SGS do Banco Central.</p>
+    <p>Ibovespa e ações: cotações da B3 com 15 minutos de atraso. O Ibovespa é relido direto da B3 pelo navegador a cada minuto, em dias úteis das 9h às 18h50, enquanto a página está aberta; as ações das tabelas de altas e baixas só mudam nas atualizações do site; a lista de ações é a carteira teórica do índice publicada pela B3. Fechamentos diários do Ibovespa: Yahoo Finance, por um endereço não oficial. Dólar: PTAX de venda, série 1 do SGS do Banco Central.</p>
     <p>Variação no dia do Ibovespa e das ações: a oscilação informada pela B3 contra o fechamento anterior. Variação no mês: cotação atual dividida pelo último fechamento do mês anterior, menos 1. Variação no ano: cotação atual dividida pelo último fechamento do ano anterior, menos 1. Como a cotação atual vem da B3 e os fechamentos vêm do Yahoo Finance, pode haver diferença de centésimos.</p>
     <p>Dólar futuro: primeiro vencimento do contrato de dólar comercial da B3 (o que vence no primeiro dia útil do mês seguinte), em reais por dólar; a variação no dia é a informada pela B3 contra o ajuste anterior. É a referência de preço do dólar ao longo do pregão, mas não é o dólar à vista: o futuro negocia um pouco acima, pela diferença de juros até o vencimento. A cotação gravada na atualização do site é relida direto da B3 pelo navegador a cada minuto, em dias úteis das 9h às 18h50, enquanto a página está aberta; se a B3 não responder, fica o dado gravado.</p>
     <p>Dólar: as variações comparam a PTAX mais recente com a do dia útil anterior, com a última do mês anterior e com a última do ano anterior.</p>
@@ -1185,7 +1185,7 @@ body { border-top: 4px solid var(--vc-navy); }
   <header class="di-head">
     <h1 class="di-title" id="fii-titulo">Fundos imobiliários</h1>
     <p class="di-lede" id="fii-resumo">O IFIX está em <b data-draw="fii-nivel">—</b> pontos: <b data-draw="fii-var" data-campo="dia">—</b> no dia, <b data-draw="fii-var" data-campo="mes">—</b> no mês e <b data-draw="fii-var" data-campo="ano">—</b> no ano.</p>
-    <p class="di-stamp" id="fii-carimbo">IFIX cotado na B3 em <span data-draw="fii-cotado">—</span>, com 15 minutos de atraso. O IFIX é o índice de fundos imobiliários da B3 e já inclui os rendimentos distribuídos pelos fundos.</p>
+    <p class="di-stamp" id="fii-carimbo">IFIX cotado na B3 em <span data-draw="fii-cotado">—</span>, com 15 minutos de atraso e relido a cada minuto enquanto esta página fica aberta. O IFIX é o índice de fundos imobiliários da B3 e já inclui os rendimentos distribuídos pelos fundos.</p>
   </header>
 
   <section class="di-tiles" id="fii-destaques" aria-label="IFIX">
@@ -1260,7 +1260,7 @@ body { border-top: 4px solid var(--vc-navy); }
 
   <details class="di-details" id="fii-metodo">
     <summary>Fontes e fórmulas</summary>
-    <p>IFIX e cotas dos fundos: cotações da B3 com 15 minutos de atraso. A lista de fundos e os pesos são os da carteira teórica do IFIX publicada pela B3. Fechamentos diários do IFIX: estatísticas históricas do índice no site da B3. Fechamentos do Ibovespa: Yahoo Finance, por um endereço não oficial. CDI: taxa diária da série 12 do SGS do Banco Central.</p>
+    <p>IFIX e cotas dos fundos: cotações da B3 com 15 minutos de atraso. O IFIX é relido direto da B3 pelo navegador a cada minuto, em dias úteis das 9h às 18h50, enquanto a página está aberta; as cotas dos fundos só mudam nas atualizações do site. A lista de fundos e os pesos são os da carteira teórica do IFIX publicada pela B3. Fechamentos diários do IFIX: estatísticas históricas do índice no site da B3. Fechamentos do Ibovespa: Yahoo Finance, por um endereço não oficial. CDI: taxa diária da série 12 do SGS do Banco Central.</p>
     <p>Variação no dia do IFIX e das cotas: a oscilação informada pela B3 contra o fechamento anterior. Variação no mês: cotação atual dividida pelo último fechamento do mês anterior, menos 1. Variação no ano: cotação atual dividida pelo último fechamento do ano anterior, menos 1.</p>
     <p>Comparação em 12 meses: a data inicial é o último pregão até um ano antes do fechamento mais recente do IFIX. IFIX e Ibovespa: fechamento de cada dia dividido pelo da data inicial, vezes 100. CDI: 100 vezes o produto de (1 + taxa diária) de cada dia útil desde a data inicial até a véspera. Rentabilidade passada não garante rentabilidade futura.</p>
   </details>
@@ -1385,6 +1385,16 @@ body { border-top: 4px solid var(--vc-navy); }
     calc(id, definicao) { calculos[id] = definicao; },
     draw(nome, fn) { if (fn) desenhos[nome] = fn; else if (desenhos[nome]) desenhar(nome); },
     onData(fn) { avisos.push(fn); },
+    // Troca um conjunto de dados com a página aberta e descarta os cálculos que dependem dele; quem chama redesenha o que precisar.
+    definir(id, linhas) {
+      DADOS[id] = linhas;
+      const sujos = new Set([id]);
+      for (let mudou = true; mudou;) {
+        mudou = false;
+        Object.entries(calculos).forEach(([nome, c]) => { if (!sujos.has(nome) && c.inputs.some((i) => sujos.has(i))) { sujos.add(nome); mudou = true; } });
+      }
+      sujos.forEach((nome) => { delete valores[nome]; });
+    },
   };
   window.iniciarCurvaDI = () => {
     avisos.forEach((fn) => { try { fn(); } catch (erro) { console.error(erro); } });
@@ -3231,44 +3241,54 @@ dash.draw('grafico', (el) => {
 
 </script>
 <script>
-// ---------- Dólar futuro (B3), com releitura enquanto a página está aberta ----------
-// A atualização do site grava a cotação do primeiro vencimento do dólar futuro. Com a página aberta, o navegador relê
-// essa mesma cotação direto da B3 a cada minuto, em horário de pregão. A B3 já entrega o dado com 15 minutos de atraso.
+// ---------- Cotações relidas ao vivo: dólar futuro, Ibovespa e IFIX ----------
+// A atualização do site grava essas três cotações. Com a página aberta, o navegador as relê direto da B3 a cada minuto,
+// em horário de pregão, e troca o dado gravado pelo mais novo. A B3 já entrega o dado com 15 minutos de atraso.
+// Se a B3 não responder, fica o dado gravado, sem aviso. Os outros números da página só mudam nas atualizações do site.
 (() => {
   const { num, ok, reais, varPct, dataHora, linhas, MESES, INDISPONIVEL } = VC;
-  const gravado = () => linhas('br_dolar_fut')[0] || null;
-  let aoVivo = null;
-  const atual = () => {
-    const g = gravado();
-    return aoVivo && g && aoVivo.simbolo === g.simbolo && aoVivo.cotado_em > g.cotado_em ? aoVivo : g;
-  };
-  VC.dolarFuturo = atual;
+  const texto = (v) => (ok(v) ? String(v) : null);
+  const mil = (v) => (ok(v) ? String(+(v / 1000).toFixed(4)) : null);   // o dólar futuro é cotado por US$ 1.000
+  const RESUMO = ['rs-valor', 'rs-tiles', 'rs-tabela'];
+  const indice = (g, q) => ({ ...g, nivel: texto(q.curPrc), var_dia: texto(q.prcFlcn), abertura: texto(q.opngPric), minimo: texto(q.minPric), maximo: texto(q.maxPric) });
+  const ALVOS = [
+    { dado: 'br_dolar_fut', simbolo: (g) => g.simbolo, formato: /^DOL[A-Z]\d\d$/, desenhos: ['dol-preco', 'dol-var', 'dol-campo', 'dol-quando'],
+      aplicar: (g, q) => ({ ...g, preco: mil(q.curPrc), var_dia: texto(q.prcFlcn), abertura: mil(q.opngPric), minimo: mil(q.minPric), maximo: mil(q.maxPric) }) },
+    { dado: 'br_ibov', simbolo: () => 'IBOV', formato: /^IBOV$/, desenhos: ['ac-nivel', 'ac-campo', 'ac-cotado', 'ac-var', 'ac-base', 'ac-grafico'], aplicar: indice },
+    { dado: 'br_ifix', simbolo: () => 'IFIX', formato: /^IFIX$/, desenhos: ['fii-nivel', 'fii-campo', 'fii-cotado', 'fii-var', 'fii-base'], aplicar: indice },
+  ];
+
+  // Dólar futuro: leitura e desenhos próprios (o Ibovespa e o IFIX usam os desenhos das abas deles).
+  const dolar = () => linhas('br_dolar_fut')[0] || null;
+  VC.dolarFuturo = dolar;
   VC.mesDoContrato = (c) => (c ? MESES[+c.vencimento.slice(5, 7) - 1] + '/' + c.vencimento.slice(2, 4) : '');
+  dash.draw('dol-preco', (el) => { const c = dolar(); el.textContent = c ? reais(num(c.preco), 4) : INDISPONIVEL; });
+  dash.draw('dol-var', (el) => { const c = dolar(); el.textContent = c ? varPct(num(c.var_dia)) : INDISPONIVEL; });
+  dash.draw('dol-campo', (el) => { const c = dolar(); el.textContent = c && ok(num(c[el.dataset.campo])) ? reais(num(c[el.dataset.campo]), 4) : INDISPONIVEL; });
+  dash.draw('dol-venc', (el) => { const c = dolar(); el.textContent = c ? VC.mesDoContrato(c) : INDISPONIVEL; });
+  dash.draw('dol-simbolo', (el) => { const c = dolar(); el.textContent = c ? c.simbolo : INDISPONIVEL; });
+  dash.draw('dol-quando', (el) => { const c = dolar(); el.textContent = c ? dataHora(c.cotado_em) : INDISPONIVEL; });
 
-  dash.draw('dol-preco', (el) => { const c = atual(); el.textContent = c ? reais(num(c.preco), 4) : INDISPONIVEL; });
-  dash.draw('dol-var', (el) => { const c = atual(); el.textContent = c ? varPct(num(c.var_dia)) : INDISPONIVEL; });
-  dash.draw('dol-campo', (el) => { const c = atual(); el.textContent = c && ok(num(c[el.dataset.campo])) ? reais(num(c[el.dataset.campo]), 4) : INDISPONIVEL; });
-  dash.draw('dol-venc', (el) => { const c = atual(); el.textContent = c ? VC.mesDoContrato(c) : INDISPONIVEL; });
-  dash.draw('dol-simbolo', (el) => { const c = atual(); el.textContent = c ? c.simbolo : INDISPONIVEL; });
-  dash.draw('dol-quando', (el) => { const c = atual(); el.textContent = c ? dataHora(c.cotado_em) : INDISPONIVEL; });
-
-  const DESENHOS = ['dol-preco', 'dol-var', 'dol-campo', 'dol-quando', 'rs-valor', 'rs-tiles', 'rs-tabela'];
-  const reler = () => {
-    const g = gravado();
-    if (!g || !/^DOL[A-Z]\d\d$/.test(g.simbolo)) return;
-    fetch('https://cotacao.b3.com.br/mds/api/v1/instrumentQuotation/' + g.simbolo, { cache: 'no-store' })
+  const reler = (alvo) => {
+    const g = linhas(alvo.dado)[0];
+    if (!g) return;
+    const simbolo = alvo.simbolo(g);
+    if (!alvo.formato.test(String(simbolo))) return;
+    fetch('https://cotacao.b3.com.br/mds/api/v1/instrumentQuotation/' + simbolo, { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('resposta ' + r.status))))
       .then((j) => {
         const q = j && j.BizSts && j.BizSts.cd === 'OK' && j.Trad && j.Trad[0] && j.Trad[0].scty && j.Trad[0].scty.SctyQtn;
         if (!q || !ok(q.curPrc) || !j.Msg || !j.Msg.dtTm) return;   // sem cotação nova, fica o dado gravado
-        const mil = (v) => (ok(v) ? +(v / 1000).toFixed(4) : null);
-        aoVivo = { ...g, preco: mil(q.curPrc), var_dia: ok(q.prcFlcn) ? q.prcFlcn : null, abertura: mil(q.opngPric), minimo: mil(q.minPric), maximo: mil(q.maxPric),
-          cotado_em: String(j.Msg.dtTm).replace(' ', 'T') + '-03:00' };
-        DESENHOS.forEach((n) => dash.draw(n));
+        const quando = String(j.Msg.dtTm).replace(' ', 'T') + '-03:00';
+        const agora = linhas(alvo.dado)[0];
+        if (!agora || quando <= String(agora.cotado_em)) return;
+        dash.definir(alvo.dado, [{ ...alvo.aplicar(agora, q), cotado_em: quando }]);
+        [...alvo.desenhos, ...RESUMO].forEach((n) => dash.draw(n));
       })
-      .catch(() => {});   // falha de rede ou recusa da B3: fica o dado gravado, sem aviso
+      .catch(() => {});   // falha de rede ou recusa da B3: fica o dado gravado
   };
-  // Pregão do dólar futuro: dias úteis, das 9h às 18h30 de Brasília (com folga para o atraso de 15 minutos).
+  const relerTudo = () => ALVOS.forEach((alvo, i) => setTimeout(() => reler(alvo), i * 400));
+  // Pregão: dias úteis, das 9h às 18h50 de Brasília (o dólar futuro abre às 9h; a folga cobre o atraso de 15 minutos).
   const emPregao = () => {
     const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: 'America/Sao_Paulo', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false })
       .formatToParts(new Date()).map((x) => [x.type, x.value]));
@@ -3276,9 +3296,9 @@ dash.draw('grafico', (el) => {
     return p.weekday !== 'Sat' && p.weekday !== 'Sun' && minutos >= 9 * 60 && minutos <= 18 * 60 + 50;
   };
   dash.onData(() => {
-    setTimeout(reler, 0);   // uma leitura ao abrir a página, mesmo fora do pregão
-    setInterval(() => { if (document.visibilityState === 'visible' && emPregao()) reler(); }, 60000);
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && emPregao()) reler(); });
+    setTimeout(relerTudo, 0);   // uma leitura ao abrir a página, mesmo fora do pregão
+    setInterval(() => { if (document.visibilityState === 'visible' && emPregao()) relerTudo(); }, 60000);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && emPregao()) relerTudo(); });
   });
 })();
 
