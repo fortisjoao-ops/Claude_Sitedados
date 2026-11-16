@@ -385,6 +385,22 @@ def bloco_acoes_br(dados,tmp,notes):
     ibov=[dict(simbolo='IBOV',nivel=s(q['curPrc']),var_dia=s(q.get('prcFlcn')),abertura=s(q.get('opngPric')),minimo=s(q.get('minPric')),maximo=s(q.get('maxPric')),cotado_em=quando)]
     mudou=[{k:v for k,v in r.items() if k!='cotado_em'} for r in ibov]!=[{k:v for k,v in r.items() if k!='cotado_em'} for r in dados.get('br_ibov',[])]
     if mudou: dados['br_ibov']=ibov; notes.append('Ibovespa de '+quando)
+def bloco_dolar_futuro(dados,tmp,notes):
+    # Dolar futuro da B3, primeiro vencimento: o contrato que vence no primeiro dia util do mes seguinte (preco por US$ 1.000).
+    hoje=agora_br().date(); letra={v:k for k,v in MONTH.items()}
+    for i in (1,2):   # se o primeiro vencimento estiver sem negocio, tenta o seguinte
+        m=hoje.month+i; ano=hoje.year+(m-1)//12; m=(m-1)%12+1
+        simbolo='DOL%s%02d'%(letra[m],ano%100)
+        try: quando,q=cotacao_b3(tmp,simbolo)
+        except RuntimeError: continue
+        if q.get('curPrc') is None: continue
+        mil=lambda v: None if v is None else s(round(v/1000,4))
+        linha=[dict(simbolo=simbolo,vencimento=maturity(simbolo).isoformat(),preco=mil(q['curPrc']),var_dia=s(q.get('prcFlcn')),
+            abertura=mil(q.get('opngPric')),minimo=mil(q.get('minPric')),maximo=mil(q.get('maxPric')),cotado_em=quando)]
+        sem=lambda l:[{k:v for k,v in r.items() if k!='cotado_em'} for r in l]
+        if sem(linha)!=sem(dados.get('br_dolar_fut',[])): dados['br_dolar_fut']=linha; notes.append('dolar futuro %s de %s'%(simbolo,quando))
+        return
+    raise RuntimeError('dolar futuro sem cotacao na B3')
 def cotacoes_da_carteira(tmp,cart):
     # Uma cotacao por papel, com pausa entre os pedidos para pesar pouco na B3. A B3 as vezes recusa pedidos (403 ou 429):
     # o pedido recusado nao e repetido; com 3 recusas seguidas a rotina para de pedir; e se as recusas deixarem menos de
@@ -605,7 +621,7 @@ def montar_noticias(dados,tmp,notes):
 
 # ---------------------------------------------------------------- execução
 BLOCOS=[('curva_di',bloco_curva_di),('ntnb',bloco_ntnb),('fed_funds',bloco_fed_funds),('treasuries',bloco_treasuries),('fomc',bloco_fomc),
-        ('historico_br',bloco_historico_br),('futuros_fed',bloco_futuros_fed),('inflacao_br',bloco_inflacao_br),('ibovespa',bloco_acoes_br),('papeis_br',bloco_papeis_br),
+        ('historico_br',bloco_historico_br),('futuros_fed',bloco_futuros_fed),('inflacao_br',bloco_inflacao_br),('ibovespa',bloco_acoes_br),('dolar_futuro',bloco_dolar_futuro),('papeis_br',bloco_papeis_br),
         ('ifix',bloco_ifix),('fiis',bloco_fiis),('historico_fii',bloco_historico_fii),('focus',bloco_focus)]
 def main():
     src,out=sys.argv[1],sys.argv[2]; modo=sys.argv[3] if len(sys.argv)>3 else ''
