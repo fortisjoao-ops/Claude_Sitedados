@@ -1,0 +1,51 @@
+  <header class="di-head">
+    <h1 class="di-title" id="calc-titulo">Calculadora de equivalência de taxas</h1>
+    <p class="di-lede" id="calc-resumo">Informe a taxa de um papel e o prazo, e veja quanto ela vale nos outros indexadores pelas curvas de mercado de hoje: prefixado, CDI mais spread, percentual do CDI e IPCA mais juro real.</p>
+    <p class="di-stamp" id="calc-carimbo">A conta usa as taxas de ajuste do DI de <span data-draw="calc-data" data-campo="di">—</span> (B3) e as taxas das NTN-B Principal de <span data-draw="calc-data" data-campo="ntnb">—</span> (Tesouro Direto). É uma equivalência num único prazo, não o preço de um papel.</p>
+  </header>
+
+  <section class="di-block di-query" id="calc-entrada">
+    <h2 class="di-h2">O papel</h2>
+    <div class="vc-controles">
+      <label class="di-field"><span>Indexador</span>
+        <select class="di-date vc-select" id="calc-indexador" data-draw="calc-campo" aria-label="Indexador">
+          <option value="ipca" selected>IPCA + taxa</option><option value="cdi">CDI + spread</option><option value="pcdi">% do CDI</option><option value="pre">Prefixado</option>
+        </select></label>
+      <label class="di-field"><span data-draw="calc-rotulo-taxa">Taxa (% ao ano)</span>
+        <input class="di-date" id="calc-taxa" type="text" inputmode="decimal" value="8,50" data-draw="calc-campo" aria-label="Taxa"></label>
+      <label class="di-field"><span>Prazo médio (anos)</span>
+        <input class="di-date" id="calc-prazo" type="text" inputmode="decimal" value="5" data-draw="calc-campo" aria-label="Prazo médio em anos"></label>
+    </div>
+    <p class="di-note">Use o prazo médio (duration) do papel, e não o vencimento final, quando houver amortizações no caminho. Vale de <span data-draw="calc-faixa" data-campo="min">—</span> a <span data-draw="calc-faixa" data-campo="max">—</span> anos; as equivalências com IPCA só existem de <span data-draw="calc-faixa" data-campo="ipca_min">—</span> a <span data-draw="calc-faixa" data-campo="ipca_max">—</span> anos, onde há NTN-B Principal e DI no mesmo prazo.</p>
+  </section>
+
+  <p class="di-note vc-alerta" data-draw="calc-aviso" hidden></p>
+
+  <section class="di-block" id="calc-saida">
+    <h2 class="di-h2">Equivalências no prazo de <span data-draw="calc-prazo-texto">—</span></h2>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Indexador</th><th class="di-num">Taxa equivalente</th><th>Como ler</th></tr></thead>
+        <tbody data-draw="calc-resultado"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="di-block" id="calc-curvas">
+    <h2 class="di-h2">Curvas usadas nesse prazo</h2>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Curva</th><th class="di-num">Taxa no prazo</th><th>De onde vem</th></tr></thead>
+        <tbody data-draw="calc-curvas"></tbody>
+      </table>
+    </div>
+    <p class="di-note">Limitações: a equivalência olha um único ponto de cada curva, então não substitui a precificação pelo fluxo de caixa do papel. Não considera risco de crédito, liquidez nem imposto. A inflação implícita carrega prêmio de risco, e as taxas das NTN-B são as da manhã no Tesouro Direto, não as indicativas da ANBIMA.</p>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="curva_di ntnb">—</p>
+  </section>
+
+  <details class="di-details" id="calc-metodo">
+    <summary>Fontes e fórmulas</summary>
+    <p>DI no prazo: taxas de ajuste dos contratos de DI futuro do pregão anterior (B3), interpoladas em linha reta por dias úteis, com 252 dias úteis por ano de prazo. Juro real no prazo: taxa de venda das NTN-B Principal (Tesouro IPCA+, sem cupom) no Tesouro Direto, interpolada em linha reta pelo prazo até o vencimento. Inflação implícita: (1 + DI) dividido por (1 + juro real), menos 1.</p>
+    <p>Todas as conversões passam pela taxa prefixada equivalente. De IPCA + taxa: (1 + taxa) vezes (1 + inflação implícita), menos 1. De CDI + spread: (1 + DI) vezes (1 + spread), menos 1. De percentual do CDI: a taxa diária do DI vezes o percentual, capitalizada por 252 dias. Prefixado: a própria taxa.</p>
+    <p>Da taxa prefixada para cada indexador: CDI + spread é (1 + prefixada) dividido por (1 + DI), menos 1; percentual do CDI é a taxa diária da prefixada dividida pela taxa diária do DI; IPCA + taxa é (1 + prefixada) dividido por (1 + inflação implícita), menos 1. O prêmio sobre a NTN-B é a taxa em IPCA + menos o juro real da NTN-B Principal no mesmo prazo, em pontos-base.</p>
+  </details>

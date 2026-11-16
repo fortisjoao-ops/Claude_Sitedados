@@ -1,4 +1,4 @@
-# Monta a página única do dashboard (nove abas) a partir dos arquivos em page/.
+# Monta a página única do dashboard a partir dos arquivos em page/.
 # Uso: python3 build_dashboard.py <pagina-com-DADOS-atuais.html> <saida.html> [d3-local.js]
 import re, json, sys
 src, out = sys.argv[1], sys.argv[2]
@@ -23,7 +23,8 @@ aba1 = aba1[:aba1.rindex('</div>')].strip('\n')
 
 ABAS = [('visao-geral', 'Resumo', P('tab_resumo.html')), ('juros-br', 'Curva DI Futuro', aba1), ('juro-real-br', 'Juro real BR', P('tab_juroreal.html')),
         ('juros-eua', 'Juros EUA', P('tab_eua.html')), ('inflacao-br', 'Inflação BR', P('tab_inflacao.html')), ('focus', 'Focus', P('tab_focus.html')),
-        ('acoes-br', 'Ações BR', P('tab_acoes.html')), ('fiis', 'FIIs', P('tab_fiis.html')), ('historico', 'Histórico', P('tab_historico.html')),
+        ('dolar', 'Dólar', P('tab_dolar.html')), ('acoes-br', 'Ações BR', P('tab_acoes.html')), ('fiis', 'FIIs', P('tab_fiis.html')),
+        ('calculadora', 'Calculadora', P('tab_calculadora.html')), ('historico', 'Histórico', P('tab_historico.html')),
         ('noticias', 'Notícias', P('tab_noticias.html'))]
 
 pagina = open(src, encoding='utf-8').read()
@@ -112,7 +113,7 @@ corpo = '''<div class="di-wrap">
 ''' % (nav, paineis)
 d3tag = ('<script>' + open(d3local, encoding='utf-8').read() + '</script>') if d3local else '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>'
 scripts = '<script>\n' + shim + '\n</script>\n<script>\n' + P('vc.js') + '\n</script>\n<script>\n(() => {\n' + P('app.js') + '\n})();\n</script>\n'
-for n in ('ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'aovivo.js', 'resumo.js', 'extras.js', 'historico.js', 'csv.js'):
+for n in ('ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'aovivo.js', 'cambio.js', 'calculadora.js', 'resumo.js', 'extras.js', 'historico.js', 'csv.js'):
     scripts += '<script>\n' + P(n) + '\n</script>\n'
 scripts += '<script>\n' + abas_js + '\n</script>\n'
 html_final = head + '<style>\n' + tokens + P('style.css') + brand_css + P('tabs.css') + P('refino.css') + '</style>\n' + corpo + d3tag + '\n' + scripts

@@ -74,9 +74,34 @@
     <p class="di-note vc-fonte" data-draw="fonte" data-bloco="fiis">—</p>
   </section>
 
+  <section class="di-block" id="fii-indicadores">
+    <h2 class="di-h2">Indicadores dos fundos do IFIX</h2>
+    <p class="di-note">Cota de mercado contra o valor patrimonial, tipo de carteira e dividend yield de cada fundo, a partir dos informes mensais que os fundos entregam à CVM. Mês de referência dos informes: <span data-draw="fii-cvm-mes">—</span>. <span data-draw="fii-cvm-n">—</span>.</p>
+    <div class="di-scroll">
+      <table class="di-table vc-cab-quebra">
+        <thead><tr><th>Tipo de carteira</th><th class="di-num">Fundos</th><th class="di-num">Peso no IFIX</th><th class="di-num">P/VP ponderado pelo peso</th><th class="di-num">Dividend yield em 12 meses, mediana</th></tr></thead>
+        <tbody data-draw="fii-tabela-tipos"></tbody>
+      </table>
+    </div>
+    <div class="di-scroll vc-rolagem">
+      <table class="di-table vc-cab-quebra">
+        <thead><tr>
+          <th>Código</th><th>Fundo</th><th>Tipo de carteira</th><th class="di-num">Peso no IFIX</th><th class="di-num">Cota</th><th class="di-num">Valor patrimonial da cota</th><th class="di-num">P/VP</th>
+          <th class="di-num">Patrimônio (R$ milhões)</th><th class="di-num">Dividend yield no mês</th><th class="di-num">Dividend yield em 12 meses</th>
+        </tr></thead>
+        <tbody data-draw="fii-tabela-indicadores"></tbody>
+      </table>
+    </div>
+    <p class="di-note vc-baixar"><button type="button" class="vc-botao" data-draw="csv" data-csv="fiis-indicadores">Baixar os indicadores em CSV</button><span>Separado por ponto e vírgula, com vírgula decimal, para abrir direto no Excel.</span></p>
+    <p class="di-note">Limitações: a cota é a de agora e o valor patrimonial é o do fim do mês de referência, então o P/VP mistura duas datas. O dividend yield é o que cada fundo informa à CVM, na base que ele usa; a soma de 12 meses só aparece quando o fundo informou os 12 meses com valor positivo. O tipo de carteira é uma classificação desta página, pelo balanço do fundo, e não a categoria oficial.</p>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="fiis_cvm fiis">—</p>
+  </section>
+
   <details class="di-details" id="fii-metodo">
     <summary>Fontes e fórmulas</summary>
     <p>IFIX e cotas dos fundos: cotações da B3 com 15 minutos de atraso. O IFIX é relido direto da B3 pelo navegador a cada minuto, em dias úteis das 9h às 18h50, enquanto a página está aberta; as cotas dos fundos só mudam nas atualizações do site. A lista de fundos e os pesos são os da carteira teórica do IFIX publicada pela B3. Fechamentos diários do IFIX: estatísticas históricas do índice no site da B3. Fechamentos do Ibovespa: Yahoo Finance, por um endereço não oficial. CDI: taxa diária da série 12 do SGS do Banco Central.</p>
     <p>Variação no dia do IFIX e das cotas: a oscilação informada pela B3 contra o fechamento anterior. Variação no mês: cotação atual dividida pelo último fechamento do mês anterior, menos 1. Variação no ano: cotação atual dividida pelo último fechamento do ano anterior, menos 1.</p>
+    <p>Indicadores: informes mensais de FII nos dados abertos da CVM (cadastro, complemento e ativo e passivo), na versão mais recente de cada mês. Cada fundo do IFIX é localizado pelo código ISIN; os que não são encontrados aparecem como indisponíveis. P/VP: cota de agora na B3 dividida pelo valor patrimonial da cota no informe. Se o número de cotas do informe difere em mais de 20% do usado pela B3 no índice, o P/VP aparece como indisponível, porque houve emissão, desdobramento ou grupamento depois do informe.</p>
+    <p>Tipo de carteira: pelo balanço do informe. Tijolo: imóveis e participações em sociedades imobiliárias. Papel: CRI, LCI, LIG, letras hipotecárias, debêntures e outros títulos privados. Fundo de fundos: cotas de outros FIIs. O fundo leva o tipo que soma pelo menos 60% desses três grupos; abaixo disso, é híbrido. Dividend yield: o percentual do mês informado pelo fundo; em 12 meses, a soma dos 12 percentuais mensais.</p>
     <p>Comparação em 12 meses: a data inicial é o último pregão até um ano antes do fechamento mais recente do IFIX. IFIX e Ibovespa: fechamento de cada dia dividido pelo da data inicial, vezes 100. CDI: 100 vezes o produto de (1 + taxa diária) de cada dia útil desde a data inicial até a véspera. Rentabilidade passada não garante rentabilidade futura.</p>
   </details>

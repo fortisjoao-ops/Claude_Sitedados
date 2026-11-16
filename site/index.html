@@ -393,7 +393,7 @@ body { border-top: 4px solid var(--vc-navy); }
   mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
 }
 .vc-tabs::-webkit-scrollbar { display: none; }
-.vc-tab { padding: 12px 11px 13px; border-radius: 0; border-bottom: 2px solid transparent; color: var(--vc-ardosia); font-size: 0.875rem; font-weight: 500; letter-spacing: 0.01em; }
+.vc-tab { padding: 12px 9px 13px; border-radius: 0; border-bottom: 2px solid transparent; color: var(--vc-ardosia); font-size: 0.875rem; font-weight: 500; letter-spacing: 0.01em; }
 .vc-tab:hover { background: none; color: var(--vc-navy); border-bottom-color: var(--vc-cinza-claro); }
 .vc-tab[aria-current="page"] { background: none; color: var(--vc-navy); border-bottom-color: var(--vc-navy); }
 .vc-tab:focus-visible { outline-offset: -2px; }
@@ -487,6 +487,13 @@ body { border-top: 4px solid var(--vc-navy); }
 }
 .vc-controles .di-field { flex: 0 1 260px; min-width: 0; max-width: 100%; }
 .di-page .vc-select { width: 100%; min-width: 0; }
+
+/* Tabela longa com rolagem própria e cabeçalho fixo (indicadores dos FIIs) */
+.vc-rolagem { max-height: 520px; overflow: auto; border-bottom: 1px solid var(--vc-azul-gelo); }
+.di-page .vc-rolagem .di-table th { position: sticky; top: 0; z-index: 1; background: var(--vc-branco); box-shadow: inset 0 -2px 0 var(--vc-navy); border-bottom: 0; }
+/* Calculadora: campos de texto no mesmo tamanho dos seletores */
+.di-page .vc-controles input.di-date { width: 100%; }
+@media print { .vc-rolagem { max-height: none; overflow: visible; } }
 </style>
 </head>
 <body>
@@ -500,8 +507,10 @@ body { border-top: 4px solid var(--vc-navy); }
       <a class="vc-tab" href="#juros-eua">Juros EUA</a>
       <a class="vc-tab" href="#inflacao-br">Inflação BR</a>
       <a class="vc-tab" href="#focus">Focus</a>
+      <a class="vc-tab" href="#dolar">Dólar</a>
       <a class="vc-tab" href="#acoes-br">Ações BR</a>
       <a class="vc-tab" href="#fiis">FIIs</a>
+      <a class="vc-tab" href="#calculadora">Calculadora</a>
       <a class="vc-tab" href="#historico">Histórico</a>
       <a class="vc-tab" href="#noticias">Notícias</a>
     </nav>
@@ -1105,6 +1114,94 @@ body { border-top: 4px solid var(--vc-navy); }
   </details>
 </div>
 
+<div class="di-page vc-painel" id="dolar" hidden>
+  <header class="di-head">
+    <h1 class="di-title" id="cb-titulo">Dólar</h1>
+    <p class="di-lede" id="cb-resumo">O dólar futuro de <b data-draw="dol-venc">—</b> está em <b data-draw="dol-preco">—</b>, <b data-draw="dol-var">—</b> no dia. A PTAX de <b data-draw="ac-dolar-data">—</b> fechou a <b data-draw="ac-dolar">—</b>.</p>
+    <p class="di-stamp" id="cb-carimbo">Dólar futuro (contrato <span data-draw="dol-simbolo">—</span>) cotado na B3 em <span data-draw="dol-quando">—</span>, com 15 minutos de atraso e relido a cada minuto enquanto esta página fica aberta. A PTAX é a taxa de fechamento do Banco Central, não a cotação do momento.</p>
+  </header>
+
+  <section class="di-tiles" id="cb-destaques" aria-label="Dólar">
+    <div class="di-tile">
+      <div class="di-tile-label">Dólar futuro, <span data-draw="dol-venc">—</span></div>
+      <div class="di-tile-num" data-draw="dol-preco">—</div>
+      <div class="di-tile-sub"><span data-draw="dol-var">—</span> no dia; mínima <span data-draw="dol-campo" data-campo="minimo">—</span>, máxima <span data-draw="dol-campo" data-campo="maximo">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Dólar PTAX, venda</div>
+      <div class="di-tile-num" data-draw="ac-dolar">—</div>
+      <div class="di-tile-sub"><span data-draw="ac-dolar-var" data-campo="dia">—</span> no dia, em <span data-draw="ac-dolar-data">—</span></div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">PTAX no mês</div>
+      <div class="di-tile-num" data-draw="ac-dolar-var" data-campo="mes">—</div>
+      <div class="di-tile-sub">contra a última PTAX do mês anterior</div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">PTAX no ano</div>
+      <div class="di-tile-num" data-draw="ac-dolar-var" data-campo="ano">—</div>
+      <div class="di-tile-sub">contra a última PTAX do ano anterior</div>
+    </div>
+    <div class="di-tile">
+      <div class="di-tile-label">Focus, dólar em <span data-draw="fx-ano" data-idx="0">—</span></div>
+      <div class="di-tile-num" data-draw="fx-num" data-ind="Câmbio" data-idx="0">—</div>
+      <div class="di-tile-sub">para <span data-draw="fx-ano" data-idx="1">—</span>: <span data-draw="fx-num" data-ind="Câmbio" data-idx="1">—</span></div>
+    </div>
+  </section>
+
+  <section class="di-block" id="cb-curva">
+    <h2 class="di-h2">Curva do dólar futuro</h2>
+    <p class="di-note">Preço de cada vencimento do dólar futuro na B3, em reais por dólar. A linha é o ajuste oficial do pregão de <span data-draw="cb-data" data-campo="ajuste">—</span>, que existe para todos os vencimentos; os círculos são a cotação de agora, onde há oferta ou negócio. A curva sobe com o prazo porque o juro em reais é maior que o juro em dólar: é a diferença de juros embutida, não uma previsão para o câmbio.</p>
+    <div class="di-chart" data-draw="cb-grafico-curva" data-source="dolar_curva"></div>
+    <ul class="di-legend">
+      <li><span class="di-sw di-sw-line"></span>Ajuste de <span class="di-legend-data" data-draw="cb-data" data-campo="ajuste">—</span></li>
+      <li><span class="di-sw di-sw-ring"></span>Cotação de agora (média entre compra e venda, ou último negócio)</li>
+    </ul>
+    <div class="di-scroll">
+      <table class="di-table vc-cab-quebra">
+        <thead><tr>
+          <th>Contrato</th><th>Vencimento</th><th class="di-num">Dias úteis</th><th class="di-num">Ajuste anterior</th><th class="di-num">Agora</th>
+          <th class="di-num">Prêmio sobre o 1º vencimento</th><th class="di-num">Prêmio ao ano</th><th class="di-num">Juro em dólar embutido</th><th class="di-num">Contratos em aberto</th>
+        </tr></thead>
+        <tbody data-draw="cb-tabela-curva"></tbody>
+      </table>
+    </div>
+    <p class="di-note vc-baixar"><button type="button" class="vc-botao" data-draw="csv" data-csv="dolar-curva">Baixar a curva em CSV</button><span>Separado por ponto e vírgula, com vírgula decimal, para abrir direto no Excel.</span></p>
+    <p class="di-note">Limitações: só o primeiro vencimento tem negócios todos os dias; nos demais o ajuste é um preço de referência calculado pela B3. O juro em dólar embutido (cupom cambial a termo) é uma conta desta página, sensível a pequenas diferenças de preço nos prazos curtos.</p>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="dolar_curva dolar_futuro">—</p>
+  </section>
+
+  <section class="di-block" id="cb-diferencial">
+    <h2 class="di-h2">Diferencial de juros entre Brasil e Estados Unidos</h2>
+    <p class="di-note">Taxa do DI futuro menos o rendimento do Treasury de mesmo prazo. É o ganho de juros de quem aplica em reais em vez de em dólares, antes do risco de câmbio. DI de <span data-draw="cb-data" data-campo="di">—</span> e Treasuries de <span data-draw="cb-data" data-campo="ust">—</span>.</p>
+    <div class="di-scroll">
+      <table class="di-table vc-cab-quebra">
+        <thead><tr>
+          <th>Prazo</th><th class="di-num">DI futuro</th><th class="di-num">Treasury</th><th class="di-num">Diferencial</th><th class="di-num">Diferencial há 3 meses</th><th class="di-num">Mudança em 3 meses</th>
+        </tr></thead>
+        <tbody data-draw="cb-tabela-dif"></tbody>
+      </table>
+    </div>
+    <p class="di-note">As duas taxas têm convenções diferentes: o DI é uma taxa composta em dias úteis, sem cupom; o Treasury é um rendimento ao par de um título com cupom semestral. O diferencial é uma aproximação, boa para acompanhar a direção e a ordem de grandeza. A evolução no tempo está na aba Histórico, no indicador "Diferencial DI menos Treasury".</p>
+  </section>
+
+  <section class="di-block" id="cb-ptax">
+    <h2 class="di-h2">Dólar PTAX nos últimos 12 meses</h2>
+    <p class="di-note">PTAX de venda de cada dia útil, em reais por dólar.</p>
+    <div class="di-chart" data-draw="cb-grafico-ptax" data-source="br_dolar"></div>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="historico_br">—</p>
+  </section>
+
+  <details class="di-details" id="cb-metodo">
+    <summary>Fontes e fórmulas</summary>
+    <p>Dólar futuro: contratos de dólar comercial da B3, cotados em reais por mil dólares e mostrados aqui em reais por dólar. O ajuste anterior é o preço de ajuste do pregão anterior; a cotação de agora é a média entre a melhor compra e a melhor venda ou, sem as duas, o último negócio. PTAX: taxa de venda, série 1 do SGS do Banco Central. Focus: mediana da expectativa anual para o câmbio.</p>
+    <p>Prêmio sobre o 1º vencimento: ajuste do vencimento dividido pelo ajuste do primeiro vencimento, menos 1. Prêmio ao ano: essa razão elevada a 252 dividido pelos dias úteis entre os dois vencimentos, menos 1.</p>
+    <p>Juro em dólar embutido (cupom cambial a termo, entre o primeiro vencimento e cada um dos seguintes): o fator de juros do DI entre as duas datas, dividido pela razão entre os dois preços de ajuste, menos 1, multiplicado por 360 e dividido pelos dias corridos entre as duas datas. O fator do DI usa as taxas de ajuste dos contratos de DI do mesmo pregão, interpoladas em linha reta por dias úteis.</p>
+    <p>Diferencial de juros: taxa do DI no prazo, lida na curva interpolada da aba Curva DI Futuro (de 10 anos, quando o prazo passa de 5), menos o rendimento do Treasury de mesmo prazo. Três meses atrás: as mesmas duas curvas nas datas de comparação de cada aba.</p>
+    <p>A cotação do primeiro vencimento é relida direto da B3 pelo navegador a cada minuto, em dias úteis das 9h às 18h50, enquanto a página está aberta. A curva dos demais vencimentos só muda nas atualizações do site.</p>
+  </details>
+</div>
+
 <div class="di-page vc-painel" id="acoes-br" hidden>
   <header class="di-head">
     <h1 class="di-title" id="acoes-titulo">Mercado de ações brasileiro</h1>
@@ -1258,11 +1355,90 @@ body { border-top: 4px solid var(--vc-navy); }
     <p class="di-note vc-fonte" data-draw="fonte" data-bloco="fiis">—</p>
   </section>
 
+  <section class="di-block" id="fii-indicadores">
+    <h2 class="di-h2">Indicadores dos fundos do IFIX</h2>
+    <p class="di-note">Cota de mercado contra o valor patrimonial, tipo de carteira e dividend yield de cada fundo, a partir dos informes mensais que os fundos entregam à CVM. Mês de referência dos informes: <span data-draw="fii-cvm-mes">—</span>. <span data-draw="fii-cvm-n">—</span>.</p>
+    <div class="di-scroll">
+      <table class="di-table vc-cab-quebra">
+        <thead><tr><th>Tipo de carteira</th><th class="di-num">Fundos</th><th class="di-num">Peso no IFIX</th><th class="di-num">P/VP ponderado pelo peso</th><th class="di-num">Dividend yield em 12 meses, mediana</th></tr></thead>
+        <tbody data-draw="fii-tabela-tipos"></tbody>
+      </table>
+    </div>
+    <div class="di-scroll vc-rolagem">
+      <table class="di-table vc-cab-quebra">
+        <thead><tr>
+          <th>Código</th><th>Fundo</th><th>Tipo de carteira</th><th class="di-num">Peso no IFIX</th><th class="di-num">Cota</th><th class="di-num">Valor patrimonial da cota</th><th class="di-num">P/VP</th>
+          <th class="di-num">Patrimônio (R$ milhões)</th><th class="di-num">Dividend yield no mês</th><th class="di-num">Dividend yield em 12 meses</th>
+        </tr></thead>
+        <tbody data-draw="fii-tabela-indicadores"></tbody>
+      </table>
+    </div>
+    <p class="di-note vc-baixar"><button type="button" class="vc-botao" data-draw="csv" data-csv="fiis-indicadores">Baixar os indicadores em CSV</button><span>Separado por ponto e vírgula, com vírgula decimal, para abrir direto no Excel.</span></p>
+    <p class="di-note">Limitações: a cota é a de agora e o valor patrimonial é o do fim do mês de referência, então o P/VP mistura duas datas. O dividend yield é o que cada fundo informa à CVM, na base que ele usa; a soma de 12 meses só aparece quando o fundo informou os 12 meses com valor positivo. O tipo de carteira é uma classificação desta página, pelo balanço do fundo, e não a categoria oficial.</p>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="fiis_cvm fiis">—</p>
+  </section>
+
   <details class="di-details" id="fii-metodo">
     <summary>Fontes e fórmulas</summary>
     <p>IFIX e cotas dos fundos: cotações da B3 com 15 minutos de atraso. O IFIX é relido direto da B3 pelo navegador a cada minuto, em dias úteis das 9h às 18h50, enquanto a página está aberta; as cotas dos fundos só mudam nas atualizações do site. A lista de fundos e os pesos são os da carteira teórica do IFIX publicada pela B3. Fechamentos diários do IFIX: estatísticas históricas do índice no site da B3. Fechamentos do Ibovespa: Yahoo Finance, por um endereço não oficial. CDI: taxa diária da série 12 do SGS do Banco Central.</p>
     <p>Variação no dia do IFIX e das cotas: a oscilação informada pela B3 contra o fechamento anterior. Variação no mês: cotação atual dividida pelo último fechamento do mês anterior, menos 1. Variação no ano: cotação atual dividida pelo último fechamento do ano anterior, menos 1.</p>
+    <p>Indicadores: informes mensais de FII nos dados abertos da CVM (cadastro, complemento e ativo e passivo), na versão mais recente de cada mês. Cada fundo do IFIX é localizado pelo código ISIN; os que não são encontrados aparecem como indisponíveis. P/VP: cota de agora na B3 dividida pelo valor patrimonial da cota no informe. Se o número de cotas do informe difere em mais de 20% do usado pela B3 no índice, o P/VP aparece como indisponível, porque houve emissão, desdobramento ou grupamento depois do informe.</p>
+    <p>Tipo de carteira: pelo balanço do informe. Tijolo: imóveis e participações em sociedades imobiliárias. Papel: CRI, LCI, LIG, letras hipotecárias, debêntures e outros títulos privados. Fundo de fundos: cotas de outros FIIs. O fundo leva o tipo que soma pelo menos 60% desses três grupos; abaixo disso, é híbrido. Dividend yield: o percentual do mês informado pelo fundo; em 12 meses, a soma dos 12 percentuais mensais.</p>
     <p>Comparação em 12 meses: a data inicial é o último pregão até um ano antes do fechamento mais recente do IFIX. IFIX e Ibovespa: fechamento de cada dia dividido pelo da data inicial, vezes 100. CDI: 100 vezes o produto de (1 + taxa diária) de cada dia útil desde a data inicial até a véspera. Rentabilidade passada não garante rentabilidade futura.</p>
+  </details>
+</div>
+
+<div class="di-page vc-painel" id="calculadora" hidden>
+  <header class="di-head">
+    <h1 class="di-title" id="calc-titulo">Calculadora de equivalência de taxas</h1>
+    <p class="di-lede" id="calc-resumo">Informe a taxa de um papel e o prazo, e veja quanto ela vale nos outros indexadores pelas curvas de mercado de hoje: prefixado, CDI mais spread, percentual do CDI e IPCA mais juro real.</p>
+    <p class="di-stamp" id="calc-carimbo">A conta usa as taxas de ajuste do DI de <span data-draw="calc-data" data-campo="di">—</span> (B3) e as taxas das NTN-B Principal de <span data-draw="calc-data" data-campo="ntnb">—</span> (Tesouro Direto). É uma equivalência num único prazo, não o preço de um papel.</p>
+  </header>
+
+  <section class="di-block di-query" id="calc-entrada">
+    <h2 class="di-h2">O papel</h2>
+    <div class="vc-controles">
+      <label class="di-field"><span>Indexador</span>
+        <select class="di-date vc-select" id="calc-indexador" data-draw="calc-campo" aria-label="Indexador">
+          <option value="ipca" selected>IPCA + taxa</option><option value="cdi">CDI + spread</option><option value="pcdi">% do CDI</option><option value="pre">Prefixado</option>
+        </select></label>
+      <label class="di-field"><span data-draw="calc-rotulo-taxa">Taxa (% ao ano)</span>
+        <input class="di-date" id="calc-taxa" type="text" inputmode="decimal" value="8,50" data-draw="calc-campo" aria-label="Taxa"></label>
+      <label class="di-field"><span>Prazo médio (anos)</span>
+        <input class="di-date" id="calc-prazo" type="text" inputmode="decimal" value="5" data-draw="calc-campo" aria-label="Prazo médio em anos"></label>
+    </div>
+    <p class="di-note">Use o prazo médio (duration) do papel, e não o vencimento final, quando houver amortizações no caminho. Vale de <span data-draw="calc-faixa" data-campo="min">—</span> a <span data-draw="calc-faixa" data-campo="max">—</span> anos; as equivalências com IPCA só existem de <span data-draw="calc-faixa" data-campo="ipca_min">—</span> a <span data-draw="calc-faixa" data-campo="ipca_max">—</span> anos, onde há NTN-B Principal e DI no mesmo prazo.</p>
+  </section>
+
+  <p class="di-note vc-alerta" data-draw="calc-aviso" hidden></p>
+
+  <section class="di-block" id="calc-saida">
+    <h2 class="di-h2">Equivalências no prazo de <span data-draw="calc-prazo-texto">—</span></h2>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Indexador</th><th class="di-num">Taxa equivalente</th><th>Como ler</th></tr></thead>
+        <tbody data-draw="calc-resultado"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="di-block" id="calc-curvas">
+    <h2 class="di-h2">Curvas usadas nesse prazo</h2>
+    <div class="di-scroll">
+      <table class="di-table">
+        <thead><tr><th>Curva</th><th class="di-num">Taxa no prazo</th><th>De onde vem</th></tr></thead>
+        <tbody data-draw="calc-curvas"></tbody>
+      </table>
+    </div>
+    <p class="di-note">Limitações: a equivalência olha um único ponto de cada curva, então não substitui a precificação pelo fluxo de caixa do papel. Não considera risco de crédito, liquidez nem imposto. A inflação implícita carrega prêmio de risco, e as taxas das NTN-B são as da manhã no Tesouro Direto, não as indicativas da ANBIMA.</p>
+    <p class="di-note vc-fonte" data-draw="fonte" data-bloco="curva_di ntnb">—</p>
+  </section>
+
+  <details class="di-details" id="calc-metodo">
+    <summary>Fontes e fórmulas</summary>
+    <p>DI no prazo: taxas de ajuste dos contratos de DI futuro do pregão anterior (B3), interpoladas em linha reta por dias úteis, com 252 dias úteis por ano de prazo. Juro real no prazo: taxa de venda das NTN-B Principal (Tesouro IPCA+, sem cupom) no Tesouro Direto, interpolada em linha reta pelo prazo até o vencimento. Inflação implícita: (1 + DI) dividido por (1 + juro real), menos 1.</p>
+    <p>Todas as conversões passam pela taxa prefixada equivalente. De IPCA + taxa: (1 + taxa) vezes (1 + inflação implícita), menos 1. De CDI + spread: (1 + DI) vezes (1 + spread), menos 1. De percentual do CDI: a taxa diária do DI vezes o percentual, capitalizada por 252 dias. Prefixado: a própria taxa.</p>
+    <p>Da taxa prefixada para cada indexador: CDI + spread é (1 + prefixada) dividido por (1 + DI), menos 1; percentual do CDI é a taxa diária da prefixada dividida pela taxa diária do DI; IPCA + taxa é (1 + prefixada) dividido por (1 + inflação implícita), menos 1. O prêmio sobre a NTN-B é a taxa em IPCA + menos o juro real da NTN-B Principal no mesmo prazo, em pontos-base.</p>
   </details>
 </div>
 
@@ -1320,7 +1496,7 @@ body { border-top: 4px solid var(--vc-navy); }
     <p>DI: taxa de ajuste de cada contrato futuro de DI de 1 dia, do pregão indicado. A partir de 12/11/2026 vem das cotações da B3 (o ajuste do pregão anterior, lido a cada dia); as datas anteriores vêm do Boletim Diário do Mercado da B3, e algumas ficaram de fora porque a B3 não entregou o boletim do dia. O prazo de cada contrato é contado em dias úteis a partir da data do pregão.</p>
     <p>DI em prazo fixo (1, 2, 5 e 10 anos): interpolação em linha reta, por dias úteis, entre os dois contratos vizinhos daquele pregão. É uma conta mais simples que a spline da aba Curva DI Futuro, então pode diferir dela em frações de ponto-base.</p>
     <p>Juro real: taxa de venda da manhã de cada NTN-B no Tesouro Direto, um dado por dia útil. Inflação implícita: (1 + DI no vencimento do título) dividido por (1 + juro real), menos 1, com o DI interpolado em linha reta pelo calendário; só existe nas datas em que há curva de DI gravada.</p>
-    <p>Treasuries: curva diária de rendimento ao par do Tesouro americano. IFIX: fechamentos da B3. Ibovespa: fechamentos do Yahoo Finance. Dólar: PTAX de venda do Banco Central. Esses três cobrem cerca de 13 meses.</p>
+    <p>Diferencial DI menos Treasury: DI no prazo fixo menos o rendimento do Treasury de mesmo prazo, nas datas em que há as duas curvas gravadas. Treasuries: curva diária de rendimento ao par do Tesouro americano. IFIX: fechamentos da B3. Ibovespa: fechamentos do Yahoo Finance. Dólar: PTAX de venda do Banco Central. Esses três cobrem cerca de 13 meses.</p>
     <p>Variação no período: para taxas, último dado menos o primeiro, em pontos-base; para índices e dólar, último dividido pelo primeiro, menos 1.</p>
   </details>
 </div>
@@ -3096,6 +3272,58 @@ dash.draw('grafico', (el) => {
     },
   });
 
+  dash.calc('fiis_indicadores', {
+    title: 'Indicadores dos fundos do IFIX',
+    description: 'Cota de agora contra o valor patrimonial do informe mensal da CVM, tipo de carteira pelo balanço e dividend yield informado pelo fundo.',
+    inputs: ['br_fiis', 'br_fiis_cvm'],
+    fn: (fundos, cvm) => {
+      const porTicker = new Map(cvm.map((c) => [c.ticker, c]));
+      const n = (v) => (v === null || v === undefined || v === '' ? null : +v);
+      return fundos.map((f) => {
+        const c = porTicker.get(f.ticker) || {}, preco = n(f.preco), vp = n(c.vp_cota), qtd = n(f.qtd), cotas = n(c.cotas);
+        // com mais de 20% de diferença entre as cotas do informe e as do índice, a cota e o valor patrimonial estão em bases diferentes
+        const mesmaBase = qtd === null || cotas === null || Math.abs(qtd / cotas - 1) <= 0.2;
+        return {
+          ticker: f.ticker, nome: f.nome, peso: n(f.peso), preco, mes: c.mes || null, tipo: c.tipo || null, vp_cota: vp,
+          pvp: preco !== null && vp && mesmaBase ? +(preco / vp).toFixed(2) : null, pl_milhoes: n(c.pl) === null ? null : +(n(c.pl) / 1e6).toFixed(0),
+          dy_mes: n(c.dy_mes), dy_12m: n(c.dy_12m),
+        };
+      }).sort((a, b) => (b.peso || 0) - (a.peso || 0));
+    },
+  });
+
+  dash.calc('fiis_por_tipo', {
+    title: 'Fundos do IFIX por tipo de carteira',
+    description: 'Número de fundos, peso no índice, P/VP ponderado pelo peso e mediana do dividend yield em 12 meses de cada tipo de carteira.',
+    inputs: ['fiis_indicadores'],
+    fn: (fundos) => {
+      const mediana = (l) => { const o = l.slice().sort((a, b) => a - b); return o.length ? (o.length % 2 ? o[(o.length - 1) / 2] : (o[o.length / 2 - 1] + o[o.length / 2]) / 2) : null; };
+      const grupo = (chave, lista) => {
+        const comPvp = lista.filter((f) => f.pvp !== null && f.peso), pesoPvp = comPvp.reduce((s, f) => s + f.peso, 0), dys = lista.map((f) => f.dy_12m).filter((v) => v !== null);
+        return { tipo: chave, fundos: lista.length, peso: +lista.reduce((s, f) => s + (f.peso || 0), 0).toFixed(2),
+          pvp: pesoPvp > 0 ? +(comPvp.reduce((s, f) => s + f.peso * f.pvp, 0) / pesoPvp).toFixed(2) : null,
+          dy_12m: dys.length ? +mediana(dys).toFixed(2) : null, com_dy: dys.length };
+      };
+      const tipos = ['tijolo', 'papel', 'fundo de fundos', 'hibrido'].map((t) => grupo(t, fundos.filter((f) => f.tipo === t))).filter((g) => g.fundos);
+      const semTipo = fundos.filter((f) => !f.tipo);
+      return [...tipos, ...(semTipo.length ? [grupo('sem informe', semTipo)] : []), grupo('todos', fundos)];
+    },
+  });
+  const TIPOS = { tijolo: 'Tijolo', papel: 'Papel', 'fundo de fundos': 'Fundo de fundos', hibrido: 'Híbrido', 'sem informe': 'Sem informe localizado', todos: 'IFIX inteiro' };
+  VC.tipoDeFundo = (t) => TIPOS[t] || INDISPONIVEL;
+  const vezes = (v) => (ok(v) ? nf(2).format(v) : INDISPONIVEL);
+  dash.draw('fii-cvm-mes', (el) => { const m = linhas('br_fiis_cvm').map((c) => c.mes).sort().pop(); el.textContent = m ? VC.mes(m) : INDISPONIVEL; });
+  dash.draw('fii-cvm-n', (el) => { const c = linhas('br_fiis_cvm').length, t = linhas('br_fiis').length; el.textContent = c ? `${c} dos ${t} fundos com cotação foram localizados na CVM` : 'Informes da CVM indisponíveis'; });
+  dash.draw('fii-tabela-tipos', (corpo) => tabela(corpo, linhas('br_fiis_cvm').length ? linhas('fiis_por_tipo') : [], 'tipo', [
+    [(r) => TIPOS[r.tipo] || r.tipo, 'di-strong'], [(r) => String(r.fundos), 'di-num'], [(r) => pct(r.peso), 'di-num'], [(r) => vezes(r.pvp), 'di-num di-strong'],
+    [(r) => (r.dy_12m === null ? INDISPONIVEL : `${pct(r.dy_12m)} (${r.com_dy} fundos)`), 'di-num'],
+  ]));
+  dash.draw('fii-tabela-indicadores', (corpo) => tabela(corpo, linhas('br_fiis_cvm').length ? linhas('fiis_indicadores') : [], 'ticker', [
+    [(r) => r.ticker, 'di-strong'], [(r) => r.nome, ''], [(r) => VC.tipoDeFundo(r.tipo), ''], [(r) => pct(r.peso), 'di-num'], [(r) => reais(r.preco), 'di-num'],
+    [(r) => reais(r.vp_cota), 'di-num'], [(r) => vezes(r.pvp), 'di-num di-strong'], [(r) => (r.pl_milhoes === null ? INDISPONIVEL : nf(0).format(r.pl_milhoes)), 'di-num'],
+    [(r) => pct(r.dy_mes), 'di-num'], [(r) => pct(r.dy_12m), 'di-num'],
+  ]));
+
   const ifix = () => linhas('br_ifix')[0] || null;
   const pontos = (v) => (ok(v) ? nf(2).format(v) : INDISPONIVEL);
   const variacao = (campo) => linhas('ifix_variacoes').find((x) => x.campo === campo);
@@ -3304,6 +3532,210 @@ dash.draw('grafico', (el) => {
 
 </script>
 <script>
+// ---------- Aba Dólar ----------
+(() => {
+  const { num, nf, ok, fmt, pct, bps, reais, sinal, data, dataHora, ms, linhas, tabela, aviso, grafico, MESES, INDISPONIVEL } = VC;
+  const BASE = 252;
+  const n = (v) => { const x = num(v); return isFinite(x) ? x : null; };
+
+  dash.calc('dolar_curva', {
+    title: 'Curva do dólar futuro',
+    description: 'Preço de ajuste de cada vencimento, o prêmio sobre o primeiro vencimento e o juro em dólar embutido entre o primeiro vencimento e cada um dos seguintes.',
+    inputs: ['br_dolar_curva', 'di1_longo'],
+    fn: (curva, di) => {
+      const c = curva.map((r) => {
+        const compra = n(r.compra), venda = n(r.venda), ultimo = n(r.ultimo);
+        return { ticker: r.ticker, vencimento: r.vencimento, du: +r.du, duA: +r.du_ajuste, dcA: +r.dc_ajuste, ajuste: n(r.ajuste_ant),
+          agora: compra !== null && venda !== null ? +((compra + venda) / 2).toFixed(4) : ultimo, em_aberto: n(r.em_aberto), negociados: n(r.negociados) };
+      }).filter((r) => r.ajuste !== null).sort((a, b) => a.duA - b.duA);
+      if (!c.length) return [];
+      const base = c[0], deslocamento = base.duA - base.du;   // dias úteis entre o pregão do ajuste e hoje
+      // DI de ajuste do mesmo pregão, interpolado em linha reta por dias úteis; fora dos vencimentos negociados não há valor.
+      const pontos = di.map((v) => ({ du: +v.du + deslocamento, taxa: n(v.ajuste_ant) })).filter((p) => p.taxa !== null && isFinite(p.du)).sort((a, b) => a.du - b.du);
+      const diEm = (du) => {
+        if (pontos.length < 2 || du < pontos[0].du || du > pontos[pontos.length - 1].du) return null;
+        const i = pontos.findIndex((p) => p.du >= du);
+        if (pontos[i].du === du) return pontos[i].taxa;
+        const a = pontos[i - 1], b = pontos[i];
+        return a.taxa + ((b.taxa - a.taxa) * (du - a.du)) / (b.du - a.du);
+      };
+      const fator = (du) => { const t = diEm(du); return t === null ? null : Math.pow(1 + t / 100, du / BASE); };
+      const fatorBase = fator(base.duA);
+      return c.map((r, i) => {
+        const razao = r.ajuste / base.ajuste, dias = r.duA - base.duA, corridos = r.dcA - base.dcA, f = fator(r.duA);
+        return {
+          ticker: r.ticker, vencimento: r.vencimento, du: r.du, ajuste: r.ajuste, agora: r.agora, em_aberto: r.em_aberto,
+          premio: i === 0 ? null : +((razao - 1) * 100).toFixed(2),
+          premio_aa: i === 0 || dias <= 0 ? null : +((Math.pow(razao, BASE / dias) - 1) * 100).toFixed(2),
+          cupom: i === 0 || corridos <= 0 || f === null || fatorBase === null ? null : +((((f / fatorBase) / razao - 1) * 360 / corridos) * 100).toFixed(2),
+        };
+      });
+    },
+  });
+
+  dash.calc('juros_br_eua', {
+    title: 'Diferencial de juros entre Brasil e Estados Unidos',
+    description: 'Taxa do DI futuro menos o rendimento do Treasury de mesmo prazo, hoje e três meses atrás.',
+    inputs: ['prazos', 'curva_dez', 'eua_curva'],
+    fn: (prazos, curvaDez, treasuries) => {
+      const dez = (curvaDez || []).find((l) => l.du === 10 * BASE);
+      const di = { 1: prazos.find((p) => p.prazo === '1a'), 2: prazos.find((p) => p.prazo === '2a'), 3: prazos.find((p) => p.prazo === '3a'), 5: prazos.find((p) => p.prazo === '5a'), 10: dez };
+      return [[1, '1 Yr', '1 ano'], [2, '2 Yr', '2 anos'], [3, '3 Yr', '3 anos'], [5, '5 Yr', '5 anos'], [10, '10 Yr', '10 anos']].map(([anos, prazo, nome]) => {
+        const d = di[anos], t = (treasuries || []).find((r) => r.prazo === prazo);
+        const dif = d && t ? +(d.taxa - t.taxa).toFixed(2) : null;
+        const dif3 = d && t && d.taxa_3m !== null && d.taxa_3m !== undefined && t.taxa_3m !== null ? +(d.taxa_3m - t.taxa_3m).toFixed(2) : null;
+        return { anos, nome, di: d ? d.taxa : null, ust: t ? t.taxa : null, dif, dif_3m: dif3, var_bps: dif === null || dif3 === null ? null : +((dif - dif3) * 100).toFixed(0) };
+      });
+    },
+  });
+
+  const pp = (v) => (ok(v) ? fmt(v, 2) + ' p.p.' : INDISPONIVEL);
+  dash.draw('cb-data', (el) => {
+    const campo = el.dataset.campo, c = linhas('br_dolar_curva')[0], cot = linhas('di1')[0], t = linhas('eua_curva')[0];
+    el.textContent = campo === 'ajuste' ? (c ? data(c.data_ajuste_ant) : INDISPONIVEL) : campo === 'di' ? (cot ? dataHora(cot.cotacao_em) : INDISPONIVEL) : (t ? data(t.data) : INDISPONIVEL);
+  });
+
+  dash.draw('cb-grafico-curva', (el) => {
+    const c = linhas('dolar_curva');
+    if (c.length < 3) return aviso(el, INDISPONIVEL);
+    const xs = c.map((r) => ms(r.vencimento)), ini = xs[0], fim = xs[xs.length - 1], folga = (fim - ini) * 0.02;
+    const marcas = [];
+    for (let a = new Date(ini).getUTCFullYear() + 1; a <= new Date(fim).getUTCFullYear(); a++) marcas.push({ v: Date.UTC(a, 0, 1), rotulo: String(a) });
+    grafico(el, {
+      rotulo: 'Curva do dólar futuro por vencimento: preço de ajuste e cotação de agora.',
+      x: { dominio: [ini - folga, fim + folga], marcas },
+      y: { casas: 2, folgaMin: 0.02 },
+      series: [
+        { classe: 'di-line', pontos: c.map((r) => ({ x: ms(r.vencimento), y: r.ajuste })), curva: 'monotona', marcadores: true },
+        { classe: 'vc-sem-linha', pontos: c.filter((r) => r.agora !== null).map((r) => ({ x: ms(r.vencimento), y: r.agora })), marcadores: true, classeMarcador: 'di-ring' },
+      ],
+      encaixes: xs,
+      dica: (xv) => {
+        const r = c.find((q) => ms(q.vencimento) === xv);
+        if (!r) return null;
+        return { x: xv, titulo: `${r.ticker} · vence em ${data(r.vencimento)}`, sub: `${nf(0).format(r.du)} dias úteis`, pontos: [{ y: r.ajuste }],
+          linhas: [['Ajuste anterior', reais(r.ajuste, 4)], ['Agora', reais(r.agora, 4)], ['Prêmio ao ano', pct(r.premio_aa)], ['Juro em dólar', pct(r.cupom)]] };
+      },
+    });
+  });
+
+  dash.draw('cb-tabela-curva', (corpo) => tabela(corpo, linhas('dolar_curva'), 'ticker', [
+    [(r) => r.ticker, 'di-strong'], [(r) => data(r.vencimento), ''], [(r) => nf(0).format(r.du), 'di-num'], [(r) => reais(r.ajuste, 4), 'di-num di-strong'],
+    [(r) => (r.agora === null ? '—' : reais(r.agora, 4)), 'di-num'], [(r) => (r.premio === null ? '—' : sinal(r.premio, 2, '%')), 'di-num'],
+    [(r) => (r.premio_aa === null ? '—' : pct(r.premio_aa)), 'di-num'], [(r) => (r.cupom === null ? '—' : pct(r.cupom)), 'di-num'],
+    [(r) => (r.em_aberto === null ? '—' : nf(0).format(r.em_aberto)), 'di-num'],
+  ]));
+
+  dash.draw('cb-tabela-dif', (corpo) => tabela(corpo, linhas('juros_br_eua'), 'anos', [
+    [(r) => r.nome, ''], [(r) => pct(r.di), 'di-num'], [(r) => pct(r.ust), 'di-num'], [(r) => pp(r.dif), 'di-num di-strong'], [(r) => pp(r.dif_3m), 'di-num'], [(r) => bps(r.var_bps), 'di-num'],
+  ]));
+
+  dash.draw('cb-grafico-ptax', (el) => {
+    const serie = linhas('br_dolar').slice(-252).map((p) => ({ x: ms(p.data), y: +p.valor, data: p.data }));
+    if (serie.length < 20) return aviso(el, INDISPONIVEL);
+    const marcas = [];
+    serie.forEach((p, i) => { if (i > 0 && p.data.slice(0, 7) !== serie[i - 1].data.slice(0, 7)) marcas.push({ v: p.x, rotulo: MESES[+p.data.slice(5, 7) - 1] + '/' + p.data.slice(2, 4) }); });
+    grafico(el, {
+      rotulo: 'Dólar PTAX de venda nos últimos 12 meses.',
+      x: { dominio: [serie[0].x, serie[serie.length - 1].x], marcas },
+      y: { casas: 2, folgaMin: 0.02 },
+      series: [{ classe: 'di-line', pontos: serie }],
+      encaixes: serie.map((p) => p.x),
+      dica: (xv) => { const p = serie.find((q) => q.x === xv); return p ? { x: p.x, titulo: data(p.data), pontos: [{ y: p.y }], linhas: [['PTAX, venda', reais(p.y, 4)]] } : null; },
+    });
+  });
+})();
+
+</script>
+<script>
+// ---------- Aba Calculadora de equivalência de taxas ----------
+(() => {
+  const { num, nf, ok, fmt, pct, bps, sinal, data, linhas, tabela, INDISPONIVEL } = VC;
+  const BASE = 252;
+  const n = (v) => { const x = num(v); return isFinite(x) ? x : null; };
+  const interpolar = (pontos, x) => {
+    if (pontos.length < 2 || x < pontos[0].x || x > pontos[pontos.length - 1].x) return null;
+    const i = pontos.findIndex((p) => p.x >= x);
+    if (pontos[i].x === x) return pontos[i].y;
+    const a = pontos[i - 1], b = pontos[i];
+    return a.y + ((b.y - a.y) * (x - a.x)) / (b.x - a.x);
+  };
+  // Curvas: DI de ajuste por dias úteis e juro real das NTN-B Principal pelo prazo em anos.
+  const curvaDI = () => linhas('di1_longo').map((v) => ({ x: +v.du, y: n(v.ajuste_ant) })).filter((p) => p.y !== null && isFinite(p.x)).sort((a, b) => a.x - b.x);
+  const curvaReal = () => linhas('br_real').filter((t) => t.principal && t.real !== null).map((t) => ({ x: t.anos, y: t.real })).sort((a, b) => a.x - b.x);
+  const faixa = () => {
+    const di = curvaDI(), real = curvaReal();
+    if (di.length < 2) return null;
+    // limites arredondados para dentro, em décimos de ano, para o texto e a validação baterem
+    const acima = (v) => Math.ceil(v * 10 - 1e-9) / 10, abaixo = (v) => Math.floor(v * 10 + 1e-9) / 10;
+    const min = acima(di[0].x / BASE), max = abaixo(di[di.length - 1].x / BASE);
+    return { min, max, ipca_min: real.length > 1 ? Math.max(min, acima(real[0].x)) : null, ipca_max: real.length > 1 ? Math.min(max, abaixo(real[real.length - 1].x)) : null };
+  };
+
+  const ler = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+  const numero = (texto) => { const t = String(texto).trim().replace(/\s/g, '').replace('%', '').replace(',', '.'); return /^-?\d+(\.\d+)?$/.test(t) ? +t : NaN; };
+  const calcular = () => {
+    const indexador = ler('calc-indexador'), taxa = numero(ler('calc-taxa')), prazo = numero(ler('calc-prazo')), f = faixa();
+    if (!f) return { erro: 'indisponível: a curva de DI não foi carregada' };
+    if (!isFinite(taxa)) return { erro: 'Informe a taxa como número, por exemplo 8,50.' };
+    if (!isFinite(prazo) || prazo < f.min || prazo > f.max) return { erro: `Informe um prazo entre ${fmt(f.min, 1)} e ${fmt(f.max, 1)} anos.` };
+    const di = interpolar(curvaDI(), prazo * BASE);
+    const real = interpolar(curvaReal(), prazo);
+    const inflacao = di === null || real === null ? null : ((1 + di / 100) / (1 + real / 100) - 1) * 100;
+    const diaria = (anual) => Math.pow(1 + anual / 100, 1 / BASE) - 1;
+    let pre = null;
+    if (indexador === 'pre') pre = taxa;
+    else if (indexador === 'cdi') pre = ((1 + di / 100) * (1 + taxa / 100) - 1) * 100;
+    else if (indexador === 'pcdi') pre = (Math.pow(1 + diaria(di) * taxa / 100, BASE) - 1) * 100;
+    else if (inflacao !== null) pre = ((1 + taxa / 100) * (1 + inflacao / 100) - 1) * 100;
+    if (pre === null) return { erro: `Nesse prazo não há NTN-B Principal e DI juntos; as equivalências com IPCA existem de ${fmt(f.ipca_min, 1)} a ${fmt(f.ipca_max, 1)} anos.`, prazo };
+    if (pre <= -99) return { erro: 'A taxa informada não gera uma equivalência válida.' };
+    const ipca = inflacao === null ? null : ((1 + pre / 100) / (1 + inflacao / 100) - 1) * 100;
+    return { indexador, taxa, prazo, di, real, inflacao, pre, cdi: ((1 + pre / 100) / (1 + di / 100) - 1) * 100, pcdi: (diaria(pre) / diaria(di)) * 100, ipca,
+      premio: ipca === null || real === null ? null : (ipca - real) * 100 };
+  };
+
+  const DESENHOS = ['calc-aviso', 'calc-prazo-texto', 'calc-resultado', 'calc-curvas', 'calc-rotulo-taxa'];
+  dash.draw('calc-campo', (el) => { el.oninput = el.onchange = () => DESENHOS.forEach((nome) => dash.draw(nome)); });
+  dash.draw('calc-rotulo-taxa', (el) => { el.textContent = { ipca: 'Taxa acima do IPCA (% ao ano)', cdi: 'Spread sobre o CDI (% ao ano)', pcdi: 'Percentual do CDI (%)', pre: 'Taxa prefixada (% ao ano)' }[ler('calc-indexador')] || 'Taxa'; });
+  dash.draw('calc-faixa', (el) => { const f = faixa(), v = f ? f[el.dataset.campo] : null; el.textContent = ok(v) ? fmt(v, 1) : INDISPONIVEL; });
+  dash.draw('calc-data', (el) => {
+    const d = linhas('di1_longo')[0], t = linhas('ntnb')[0];
+    el.textContent = el.dataset.campo === 'di' ? (d && d.data_ajuste_ant ? data(d.data_ajuste_ant) : INDISPONIVEL) : (t ? data(t.data_ref) : INDISPONIVEL);
+  });
+  dash.draw('calc-aviso', (el) => { const r = calcular(); el.hidden = !r.erro; el.textContent = r.erro || ''; });
+  dash.draw('calc-prazo-texto', (el) => { const r = calcular(); el.textContent = ok(r.prazo) ? `${fmt(r.prazo, 1)} ${r.prazo === 1 ? 'ano' : 'anos'}` : '—'; });
+
+  dash.draw('calc-resultado', (corpo) => {
+    const r = calcular();
+    if (r.erro) return tabela(corpo, [], 'id', [[() => '', ''], [() => '', ''], [() => '', '']]);
+    const informado = (id) => (r.indexador === id ? ' (informado)' : '');
+    const registros = [
+      { id: 'pre', nome: 'Prefixado' + informado('pre'), valor: pct(r.pre), ler: 'taxa nominal ao ano, base 252 dias úteis' },
+      { id: 'cdi', nome: 'CDI + spread' + informado('cdi'), valor: 'CDI ' + sinal(r.cdi, 2, '%'), ler: 'spread ao ano, composto sobre o CDI' },
+      { id: 'pcdi', nome: '% do CDI' + informado('pcdi'), valor: fmt(r.pcdi, 1) + '% do CDI', ler: 'percentual aplicado à taxa diária do CDI' },
+      { id: 'ipca', nome: 'IPCA + taxa' + informado('ipca'), valor: r.ipca === null ? INDISPONIVEL : 'IPCA ' + sinal(r.ipca, 2, '%'), ler: 'juro real ao ano, pela inflação implícita do prazo' },
+      { id: 'premio', nome: 'Prêmio sobre a NTN-B', valor: r.premio === null ? INDISPONIVEL : bps(r.premio), ler: 'taxa em IPCA + menos a NTN-B Principal do mesmo prazo' },
+    ];
+    tabela(corpo, registros, 'id', [[(x) => x.nome, ''], [(x) => x.valor, 'di-num di-strong'], [(x) => x.ler, '']]);
+  });
+
+  dash.draw('calc-curvas', (corpo) => {
+    const r = calcular();
+    if (r.erro && !ok(r.prazo)) return tabela(corpo, [], 'id', [[() => '', ''], [() => '', ''], [() => '', '']]);
+    const f = faixa(), prazo = r.prazo, di = r.erro ? interpolar(curvaDI(), prazo * BASE) : r.di, real = r.erro ? interpolar(curvaReal(), prazo) : r.real;
+    const inflacao = r.erro ? null : r.inflacao;
+    const registros = [
+      { id: 'di', nome: 'DI futuro (prefixado)', valor: pct(di), origem: 'ajuste dos contratos de DI, B3' },
+      { id: 'real', nome: 'Juro real, NTN-B Principal', valor: real === null ? INDISPONIVEL : pct(real), origem: 'taxa de venda no Tesouro Direto' },
+      { id: 'inf', nome: 'Inflação implícita', valor: inflacao === null ? INDISPONIVEL : pct(inflacao), origem: 'conta desta página: DI contra NTN-B' },
+    ];
+    tabela(corpo, registros, 'id', [[(x) => x.nome, ''], [(x) => x.valor, 'di-num di-strong'], [(x) => x.origem, '']]);
+  });
+})();
+
+</script>
+<script>
 // ---------- Aba Resumo ----------
 (() => {
   const { num, nf, ok, fmt, pct, sinal, bps, varPct, reais, data, dataHora, diaHora, mes, linhas, valor, tabela, INDISPONIVEL } = VC;
@@ -3448,7 +3880,7 @@ dash.draw('grafico', (el) => {
     curva_di: 'curva DI (B3)', ntnb: 'NTN-B (Tesouro Direto)', fed_funds: 'Fed funds (NY Fed)', treasuries: 'Treasuries (Tesouro americano)', fomc: 'dot plot e calendário do Fed',
     futuros_fed: 'futuros de Fed funds (Yahoo Finance)', macro_eua: 'inflação e emprego dos EUA (BLS)', inflacao_br: 'inflação brasileira (Banco Central)', ibovespa: 'Ibovespa (B3)',
     papeis_br: 'ações do Ibovespa (B3)', historico_br: 'dólar e histórico do Ibovespa', ifix: 'IFIX (B3)', fiis: 'fundos do IFIX (B3)', historico_fii: 'CDI e histórico do IFIX',
-    dolar_futuro: 'dólar futuro (B3)', focus: 'Focus (Banco Central)', agenda: 'agenda de divulgações (FRED)', noticias: 'notícias',
+    dolar_futuro: 'dólar futuro (B3)', dolar_curva: 'curva do dólar futuro (B3)', fiis_cvm: 'informes dos FIIs (CVM)', focus: 'Focus (Banco Central)', agenda: 'agenda de divulgações (FRED)', noticias: 'notícias',
   };
   dash.draw('rs-fontes', (el) => {
     const status = valor('status') || {}, nomes = Object.keys(BLOCOS).filter((n) => status[n]);
@@ -3616,6 +4048,9 @@ dash.draw('grafico', (el) => {
     });
     [['2 Yr', '2 anos'], ['10 Yr', '10 anos'], ['30 Yr', '30 anos']].forEach(([prazo, nome]) => por('ust-' + prazo, 'Juros nos Estados Unidos', `Treasury de ${nome}`, 'taxa', pct,
       () => Object.keys(H.ust).sort().map((d) => ({ data: d, v: H.ust[d][prazo] === undefined ? null : +H.ust[d][prazo] }))));
+    [[2, '2 Yr', '2 anos'], [5, '5 Yr', '5 anos'], [10, '10 Yr', '10 anos']].forEach(([anos, prazo, nome]) => por('dif-' + anos, 'Brasil e Estados Unidos', `Diferencial DI menos Treasury, ${nome}`, 'taxa',
+      (v) => (ok(v) ? nf(2).format(v) + ' p.p.' : INDISPONIVEL),
+      () => datasDI().filter((d) => H.ust[d] && H.ust[d][prazo] !== undefined).map((d) => { const di = interpolar(curvaDe(d), 'du', anos * BASE); return { data: d, v: di === null ? null : +(di - +H.ust[d][prazo]).toFixed(3) }; })));
     por('ifix', 'Bolsa e câmbio', 'IFIX (fechamento)', 'indice', (v) => (ok(v) ? nf(2).format(v) : INDISPONIVEL), () => linhas('br_ifix_hist').map((p) => ({ data: p.data, v: num(p.fechamento) })));
     por('ibov', 'Bolsa e câmbio', 'Ibovespa (fechamento)', 'indice', (v) => (ok(v) ? nf(0).format(v) : INDISPONIVEL), () => linhas('br_ibov_hist').map((p) => ({ data: p.data, v: num(p.fechamento) })));
     por('dolar', 'Bolsa e câmbio', 'Dólar PTAX, venda', 'indice', (v) => reais(v, 4), () => linhas('br_dolar').map((p) => ({ data: p.data, v: num(p.valor) })));
@@ -3660,7 +4095,7 @@ dash.draw('grafico', (el) => {
     grafico(el, {
       rotulo: `${s.nome}, de ${data(pts[0].data)} a ${data(pts[pts.length - 1].data)}.`,
       x: { dominio: [pts[0].x, pts[pts.length - 1].x], marcas },
-      y: s.tipo === 'taxa' ? { sufixo: '%', folgaMin: 0.05 } : { folgaMin: 0.01 },
+      y: s.tipo === 'taxa' ? { sufixo: s.id.startsWith('dif-') ? '' : '%', folgaMin: 0.05 } : { folgaMin: 0.01 },
       series: [{ classe: 'di-line', pontos: pts, marcadores: pts.length <= 70 }],
       encaixes: pts.map((p) => p.x),
       dica: (xv) => { const p = pts.find((q) => q.x === xv); return p ? { x: p.x, titulo: data(p.data), pontos: [{ y: p.y }], linhas: [[s.nome, s.formato(p.y)]] } : null; },
@@ -3725,6 +4160,25 @@ dash.draw('grafico', (el) => {
           `DI no mesmo vencimento, ajuste de ${dia(d.di_ref)} (% a.a.)`, 'Inflação implícita (% a.a.)',
           `DI no mesmo vencimento, ajuste de ${dia(d.di_3m)} (% a.a.)`, 'Inflação implícita há 3 meses (% a.a.)'],
         registros: linhas('br_real').map((r) => [r.titulo, dia(r.vencimento), dec(r.real), dec(r.real_3m), dec(r.di), dec(r.implicita), dec(r.di_3m), dec(r.implicita_3m)]),
+      };
+    },
+    // Aba Dólar: curva do dólar futuro.
+    'dolar-curva': () => {
+      const c = linhas('br_dolar_curva')[0] || {};
+      return {
+        nome: 'dolar-futuro-curva-' + (c.cotacao_em ? String(c.cotacao_em).slice(0, 10) : 'sem-data') + '.csv',
+        cabecalho: ['Contrato', 'Vencimento', 'Dias úteis', `Ajuste de ${dia(c.data_ajuste_ant)} (R$/US$)`, `Agora, cotação de ${c.cotacao_em ? dataHora(c.cotacao_em) : ''} (R$/US$)`,
+          'Prêmio sobre o 1º vencimento (%)', 'Prêmio ao ano (%)', 'Juro em dólar embutido (% a.a.)', 'Contratos em aberto'],
+        registros: linhas('dolar_curva').map((r) => [r.ticker, dia(r.vencimento), r.du, dec(r.ajuste), dec(r.agora), dec(r.premio), dec(r.premio_aa), dec(r.cupom), r.em_aberto === null ? '' : r.em_aberto]),
+      };
+    },
+    // Aba FIIs: indicadores dos fundos do IFIX.
+    'fiis-indicadores': () => {
+      const mes = linhas('br_fiis_cvm').map((c) => c.mes).sort().pop() || 'sem-data';
+      return {
+        nome: 'fiis-indicadores-' + mes + '.csv',
+        cabecalho: ['Código', 'Fundo', 'Tipo de carteira', 'Peso no IFIX (%)', 'Cota (R$)', 'Valor patrimonial da cota (R$)', 'Mês do informe', 'P/VP', 'Patrimônio (R$ milhões)', 'Dividend yield no mês (%)', 'Dividend yield em 12 meses (%)'],
+        registros: linhas('br_fiis_cvm').length ? linhas('fiis_indicadores').map((r) => [r.ticker, r.nome, r.tipo ? VC.tipoDeFundo(r.tipo) : '', dec(r.peso), dec(r.preco), dec(r.vp_cota), r.mes || '', dec(r.pvp), dec(r.pl_milhoes), dec(r.dy_mes), dec(r.dy_12m)]) : [],
       };
     },
     // Aba Histórico: a série escolhida, no período escolhido.
