@@ -614,6 +614,15 @@ def main():
     m=re.search(r'^(\s*const DADOS = )(\{.*\});[ \t]*$',pagina,re.M)
     if not m: sys.exit('ERRO: bloco DADOS nao encontrado na pagina')
     dados=json.loads(m.group(2)); antes=json.dumps(dados,sort_keys=True); notes=[]
+    # O agendamento pode atrasar ou pular um disparo. Se a selecao de noticias de hoje ainda nao existe, a rodada que estiver
+    # acontecendo (depois das 8h de Brasilia) monta. No modo "recuperar" a rodada so serve para isso: com noticias em dia, nao faz nada.
+    montada=(dados.get('noticias_montagem') or [{}])[0].get('montada_em','')[:10]
+    em_dia=montada>=agora_br().date().isoformat()
+    if modo=='recuperar':
+        if em_dia: print('UNCHANGED; noticias de hoje ja montadas'); return
+        modo='noticias'; notes.append('noticias em atraso: montadas nesta rodada')
+    elif modo!='noticias' and not em_dia and agora_br().hour>=8:
+        modo='noticias'; notes.append('noticias em atraso: montadas nesta rodada')
     status=dict(dados.get('status',{}))
     # Arquivo de historico (opcional): caminho na variavel HISTORICO. Um arquivo ilegivel nao e sobrescrito.
     global UST_ANO_ANTERIOR

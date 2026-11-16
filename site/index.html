@@ -511,7 +511,7 @@ body { border-top: 4px solid var(--vc-navy); }
   <header class="di-head">
     <h1 class="di-title" id="rs-titulo">Resumo do dia</h1>
     <p class="di-lede" id="rs-resumo">O DI de 5 anos varia <b data-draw="rs-valor" data-item="di5" data-campo="mudanca">—</b> frente ao ajuste anterior, o Ibovespa <b data-draw="rs-valor" data-item="ibov" data-campo="mudanca">—</b> no dia e o IFIX <b data-draw="rs-valor" data-item="ifix" data-campo="mudanca">—</b>. O dólar PTAX está em <b data-draw="rs-valor" data-item="dolar" data-campo="valor">—</b>.</p>
-    <p class="di-stamp" id="rs-carimbo">Cada número traz a data do próprio dado, porque as fontes fecham em horários diferentes. Os dados de mercado são buscados três vezes por dia nos dias úteis, às 10h20, 14h20 e 18h20; fontes e fórmulas estão na aba de cada tema.</p>
+    <p class="di-stamp" id="rs-carimbo">Cada número traz a data do próprio dado, porque as fontes fecham em horários diferentes. Os dados de mercado são buscados três vezes por dia nos dias úteis, a partir de 10h20, 14h20 e 18h20, com atraso de até cerca de meia hora; fontes e fórmulas estão na aba de cada tema.</p>
   </header>
 
   <section class="di-tiles vc-tiles-resumo" id="rs-destaques" aria-label="Principais números do dia" data-draw="rs-tiles"></section>
@@ -566,7 +566,7 @@ body { border-top: 4px solid var(--vc-navy); }
   <header class="di-head">
     <h1 class="di-title" id="titulo">Curva DI Futuro</h1>
     <p class="di-lede" id="resumo">A taxa interpolada vai de <b data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=1a">—</b> em 1 ano a <b data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=5a">—</b> em 5 anos. O ponto de 5 anos varia <b data-draw="var-prazo" data-source="prazos" data-field="var_bps" data-where="prazo=5a">—</b> frente ao ajuste anterior.</p>
-    <p class="di-stamp" id="carimbo">Cotações da B3 de <span data-draw="quando" data-source="di1" data-field="cotacao_em" data-row="0">—</span>, divulgadas com 15 minutos de atraso. Esta página busca novas cotações três vezes por dia nos dias úteis: às 10h20, 14h20 e 18h20.</p>
+    <p class="di-stamp" id="carimbo">Cotações da B3 de <span data-draw="quando" data-source="di1" data-field="cotacao_em" data-row="0">—</span>, divulgadas com 15 minutos de atraso. Esta página busca novas cotações três vezes por dia nos dias úteis, a partir de 10h20, 14h20 e 18h20; o agendamento costuma atrasar cerca de meia hora.</p>
   </header>
 
   <section class="di-tiles" id="destaques" aria-label="Taxas interpoladas em prazos fixos">
@@ -1323,7 +1323,7 @@ body { border-top: 4px solid var(--vc-navy); }
   <header class="di-head">
     <h1 class="di-title" id="noticias-titulo">Principais notícias</h1>
     <p class="di-lede" id="noticias-resumo">Seleção montada em <b data-draw="not-montagem">—</b>, a partir dos feeds de veículos brasileiros e americanos.</p>
-    <p class="di-stamp" id="noticias-carimbo">A montagem roda todo dia pouco antes das 9h, no horário de Brasília. Cada item leva ao texto original; esta página mostra só título, veículo e data.</p>
+    <p class="di-stamp" id="noticias-carimbo">A montagem roda todo dia por volta das 8h45, no horário de Brasília; se esse disparo falhar, a atualização seguinte monta a seleção. Cada item leva ao texto original; esta página mostra só título, veículo e data.</p>
   </header>
 
   <p class="di-note vc-alerta vc-aviso-noticias" hidden>A montagem de hoje ainda não rodou ou falhou. A seleção abaixo é a de <span data-draw="not-montagem">—</span>.</p>

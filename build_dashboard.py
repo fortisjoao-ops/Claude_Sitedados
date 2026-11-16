@@ -16,7 +16,7 @@ aba1 = P('index.html').replace('<meta name="dash-one-writer">\n', '').replace('<
 aba1 = aba1.replace(' dash-skeleton', '')
 velho = 'Esta página mostra uma cópia dessas cotações e só muda quando o arquivo é atualizado.'
 assert velho in aba1
-aba1 = aba1.replace(velho, 'Esta página busca novas cotações três vezes por dia nos dias úteis: às 10h20, 14h20 e 18h20.')
+aba1 = aba1.replace(velho, 'Esta página busca novas cotações três vezes por dia nos dias úteis, a partir de 10h20, 14h20 e 18h20; o agendamento costuma atrasar cerca de meia hora.')
 assert aba1.lstrip().startswith('<div class="di-page">')
 aba1 = aba1.strip()[len('<div class="di-page">'):]
 aba1 = aba1[:aba1.rindex('</div>')].strip('\n')
