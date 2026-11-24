@@ -1,62 +1,18 @@
-<div class="rl">
-  <header class="rl-capa">
-    <img class="vc-logo" src="vera-cruz-logo.svg" alt="Vera Cruz">
-    <p class="vc-cabeca-meta"><span class="vc-cabeca-rotulo">Relatório diário</span><span data-draw="rl-edicao">—</span></p>
+<div class="mb">
+  <header class="mb-cab">
+    <img class="mb-logo" src="vera-cruz-logo.svg" alt="Vera Cruz">
+    <div class="mb-cab-titulo">
+      <h1>Daily Market Briefing</h1>
+      <p data-draw="mb-data">—</p>
+    </div>
+    <p class="mb-cab-meta">Dados atualizados em <b data-draw="mb-atualizado">—</b><br>Consolidado por Vera Cruz Data</p>
   </header>
 
-  <section class="rl-abertura">
-    <h1 class="rl-titulo">Resumo do dia</h1>
-    <div data-de="#rs-resumo"></div>
-    <p class="rl-fonte">Edição montada em <b data-draw="rl-montagem">—</b>, com o pregão aberto. As cotações de bolsa, DI e dólar futuro são as de hoje até esse horário, com os 15 minutos de atraso da B3. O que ainda não saiu hoje vem do último fechamento publicado, e cada número traz a data do próprio dado.</p>
-    <div data-de="#rs-destaques"></div>
-  </section>
+  <p class="mb-lead" data-draw="mb-lead">—</p>
 
-  <div data-de="#rs-dia"></div>
-  <div class="rl-agenda"><div data-de="#rs-agenda"></div></div>
-
-  <section class="rl-tema">
-    <div class="rl-topo">
-      <h2 class="rl-h2">Juros no Brasil</h2>
-      <div data-de="#resumo"></div>
-      <p class="rl-fonte">Cotações dos contratos de DI futuro na B3 de <span data-draw="quando" data-source="di1" data-field="cotacao_em" data-row="0">—</span>, com 15 minutos de atraso.</p>
-    </div>
-    <div class="rl-par">
-      <div data-de="#curva"></div>
-      <div data-de="#copom"></div>
-    </div>
-  </section>
-
-  <section class="rl-tema">
-    <div class="rl-topo">
-      <h2 class="rl-h2">Bolsa e fundos imobiliários</h2>
-      <div data-de="#acoes-resumo"></div>
-      <p class="rl-fonte">Ibovespa cotado na B3 em <span data-draw="ac-cotado">—</span> e dólar futuro (contrato <span data-draw="dol-simbolo">—</span>) em <span data-draw="dol-quando">—</span>, com 15 minutos de atraso. A PTAX é a taxa de fechamento do Banco Central, não a cotação do momento.</p>
-    </div>
-    <div data-de="#acoes-altas"></div>
-    <div class="rl-subtema">
-      <div data-de="#fii-resumo"></div>
-      <p class="rl-fonte">IFIX cotado na B3 em <span data-draw="fii-cotado">—</span>, com 15 minutos de atraso. O IFIX já inclui os rendimentos distribuídos pelos fundos.</p>
-    </div>
-    <div data-de="#fii-altas"></div>
-  </section>
-
-  <section class="rl-tema rl-noticias">
-    <div class="rl-topo">
-      <h2 class="rl-h2">Notícias do dia</h2>
-      <p class="rl-fonte" data-draw="rl-noticias-resumo">—</p>
-    </div>
-    <div class="rl-tres">
-      <div data-de="#noticias-brasil"></div>
-      <div data-de="#noticias-mundo"></div>
-      <div data-de="#noticias-imobiliario"></div>
-    </div>
-  </section>
-
-  <section class="rl-tema rl-colofao">
-    <h2 class="rl-h2">Sobre este relatório</h2>
-    <p class="di-note" data-draw="rl-fontes">—</p>
-    <p class="di-note">Relatório informativo, montado automaticamente a partir de fontes públicas; não é recomendação de investimento. É um recorte para acompanhar o dia: juro real, juros dos Estados Unidos, inflação, Focus, dólar, séries históricas, gráficos interativos, fontes e fórmulas de cada conta estão em <a data-draw="rl-site" href="#visao-geral">—</a>.</p>
-  </section>
-
-  <p class="rl-incompleto" data-draw="rl-conferencia" hidden></p>
+  <section class="mb-sec" id="mb-resumo" data-draw="mb-resumo"></section>
+  <section class="mb-sec" id="mb-noticias" data-draw="mb-noticias"></section>
+  <section class="mb-sec" id="mb-acoes" data-draw="mb-ranking" data-universo="acoes"></section>
+  <section class="mb-sec" id="mb-fiis" data-draw="mb-ranking" data-universo="fiis"></section>
+  <section class="mb-sec mb-notas" id="mb-notas" data-draw="mb-notas"></section>
 </div>

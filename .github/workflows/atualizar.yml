@@ -43,10 +43,25 @@ jobs:
           FRED_KEY: ${{ secrets.FRED_KEY }}
           MODO: ${{ (github.event.schedule == '15 11 * * *' || inputs.noticias) && 'noticias' || (github.event.schedule == '50 13 * * 0,6' && 'recuperar' || '') }}
           HISTORICO: site/historico.json
+          NOTICIAS_TEXTOS: ${{ runner.temp }}/noticias-textos.json   # texto dos feeds das matérias escolhidas, só para o resumo editorial
         run: |
           python3 -I atualizar.py site/index.html site/index.html $MODO | tee saida.txt
           grep -qE '^(UPDATED|UNCHANGED)' saida.txt
           rm saida.txt
+
+      # Na rodada que monta as notícias: o Claude resume o texto que cada veículo distribui no feed e classifica a matéria.
+      # Sem a chave ANTHROPIC_API_KEY nos segredos, não faz nada e o relatório sai só com título, veículo, data e link.
+      - name: Escrever os resumos editoriais das notícias
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -n "$ANTHROPIC_API_KEY" ] && [ -f "$RUNNER_TEMP/noticias-textos.json" ]; then
+            python3 -m venv "$RUNNER_TEMP/venv" && "$RUNNER_TEMP/venv/bin/pip" install --quiet anthropic
+            "$RUNNER_TEMP/venv/bin/python" resumir_noticias.py site/index.html "$RUNNER_TEMP/noticias-textos.json"
+          else
+            echo "RESUMOS: nada a fazer; sem a chave ou sem selecao de noticias nova nesta rodada"
+          fi
 
       # Uma vez por dia útil, com as notícias do dia montadas e as cotações de hoje da B3 já gravadas: imprime o relatório em PDF
       # com o Chrome que já vem na máquina do GitHub. Antes da abertura do pregão, em fim de semana e em feriado, não faz nada.

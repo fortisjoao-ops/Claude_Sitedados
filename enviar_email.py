@@ -104,7 +104,7 @@ def montar_email(ficha, site):
     paginas = (', %d páginas' % int(ficha['paginas'])) if str(ficha.get('paginas', '')).isdigit() or isinstance(ficha.get('paginas'), int) else ''
     corpo = '''<!doctype html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Relatório diário Vera Cruz</title></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Daily Market Briefing · Vera Cruz</title></head>
 <body style="margin:0;padding:0;background:%(papel)s;">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">%(resumo)s</div>
 <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0" style="background:%(papel)s;"><tr><td align="center" style="padding:0 16px;">
@@ -114,26 +114,26 @@ def montar_email(ficha, site):
     <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0"><tr>
       <td valign="bottom"><a href="%(site)s"><img src="%(site)svera-cruz-logo.png" width="150" alt="Vera Cruz" style="display:block;border:0;width:150px;height:auto;"></a></td>
       <td valign="bottom" align="right" style="font-family:%(sans)s;font-size:12px;line-height:18px;color:%(tinta3)s;">
-        <span style="letter-spacing:1.2px;text-transform:uppercase;color:%(tinta)s;">Relatório diário</span><br>%(data)s</td>
+        <span style="letter-spacing:1.2px;text-transform:uppercase;color:%(tinta)s;">Daily Market Briefing</span><br>%(data)s</td>
     </tr></table></td></tr>
   <tr><td style="padding:34px 0 0;font-family:%(serifa)s;font-size:40px;line-height:44px;color:%(tinta)s;">Resumo do dia</td></tr>
   <tr><td style="padding:14px 0 0;font-family:%(serifa)s;font-size:19px;line-height:28px;color:%(tinta)s;">%(resumo)s</td></tr>
   <tr><td style="padding:26px 0 30px;">
-    <a href="%(pdf)s" style="display:inline-block;padding:13px 22px;background:%(navy)s;font-family:%(sans)s;font-size:14px;line-height:18px;font-weight:bold;color:#ffffff;text-decoration:none;">Abrir o relatório completo em PDF</a>
-    <div style="padding-top:10px;font-family:%(sans)s;font-size:12px;line-height:18px;color:%(tinta3)s;">Edição de %(data_curta)s%(paginas)s: os números do dia, a curva de juros, as maiores altas e baixas da bolsa, a agenda e as notícias.</div></td></tr>
+    <a href="%(pdf)s" style="display:inline-block;padding:13px 22px;background:%(navy)s;font-family:%(sans)s;font-size:14px;line-height:18px;font-weight:bold;color:#ffffff;text-decoration:none;">Abrir o Daily Market Briefing em PDF</a>
+    <div style="padding-top:10px;font-family:%(sans)s;font-size:12px;line-height:18px;color:%(tinta3)s;">Edição de %(data_curta)s%(paginas)s: resumo de mercado, agenda, notícias do dia com resumo e as maiores altas e baixas de ações e fundos imobiliários.</div></td></tr>
   <tr><td><table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0">%(linhas)s</table></td></tr>
   <tr><td style="padding:6px 0 0;border-top:1px solid %(tinta)s;font-family:%(sans)s;font-size:12px;line-height:18px;color:%(tinta3)s;">Cotações de bolsa, DI e dólar futuro de hoje, com os 15 minutos de atraso da B3. O que ainda não saiu hoje vem do último fechamento publicado; cada número traz a data do próprio dado.</td></tr>
   %(manchetes)s
   <tr><td style="padding:34px 0 0;font-family:%(sans)s;font-size:14px;line-height:22px;color:%(tinta)s;">Gráficos interativos, tabelas completas e séries históricas: <a href="%(site)s" style="color:%(navy)s;">%(site_curto)s</a></td></tr>
   <tr><td style="padding:30px 0 40px;"><div style="border-top:1px solid %(tinta)s;padding-top:14px;font-family:%(sans)s;font-size:12px;line-height:18px;color:%(tinta3)s;">
     Relatório informativo, montado automaticamente a partir de fontes públicas; não é recomendação de investimento.<br><br>
-    Você recebe este email porque se inscreveu em %(site_curto)s para receber o relatório diário. Para sair da lista, <a href="{{ unsubscribe }}" style="color:%(tinta2)s;">cancele a inscrição</a>.</div></td></tr>
+    Você recebe este email porque se inscreveu em %(site_curto)s para receber o Daily Market Briefing. Para sair da lista, <a href="{{ unsubscribe }}" style="color:%(tinta2)s;">cancele a inscrição</a>.</div></td></tr>
 </table></td></tr></table>
 </body>
 </html>''' % {'papel': PAPEL, 'navy': NAVY, 'tinta': TINTA, 'tinta2': TINTA2, 'tinta3': TINTA3, 'serifa': SERIFA, 'sans': SANS, 'site': e(site),
               'site_curto': e(site.replace('https://', '').rstrip('/')), 'data': e(data_longa), 'data_curta': '%02d/%02d/%d' % (dia, mes, ano), 'paginas': paginas,
               'resumo': e(ficha['resumo']), 'pdf': e(pdf), 'linhas': linhas, 'manchetes': bloco_manchetes}
-    assunto = 'Relatório diário Vera Cruz · %02d/%02d/%d' % (dia, mes, ano)
+    assunto = 'Daily Market Briefing · Vera Cruz · %02d/%02d/%d' % (dia, mes, ano)
     return assunto, corpo
 
 

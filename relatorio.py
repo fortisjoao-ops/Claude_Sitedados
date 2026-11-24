@@ -1,4 +1,4 @@
-# Gera o relatório diário em PDF (site/relatorio-diario.pdf) com os dados gravados em site/index.html.
+# Gera o Daily Market Briefing, o relatório diário em PDF (site/relatorio-diario.pdf), com os dados gravados em site/index.html.
 # Uso: python3 relatorio.py [forcar]
 #
 # Roda depois do atualizador. Sem "forcar", só gera em dia útil, com a seleção de notícias de hoje já montada, as cotações
@@ -55,16 +55,18 @@ def conferir(dados, edicao):
     if not 40000 <= tamanho <= 6000000: falha('PDF com tamanho fora do esperado (%d bytes)' % tamanho)
     info = subprocess.run(['pdfinfo', PROVA], capture_output=True, text=True).stdout
     paginas = int((re.search(r'^Pages:\s+(\d+)', info, re.M) or [0, 0])[1])
-    if not 2 <= paginas <= 12: falha('PDF com %d paginas' % paginas)
+    if not 2 <= paginas <= 30: falha('PDF com %d paginas' % paginas)
     texto = re.sub(r'\s+', ' ', subprocess.run(['pdftotext', '-layout', PROVA, '-'], capture_output=True, text=True).stdout)
-    if 'RELATORIO-INCOMPLETO' in texto: falha('a biblioteca de graficos nao carregou')
+    if 'RELATORIO-INCOMPLETO' in texto: falha('o documento saiu incompleto (biblioteca de calculo ou resumo de mercado)')
     ano, mes, dia = (int(x) for x in edicao.split('-'))
-    esperado = ['Resumo do dia', 'Juros no Brasil', 'Notícias do dia', 'Sobre este relatório', '%d de %s de %d' % (dia, MESES[mes - 1], ano)]
+    esperado = ['Daily Market Briefing', 'Resumo de mercado', 'Notícias e inteligência de mercado', 'maiores altas e baixas', 'Notas e fontes', 'Página 1 de %d' % paginas, '%d de %s de %d' % (dia, MESES[mes - 1], ano)]
     faltam = [t for t in esperado if t not in texto]
     if faltam: falha('faltou no PDF: ' + '; '.join(faltam))
     titulos = [n['titulo'] for n in dados.get('noticias', [])]
-    achados = sum(1 for t in titulos if re.sub(r'\s+', ' ', t)[:28] in texto)
-    if titulos and achados < min(6, len(titulos)): falha('so %d noticias apareceram no PDF' % achados)   # o relatório traz as primeiras de cada seção
+    # As notícias saem em duas colunas: o texto corrido (sem -layout) mantém cada título inteiro.
+    corrido = re.sub(r'\s+', ' ', subprocess.run(['pdftotext', PROVA, '-'], capture_output=True, text=True).stdout)
+    achados = sum(1 for t in titulos if re.sub(r'\s+', ' ', t)[:28] in corrido or re.sub(r'\s+', ' ', t)[:28] in texto)
+    if titulos and achados < len(titulos) * 0.8: falha('so %d das %d noticias apareceram no PDF' % (achados, len(titulos)))   # o relatório traz todas
     return paginas, tamanho
 
 

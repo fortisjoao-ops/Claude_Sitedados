@@ -1,105 +1,121 @@
 /* ==========================================================================
-   Relatório diário em PDF
-   Só entra no documento que a rotina da manhã imprime (não vai para o site).
-   Usa o sistema visual do site (estilo.css) e o acomoda numa página A4:
-   a coluna tem a largura útil da folha, as medidas encolhem e as seções das
-   abas, que no site são largas e arejadas, ficam empilhadas e compactas.
+   Daily Market Briefing — folha de estilo do relatório diário em PDF
+   Desenhado para a folha A4, não para a tela: medidas em mm e pt, coluna na
+   largura útil da página, tabelas densas com números alinhados e fios finos.
+   As cores e as fontes vêm das variáveis do site (bloco :root de estilo.css,
+   que a montagem copia para cá); o resto é próprio do relatório.
+
+   Paginação: a página pode quebrar entre blocos, nunca dentro de um deles.
+   Cada componente declara a sua unidade indivisível (linha de tabela, tema do
+   resumo, par de notícias, quadro de ranking), e todo título vai num grupo
+   .mb-junto com o primeiro bloco que o segue, para não sobrar sozinho no pé
+   da página. Não há regra que segure uma seção inteira.
    ========================================================================== */
+
+/* ---------- 1. Página: margens, cabeçalho e rodapé corridos ---------- */
 @page {
   size: A4;
-  margin: 15mm 14mm 17mm;
-  @bottom-left { content: "Vera Cruz · Relatório diário"; font: 500 6.5pt "Work Sans", Arial, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: #656C74; }
-  @bottom-right { content: counter(page) " / " counter(pages); font: 500 6.5pt "Work Sans", Arial, sans-serif; letter-spacing: 0.1em; color: #656C74; }
+  margin: 17mm 14mm 16mm;
+  @top-left { content: "VERA CRUZ  ·  DAILY MARKET BRIEFING"; vertical-align: bottom; padding-bottom: 1.6mm; margin-bottom: 3.2mm; border-bottom: 0.5pt solid #D6D1C6; font: 500 6.2pt "Work Sans", Arial, sans-serif; letter-spacing: 0.14em; color: #46505B; }
+  @top-center { content: ""; margin-bottom: 3.2mm; border-bottom: 0.5pt solid #D6D1C6; }
+  @top-right { content: ""; vertical-align: bottom; padding-bottom: 1.6mm; margin-bottom: 3.2mm; border-bottom: 0.5pt solid #D6D1C6; font: 400 6.2pt "Work Sans", Arial, sans-serif; letter-spacing: 0.04em; color: #656C74; }
+  @bottom-left { content: "Vera Cruz Data"; vertical-align: top; padding-top: 4.5mm; font: 400 6.2pt "Work Sans", Arial, sans-serif; letter-spacing: 0.04em; color: #656C74; }
+  @bottom-right { content: "Página " counter(page) " de " counter(pages); vertical-align: top; padding-top: 4.5mm; font: 500 6.2pt "Work Sans", Arial, sans-serif; letter-spacing: 0.04em; color: #46505B; }
 }
-:root { --papel: #fff; --calha: 26px; --secao: 26px; --margem: 0px; }
-html { font-size: 12.5px; }
-body { border-top: 0; background: #fff; font-size: 1rem; counter-reset: tema; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+/* A primeira página abre com o cabeçalho institucional; o cabeçalho corrido só aparece da segunda em diante */
+@page :first {
+  margin-top: 12mm;
+  @top-left { content: none; border: 0; }
+  @top-center { content: none; border: 0; }
+  @top-right { content: none; border: 0; }
+}
 
-/* A coluna tem sempre a largura útil da folha (210 mm menos as margens), na tela e na impressão: os gráficos são desenhados nessa medida */
-.rl { width: 182mm; margin: 0 auto; --di-c0: var(--serie-1); --di-c1: var(--serie-2); }
+/* ---------- 2. Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 8.2pt; }
+body { margin: 0; background: #fff; color: var(--tinta); font-family: var(--sans); line-height: 1.42; -webkit-font-smoothing: antialiased; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.mb { width: 182mm; margin: 0 auto; }
 @media screen {
-  body { background: #E9E6DF; padding: 24px 0; }
-  .rl { box-sizing: content-box; padding: 15mm 14mm 17mm; background: #fff; }
+  body { background: #E9E6DF; padding: 8mm 0; }
+  .mb { box-sizing: content-box; padding: 12mm 14mm 16mm; background: #fff; }
 }
-.rl a { color: inherit; }
+a { color: inherit; text-decoration: none; }
+p { orphans: 3; widows: 3; }
+[hidden] { display: none !important; }
 
-/* ---------- Cabeçalho e abertura ---------- */
-.rl-capa { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 12px 0 10px; border-top: 3px solid var(--navy); border-bottom: 1px solid var(--tinta); }
-.rl-capa .vc-logo { height: 44px; }
-.rl-capa .vc-cabeca-meta { font-size: 0.8rem; }
-.rl-capa .vc-cabeca-meta span[data-draw]::first-letter { text-transform: uppercase; }
-.rl-titulo { margin: 16px 0 10px; font-family: var(--serifa); font-weight: 400; font-size: 3.3rem; line-height: 1; letter-spacing: -0.026em; }
-.rl .di-lede { max-width: 62ch; font-size: 1.32rem; line-height: 1.4; }
-.rl-fonte { margin: 10px 0 0; max-width: 108ch; font-size: 0.76rem; line-height: 1.55; color: var(--tinta-3); }
-.rl-fonte b, .rl-fonte span { color: var(--tinta-2); font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* ---------- 3. Cabeçalho institucional (primeira página) ---------- */
+.mb-cab { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; column-gap: 8mm; padding: 4mm 0 3.4mm; border-top: 2.2pt solid var(--navy); border-bottom: 0.6pt solid var(--tinta); }
+.mb-logo { display: block; height: 11.5mm; width: auto; }
+.mb-cab-titulo h1 { margin: 0; font-family: var(--serifa); font-weight: 400; font-size: 21pt; line-height: 1; letter-spacing: -0.016em; }
+.mb-cab-titulo p { margin: 1.8mm 0 0; font-size: 6.8pt; font-weight: 500; letter-spacing: 0.13em; text-transform: uppercase; color: var(--tinta-2); }
+.mb-cab-meta { margin: 0; text-align: right; font-size: 6.8pt; line-height: 1.6; color: var(--tinta-3); font-variant-numeric: tabular-nums; }
+.mb-cab-meta b { font-weight: 500; color: var(--tinta); }
+.mb-lead { margin: 4.4mm 0 0; max-width: 152mm; font-family: var(--serifa); font-size: 11.6pt; line-height: 1.36; font-variant-numeric: lining-nums; }
 
-/* ---------- Destaques ---------- */
-.rl .di-tiles { margin-top: 14px; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px 18px; break-inside: avoid; }
-.rl .di-tiles:has(> :nth-child(4):last-child) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.rl .di-tiles:has(> :nth-child(6):last-child) { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 18px 14px; }
-.rl .di-tile { gap: 4px; padding-top: 8px; }
-.rl .di-tile-label { font-size: 0.6rem; letter-spacing: 0.08em; }
-.rl .di-tile-num { font-size: 1.8rem; }
-.rl .di-tile-num.vc-num-menor { font-size: 1.3rem; line-height: 1.38; }
-.rl .di-tiles:has(> :nth-child(6):last-child) .di-tile-num { font-size: 1.5rem; }
-.rl .di-tiles:has(> :nth-child(6):last-child) .di-tile-num.vc-num-menor { font-size: 1.12rem; line-height: 1.34; }
-.rl .di-tile-sub { font-size: 0.72rem; line-height: 1.45; }
-.rl .di-tile-sub.vc-tile-ref { padding-top: 2px; font-size: 0.68rem; }
+/* ---------- 4. Seções, títulos e notas ---------- */
+.mb-sec { margin-top: 6.4mm; }
+.mb-junto { break-inside: avoid; }
+.mb-h2 { margin: 0 0 2.6mm; padding-top: 1.9mm; border-top: 0.6pt solid var(--tinta); font-family: var(--serifa); font-weight: 500; font-size: 12.6pt; line-height: 1.2; letter-spacing: -0.006em; }
+.mb-h3 { margin: 3.8mm 0 1.3mm; font-size: 6.5pt; font-weight: 600; line-height: 1.3; letter-spacing: 0.13em; text-transform: uppercase; color: var(--navy); }
+.mb-h2 + .mb-h3, .mb-nota + .mb-h3 { margin-top: 2.6mm; }
+.mb-nota { margin: 1.7mm 0 0; font-size: 6.6pt; line-height: 1.5; color: var(--tinta-3); }
+.mb-nota a { color: var(--tinta-2); text-decoration: underline; text-decoration-thickness: 0.3pt; text-underline-offset: 1.5pt; }
+.mb-h2 + .mb-nota { margin-top: 0; }
 
-/* ---------- Temas e seções ---------- */
-.rl-tema { margin-top: 20px; padding-top: 10px; border-top: 1px solid var(--tinta); }
-.rl-topo { break-inside: avoid; }
-.rl-h2 { margin: 0 0 10px; font-family: var(--serifa); font-weight: 400; font-size: 2.1rem; line-height: 1.08; letter-spacing: -0.02em; }
-.rl-h2::before {
-  counter-increment: tema; content: counter(tema, decimal-leading-zero);
-  display: block; margin-bottom: 8px;
-  font-family: var(--sans); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.12em; line-height: 1; color: var(--tinta-3);
-}
-.rl-subtema { margin-top: 16px; break-inside: avoid; }
-/* Cada seção fica inteira numa página (título, nota, gráfico ou tabela); só as listas de notícias continuam de uma página para a outra */
-.rl .di-block { display: block; margin-top: 16px; padding-top: 0; border-top: 0; break-inside: avoid; }
-.rl-noticias .di-block { break-inside: auto; }
-.rl-noticias .di-block > .di-h2 { break-after: avoid; }
-.rl .di-block > * + * { margin-top: 7px; }
-.rl .di-h2 { font-size: 1.38rem; line-height: 1.15; letter-spacing: -0.012em; }
-.rl .di-block > .di-h2::before { content: none; }
-.rl .di-note { max-width: 112ch; font-size: 0.76rem; line-height: 1.55; }
-.rl .vc-alerta { padding: 2px 0 2px 12px; }
-.rl .vc-baixar, .rl .vc-seg, .rl .vc-controles, .rl .di-tip, .rl .di-details { display: none !important; }
+/* ---------- 5. Tabelas ---------- */
+.mb-tab { width: 100%; border-collapse: collapse; font-size: 7.6pt; line-height: 1.3; font-variant-numeric: tabular-nums lining-nums; }
+.mb-tab thead { display: table-header-group; }   /* o cabeçalho se repete quando a tabela continua em outra página */
+.mb-tab tr { break-inside: avoid; }
+.mb-tab th { padding: 0 2.4mm 1.1mm 0; border-bottom: 0.6pt solid var(--tinta); text-align: left; vertical-align: bottom; white-space: nowrap; font-size: 6.3pt; font-weight: 500; color: var(--tinta-3); }
+.mb-tab td { padding: 1.05mm 2.4mm 1.05mm 0; border-bottom: 0.4pt solid var(--linha-suave); vertical-align: top; }
+.mb-tab th:last-child, .mb-tab td:last-child { padding-right: 0; }
+.mb-tab .mb-num { text-align: right; white-space: nowrap; }
+.mb-forte, .mb-valor, .mb-var { font-weight: 600; }
+.mb-base { font-size: 6.5pt; color: var(--tinta-3); }
+.mb-vazio { color: var(--tinta-3); font-weight: 400; }
+.mb-sub { display: block; font-size: 6.2pt; font-weight: 400; color: var(--tinta-3); }
+/* Variações: cor discreta só no número */
+.mb-pos { color: #1D6B4C; }
+.mb-neg { color: #A5382F; }
 
-/* ---------- Tabelas e gráficos ---------- */
-.rl .di-scroll { overflow: visible; }
-.rl .di-table { font-size: 0.8rem; }
-.rl .di-table th { padding: 0 12px 5px 0; font-size: 0.7rem; white-space: normal; }
-.rl .di-table td { padding: 4px 12px 4px 0; white-space: normal; }
-.rl .di-table .di-num { white-space: nowrap; }
-.rl .di-table tr { break-inside: avoid; }
-.rl .vc-duas { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 26px; }
-.rl .di-chart { min-height: 0; break-inside: avoid; break-after: avoid; }
-/* A trajetória dos Fed funds entra só como tabela: o gráfico repete os mesmos números */
-.rl #eua-mercado .di-chart { display: none; }
-.rl .di-chart svg text { font-size: 0.68rem; }
-.rl .di-legend { break-inside: avoid; }
-/* A data consultada é uma ferramenta do site; no relatório a curva vai sem a marca dela */
-.rl .di-chart .di-ref, .rl .di-chart .di-ref-dot, .rl .di-legend li:has(.di-sw-ref) { display: none; }
+/* Resumo de mercado: uma tabela só, com um corpo por tema (o tema não se parte entre páginas) */
+.mb-tab-resumo { table-layout: fixed; }
+.mb-tab-resumo th:nth-child(1) { width: 21.5%; }
+.mb-tab-resumo th:nth-child(2) { width: 10.5%; }
+.mb-tab-resumo th:nth-child(3), .mb-tab-resumo th:nth-child(5) { width: 8.5%; }
+.mb-tab-resumo th:nth-child(4), .mb-tab-resumo th:nth-child(6) { width: 13%; }
+.mb-tab-resumo th:nth-child(7) { width: 15.5%; }
+.mb-tab-resumo th:nth-child(8) { width: 9.5%; }
+.mb-tab-resumo .mb-base { font-size: 6.3pt; white-space: nowrap; }
+.mb-tab-resumo .mb-base, .mb-tab-resumo .mb-ref { padding-top: 1.35mm; }
+.mb-tab-resumo tbody { break-inside: avoid; }
+.mb-tab .mb-tema th { padding: 2.9mm 0 1mm; border-bottom: 0.6pt solid var(--linha); font-size: 6.5pt; font-weight: 600; letter-spacing: 0.13em; text-transform: uppercase; color: var(--navy); }
+.mb-tab-resumo tbody:first-of-type .mb-tema th { padding-top: 2mm; }
+.mb-tab-resumo .mb-ind sup { margin-left: 0.6mm; font-size: 6pt; color: var(--tinta-2); }
+.mb-tab-resumo .mb-ref { white-space: nowrap; font-size: 7pt; }
+.mb-tab-resumo td:nth-child(8) { white-space: nowrap; }
+.mb-tab-agenda { margin-top: 1.5mm; }
+.mb-tab-agenda td:first-child { white-space: nowrap; }
+.mb-tab-agenda thead tr:not(.mb-tema) th { padding-top: 1.2mm; }
 
-/* ---------- Notícias ---------- */
-/* As três seções lado a lado, cada uma com as suas matérias em coluna */
-.rl-tres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 22px; align-items: start; }
-.rl-tres .di-block { margin-top: 12px; }
-.rl .vc-noticias { grid-template-columns: minmax(0, 1fr); }
-.rl .vc-noticias li { grid-template-columns: 1.6rem minmax(0, 1fr); row-gap: 3px; padding: 6px 0; break-inside: avoid; }
-.rl .vc-noticias a { font-size: 0.98rem; line-height: 1.26; text-decoration: none; }
-.rl .vc-noticia-meta { font-size: 0.6rem; }
+/* ---------- 6. Notícias: duas colunas, cada par de matérias numa linha indivisível ---------- */
+.mb-par { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 7mm; padding: 2.3mm 0 2.6mm; border-top: 0.4pt solid var(--linha); break-inside: avoid; }
+.mb-noticia { min-width: 0; }
+.mb-par-um { grid-template-columns: minmax(0, 1fr); }
+.mb-par-um .mb-noticia { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 7mm; align-items: start; }
+.mb-par-um .mb-noticia-resumo { margin-top: 0.3mm; }
+.mb-noticia h4 { margin: 0; font-family: var(--serifa); font-weight: 500; font-size: 9.7pt; line-height: 1.22; letter-spacing: -0.004em; overflow-wrap: anywhere; }
+.mb-noticia-meta { margin: 1mm 0 0; font-size: 6.1pt; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--tinta-3); font-variant-numeric: tabular-nums; }
+.mb-noticia-meta a { text-decoration: underline; text-decoration-thickness: 0.3pt; text-underline-offset: 1.5pt; }
+.mb-noticia-resumo { margin: 1.4mm 0 0; font-family: var(--serifa); font-size: 8.4pt; line-height: 1.42; color: var(--tinta); font-variant-numeric: lining-nums; overflow-wrap: anywhere; }
+.mb-noticia-resumo.mb-sem { font-family: var(--sans); font-size: 6.6pt; font-style: italic; color: var(--tinta-3); }
 
-/* Relatório sucinto: quatro matérias por seção e os quatro próximos eventos da agenda; o resto fica no site */
-.rl .vc-noticias li:nth-child(n+5) { display: none; }
-.rl #rs-agenda tbody tr:nth-child(n+5) { display: none; }
-.rl #rs-agenda .vc-fonte { display: none; }
-/* Curva de juros e reuniões do Copom lado a lado: os gráficos são desenhados na largura de cada coluna */
-.rl-par { display: grid; grid-template-columns: minmax(0, 11fr) minmax(0, 9fr); gap: 0 26px; align-items: start; break-inside: avoid; }
+/* ---------- 7. Rankings: altas e baixas lado a lado ---------- */
+.mb-duas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 7mm; align-items: start; }
+.mb-quadro .mb-h3 { margin-top: 0.6mm; }
+.mb-tab-ranking td:first-child, .mb-tab-ranking th:first-child { width: 5mm; padding-right: 1.8mm; }
+.mb-tab-ranking .mb-nome { overflow-wrap: anywhere; }
 
-/* ---------- Fecho ---------- */
-.rl-colofao { break-inside: avoid; }
-.rl-colofao .di-note + .di-note { margin-top: 6px; }
-.rl-incompleto { margin: 20px 0 0; font-weight: 600; color: #8A1F1F; }
+/* ---------- 8. Notas finais e conferência ---------- */
+.mb-notas .mb-nota { max-width: 165mm; }
+.mb-incompleto { margin: 6mm 0 0; font-weight: 600; color: #A5382F; }

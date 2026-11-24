@@ -449,10 +449,10 @@ a.vc-botao { display: inline-block; text-decoration: none; }
 
   <section class="di-tiles vc-tiles-resumo" id="rs-destaques" aria-label="Principais números do dia" data-draw="rs-tiles"></section>
 
-  <p class="di-note vc-baixar vc-relatorio" id="rs-relatorio" data-draw="relatorio-link" hidden><a class="vc-botao" href="relatorio-diario.pdf">Baixar o relatório diário em PDF</a><span></span></p>
+  <p class="di-note vc-baixar vc-relatorio" id="rs-relatorio" data-draw="relatorio-link" hidden><a class="vc-botao" href="relatorio-diario.pdf">Baixar o Daily Market Briefing em PDF</a><span></span></p>
 
   <form class="vc-inscricao" id="rs-inscricao" data-draw="inscricao" hidden novalidate>
-    <label class="di-field" for="rs-email"><span>Receba este relatório por email</span>
+    <label class="di-field" for="rs-email"><span>Receba o Daily Market Briefing por email</span>
       <input class="di-date" id="rs-email" name="EMAIL" type="email" inputmode="email" autocomplete="email" placeholder="seu@email.com" required></label>
     <input class="vc-isca" type="text" name="email_address_check" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
     <button type="submit" class="vc-botao vc-botao-enviar">Inscrever</button>
@@ -3777,6 +3777,7 @@ dash.draw('grafico', (el) => {
       comparado: 'PTAX de ' + d(vd('ano') && vd('ano').base_data), ref: dolar ? d(dolar.data) : INDISPONIVEL });
     return lista;
   };
+  VC.resumoItens = itens;   // o relatório diário monta o seu resumo de mercado com estes mesmos itens
 
   dash.draw('rs-valor', (el) => {
     const i = itens().find((x) => x.id === el.dataset.item), campo = el.dataset.campo;
@@ -3821,7 +3822,7 @@ dash.draw('grafico', (el) => {
   });
 
   // Agenda: decisões do Copom e do FOMC (já usadas nas outras abas) e divulgações dos EUA pelo calendário do FRED.
-  dash.draw('rs-agenda', (corpo) => {
+  const agenda = () => {
     const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());   // AAAA-MM-DD em Brasília
     const EVENTOS = {
       payroll: ['Payroll: emprego nos Estados Unidos', 'FRED (divulgação do BLS)'],
@@ -3837,8 +3838,10 @@ dash.draw('grafico', (el) => {
       .forEach((r) => itens.push({ chave: r.chave, data: r.data, evento: EVENTOS[r.evento][0], fonte: EVENTOS[r.evento][1] }));
     itens.sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0));
     const faltam = (d) => { const n = Math.round((VC.ms(d) - VC.ms(hoje)) / 86400000); return n === 0 ? 'hoje' : n === 1 ? '1 dia' : n + ' dias'; };
-    tabela(corpo, itens, 'chave', [[(r) => data(r.data), 'di-strong'], [(r) => r.evento, ''], [(r) => faltam(r.data), 'di-num'], [(r) => r.fonte, '']]);
-  });
+    return itens.map((r) => ({ ...r, faltam: faltam(r.data) }));
+  };
+  VC.agendaItens = agenda;   // também usado pelo relatório diário
+  dash.draw('rs-agenda', (corpo) => tabela(corpo, agenda(), 'chave', [[(r) => data(r.data), 'di-strong'], [(r) => r.evento, ''], [(r) => r.faltam, 'di-num'], [(r) => r.fonte, '']]));
 
   const BLOCOS = {
     curva_di: 'curva DI (B3)', ntnb: 'NTN-B (Tesouro Direto)', fed_funds: 'Fed funds (NY Fed)', treasuries: 'Treasuries (Tesouro americano)', fomc: 'dot plot e calendário do Fed',
@@ -3887,7 +3890,7 @@ dash.draw('grafico', (el) => {
     link.href = 'relatorio-diario.pdf?e=' + ficha.edicao;   // o endereço muda a cada edição, para o navegador não servir a de ontem
     link.download = `relatorio-diario-vera-cruz-${ficha.edicao}.pdf`;
     nota.textContent = `Edição de ${data(ficha.edicao)}` + (+ficha.paginas ? `, ${+ficha.paginas} páginas` : '')
-      + ': os números do dia, a curva de juros, as maiores altas e baixas da bolsa, a agenda e as notícias. Sai nos dias úteis, no fim da manhã, já com as cotações do dia.';
+      + ': resumo de mercado, agenda, notícias do dia com resumo e as maiores altas e baixas de ações e fundos imobiliários. Sai nos dias úteis, no fim da manhã, já com as cotações do dia.';
   });
 
   // Resumo: inscrição para receber o relatório por email. O pedido vai direto para o formulário criado no Brevo, que guarda a lista

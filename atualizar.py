@@ -659,7 +659,10 @@ def ler_feed(tmp,i,veiculo,url):
             if dt.tzinfo is None: dt=dt.replace(tzinfo=BRT)
         except Exception: continue
         if not titulo or not re.match(r'https://',link): continue
-        itens.append(dict(titulo=re.sub(r'\s+',' ',titulo)[:220],fonte=veiculo,link=link,quando=dt,pos=pos))
+        # texto que o proprio veiculo distribui no feed (chamada ou materia): serve so de base para o resumo editorial e nao vai para a pagina
+        bruto=max((it.findtext('description') or ''),(it.findtext('{http://purl.org/rss/1.0/modules/content/}encoded') or ''),key=len)
+        texto=re.sub(r'\s+',' ',html.unescape(re.sub(r'<[^>]+>',' ',re.sub(r'(?is)<(script|style|figure)[^>]*>.*?</\1>',' ',bruto)))).strip()
+        itens.append(dict(titulo=re.sub(r'\s+',' ',titulo)[:220],fonte=veiculo,link=link,quando=dt,pos=pos,texto=texto[:3000]))
     return itens
 def montar_noticias(dados,tmp,notes):
     agora=datetime.now(timezone.utc); bruto=[]; falhas=[]
@@ -676,7 +679,8 @@ def montar_noticias(dados,tmp,notes):
         except Exception: pass
     for it in list(bruto):   # matérias de imóveis saem dos feeds brasileiros por palavra-chave
         if it['secao']=='brasil' and IMOB.search(it['titulo']): bruto.append(dict(it,secao='imobiliario'))
-    selecao=[]
+    selecao=[]; textos={}
+    feitos={n.get('link'):n for n in dados.get('noticias',[]) if n.get('resumo')}   # resumo editorial ja escrito para a mesma materia
     for secao in ('brasil','mundo','imobiliario'):
         janela=36 if secao!='imobiliario' else 240
         cand=[it for it in bruto if it['secao']==secao and timedelta(0)<=agora-it['quando']<=timedelta(hours=janela)]
@@ -698,12 +702,26 @@ def montar_noticias(dados,tmp,notes):
             rep=min(g,key=lambda x:(ordem.index(x['fonte']) if x['fonte'] in ordem else 99,-x['quando'].timestamp()))
             if por_fonte.get(rep['fonte'],0)>=(5 if secao=='imobiliario' else 3): continue
             por_fonte[rep['fonte']]=por_fonte.get(rep['fonte'],0)+1
-            escolhidos.append(dict(chave='%s %d'%(secao,len(escolhidos)+1),secao=secao,ordem=len(escolhidos)+1,titulo=rep['titulo'],fonte=rep['fonte'],
-                data=rep['quando'].astimezone(BRT).strftime('%Y-%m-%dT%H:%M:%S-03:00'),link=rep['link'],veiculos=len({x['fonte'] for x in g})))
+            item=dict(chave='%s %d'%(secao,len(escolhidos)+1),secao=secao,ordem=len(escolhidos)+1,titulo=rep['titulo'],fonte=rep['fonte'],
+                data=rep['quando'].astimezone(BRT).strftime('%Y-%m-%dT%H:%M:%S-03:00'),link=rep['link'],veiculos=len({x['fonte'] for x in g}))
+            # a mesma historia em outros veiculos: uma referencia por veiculo, a mais recente
+            outras={}
+            for x in sorted(g,key=lambda x:x['quando'],reverse=True):
+                if x['fonte']!=rep['fonte'] and x['fonte'] not in outras: outras[x['fonte']]=x['link']
+            if outras: item['outras']=[dict(fonte=f,link=l) for f,l in list(outras.items())[:3]]
+            if rep['link'] in feitos:
+                item['resumo']=feitos[rep['link']]['resumo']
+                if feitos[rep['link']].get('categoria'): item['categoria']=feitos[rep['link']]['categoria']
+            if rep.get('texto'): textos[rep['link']]=dict(titulo=rep['titulo'],fonte=rep['fonte'],texto=rep['texto'],
+                outros=[dict(fonte=x['fonte'],texto=x['texto'][:1200]) for x in g if x['fonte']!=rep['fonte'] and x.get('texto')][:2])
+            escolhidos.append(item)
             if len(escolhidos)>=8: break
         selecao+=escolhidos
     if len({x['secao'] for x in selecao})<2: raise RuntimeError('selecao de noticias ficou vazia')
     dados['noticias']=selecao
+    # Textos dos feeds das materias escolhidas, para o resumo editorial (resumir_noticias.py). Ficam num arquivo de trabalho, fora da pagina.
+    if os.environ.get('NOTICIAS_TEXTOS'):
+        open(os.environ['NOTICIAS_TEXTOS'],'w',encoding='utf-8').write(json.dumps(textos,ensure_ascii=False))
     dados['noticias_montagem']=[dict(montada_em=agora_br().strftime('%Y-%m-%dT%H:%M:%S-03:00'),feeds_com_falha=', '.join(sorted(set(falhas))))]
     notes.append('noticias: %d itens'%len(selecao)+(' (falharam: %s)'%', '.join(sorted(set(falhas))) if falhas else ''))
 
