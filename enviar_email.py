@@ -56,14 +56,16 @@ def brevo(metodo, caminho, corpo=None, tolerar=()):
         falha('sem resposta do Brevo em %s %s (%s)' % (metodo, caminho.split('?')[0], type(e).__name__))
 
 
-def esperar_o_site(site, edicao, minutos=8):
+def esperar_o_site(site, edicao, gerado_em, minutos=8):
     # O site só serve a edição nova depois que o Netlify publica o commit da rodada. Sem isso, o email não sai.
+    # Confere também o horário de geração: numa edição refeita no mesmo dia, a data sozinha já bateria com a versão antiga.
     fim = time.time() + minutos * 60
     while True:
         try:
             pedido = urllib.request.Request(site + 'relatorio.json?t=%d' % time.time(), headers={'user-agent': 'curva-dashboard-updater/1.0', 'cache-control': 'no-cache'})
             with urllib.request.urlopen(pedido, timeout=20) as r:
-                if json.loads(r.read().decode('utf-8')).get('edicao') == edicao: return
+                no_site = json.loads(r.read().decode('utf-8'))
+                if no_site.get('edicao') == edicao and no_site.get('gerado_em') == gerado_em: return
         except Exception:
             pass
         if time.time() > fim: falha('o site ainda nao serve a edicao de %s; o email fica para a proxima rodada' % edicao)
@@ -151,23 +153,27 @@ def main():
     if not ficha.get('resumo') or not ficha.get('destaques'):
         print('EMAIL: nada a fazer; a ficha da edicao de hoje nao traz o resumo'); return
 
-    # A campanha do dia já existe? Enviada ou na fila: nada a fazer. Rascunho: é ela que será enviada.
+    # A campanha do dia já existe? Enviada ou na fila: nada a fazer. Rascunho (de um teste, ou de um envio que parou no meio):
+    # o conteúdo é trocado pelo desta edição antes de enviar; se o Brevo não aceitar a troca, sai uma campanha nova.
     nome = 'Relatório diário %s' % edicao
     codigo, resposta = brevo('GET', '/emailCampaigns?type=classic&limit=50&offset=0&sort=desc&excludeHtmlContent=true')
     if not isinstance(resposta, dict) or ('campaigns' not in resposta and resposta.get('count', 0) != 0):
         falha('nao foi possivel conferir as campanhas ja criadas no Brevo; nada foi enviado')
-    do_dia = [c for c in (resposta.get('campaigns') or []) if c.get('name') == nome]
+    do_dia = [c for c in (resposta.get('campaigns') or []) if str(c.get('name', '')).startswith(nome)]
     if any(c.get('status') != 'draft' for c in do_dia):
         print('EMAIL: nada a fazer; o email da edicao de %s ja foi enviado ou esta na fila' % edicao); return
 
     site = endereco_do_site()
+    assunto, corpo = montar_email(ficha, site)
+    pedido = {'subject': assunto, 'sender': REMETENTE, 'replyTo': REMETENTE['email'], 'previewText': ficha['resumo'][:180],
+              'htmlContent': corpo, 'recipients': {'listIds': [int(lista)]}}
+    campanha = None
     if do_dia:
-        campanha = do_dia[0].get('id')
-    else:
-        assunto, corpo = montar_email(ficha, site)
-        codigo, resposta = brevo('POST', '/emailCampaigns', {
-            'name': nome, 'subject': assunto, 'sender': REMETENTE, 'replyTo': REMETENTE['email'], 'previewText': ficha['resumo'][:180],
-            'htmlContent': corpo, 'recipients': {'listIds': [int(lista)]}}, tolerar=(400,))
+        codigo, resposta = brevo('PUT', '/emailCampaigns/%s' % do_dia[0].get('id'), dict(pedido, name=do_dia[0].get('name')), tolerar=(400, 404, 405))
+        if codigo < 300: campanha = do_dia[0].get('id')
+        else: nome = '%s (%s)' % (nome, datetime.now(BRT).strftime('%Hh%M'))   # o rascunho antigo fica no Brevo, sem ser enviado
+    if not campanha:
+        codigo, resposta = brevo('POST', '/emailCampaigns', dict(pedido, name=nome), tolerar=(400,))
         if codigo == 400:
             # O Brevo não cria campanha para uma lista vazia: sem inscritos, não há email a mandar.
             if 'no contacts' in str((resposta or {}).get('message', '')).lower():
@@ -178,7 +184,7 @@ def main():
     if rascunho:
         print('EMAIL: rascunho pronto no Brevo (campanha %s, "%s"); nada foi enviado' % (campanha, nome)); return
 
-    esperar_o_site(site, edicao)
+    esperar_o_site(site, edicao, ficha.get('gerado_em'))
     brevo('POST', '/emailCampaigns/%s/sendNow' % campanha)
     print('EMAIL: enviado; edicao de %s, campanha %s' % (edicao, campanha))
 

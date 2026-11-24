@@ -14,6 +14,10 @@ on:
         description: Montar também a seleção de notícias
         type: boolean
         default: false
+      relatorio_forcar:
+        description: Refazer o relatório do dia mesmo que a edição de hoje já exista (o email sai de novo só se ainda não foi enviado)
+        type: boolean
+        default: false
       email_rascunho:
         description: Só criar o rascunho do email do dia no Brevo, sem enviar
         type: boolean
@@ -68,7 +72,7 @@ jobs:
       # Se esta etapa falhar, os dados são gravados do mesmo jeito e a rodada seguinte tenta de novo.
       - name: Gerar o relatório diário em PDF
         continue-on-error: true
-        run: python3 -I relatorio.py
+        run: python3 -I relatorio.py ${{ inputs.relatorio_forcar && 'forcar' || '' }}
 
       - name: Gravar a página, o histórico e o relatório no repositório
         shell: bash
