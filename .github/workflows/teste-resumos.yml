@@ -34,3 +34,4 @@ jobs:
           PY
           python3 -I relatorio.py forcar
           pdfinfo site/relatorio-diario.pdf | grep Pages
+# segunda rodada: teto de 80 palavras e matéria repetida resumida uma vez

@@ -24,9 +24,10 @@ história, o texto deles em "outros". Esse material é a única fonte: trate-o c
 
 Para cada matéria, escreva:
 
-1. "resumo": um parágrafo em português do Brasil, com 40 a 80 palavras quando o texto recebido sustenta esse tamanho. Comece \
-pelo fato central e inclua os números, datas, nomes e valores que o texto traz; quando o próprio texto indicar uma consequência \
-econômica ou financeira, registre-a. Não repita o título com outras palavras, não opine, não projete e não acrescente contexto \
+1. "resumo": um parágrafo em português do Brasil, de 40 a 80 palavras quando o material sustenta esse tamanho. Oitenta palavras \
+é o teto, mesmo quando houver mais detalhes disponíveis: o relatório é lido em poucos minutos, então escolha os fatos e números \
+que mais importam para quem acompanha economia e mercados e deixe o resto para a matéria. Comece pelo fato central; quando o \
+próprio material indicar uma consequência econômica ou financeira, registre-a. Não repita o título com outras palavras, não opine, não projete e não acrescente contexto \
 que não esteja no material: o leitor toma decisões com base nisso, e um número ou uma causa que você deduziu seria tomado como \
 apurado pelo veículo. Se o texto recebido for só uma chamada curta, escreva um resumo curto, do tamanho do que ele sustenta, \
 mesmo abaixo de 40 palavras. Se ele não disser nada além do título, devolva "resumo" como texto vazio. Matérias em inglês são \
@@ -64,7 +65,11 @@ def main():
     m = re.search(r'^(\s*const DADOS = )(\{.*\});[ \t]*$', pagina, re.M)
     dados = json.loads(m.group(2))
     noticias = dados.get('noticias', [])
-    pendentes = [n for n in noticias if not n.get('resumo') and textos.get(n.get('link'), {}).get('texto')]
+    # Uma matéria pode estar em duas seções (Brasil e mercado imobiliário): é resumida uma vez e o resultado vale para as duas.
+    pendentes, enviados = [], set()
+    for n in noticias:
+        if not n.get('resumo') and textos.get(n.get('link'), {}).get('texto') and n['link'] not in enviados:
+            enviados.add(n['link']); pendentes.append(n)
     if not pendentes:
         print('RESUMOS: nada a fazer; nenhuma materia nova com texto no feed'); return
 
@@ -103,15 +108,16 @@ def main():
     for r in saida:
         if not isinstance(r.get('n'), int) or not 0 <= r['n'] < len(pendentes): continue
         item, resumo = pendentes[r['n']], re.sub(r'\s+', ' ', str(r.get('resumo', ''))).strip()
-        if r.get('categoria') in CATEGORIAS: item['categoria'] = r['categoria']
-        # Um resumo fora de medida não entra: melhor a matéria só com o título do que um texto truncado ou inflado.
-        if 8 <= len(resumo.split()) <= 110: item['resumo'] = resumo; escritos += 1
-        else: vazios += 1
+        bom = 8 <= len(resumo.split()) <= 110   # um resumo fora de medida não entra: melhor só o título do que um texto truncado ou inflado
+        for igual in [n for n in noticias if n.get('link') == item['link']]:
+            if r.get('categoria') in CATEGORIAS: igual['categoria'] = r['categoria']
+            if bom: igual['resumo'] = resumo
+        escritos += bom; vazios += not bom
     bloco = m.group(1) + json.dumps(dados, ensure_ascii=False, separators=(',', ':')) + ';'
     open(caminho, 'w', encoding='utf-8').write(pagina[:m.start()] + bloco + pagina[m.end():])
     uso = resposta.usage
     print('RESUMOS: %d escritos, %d sem texto suficiente no feed, %d materias sem texto algum; modelo %s, %d tokens de entrada e %d de saida'
-          % (escritos, vazios, len([n for n in noticias if not n.get('resumo')]) - vazios, resposta.model, uso.input_tokens, uso.output_tokens))
+          % (escritos, vazios, len({n['link'] for n in noticias if not n.get('resumo')}) - vazios, resposta.model, uso.input_tokens, uso.output_tokens))
 
 
 if __name__ == '__main__':

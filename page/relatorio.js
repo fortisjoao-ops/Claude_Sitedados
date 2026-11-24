@@ -135,7 +135,9 @@
   const https = (u) => /^https:\/\//.test(String(u));
   const ligacao = (texto, href) => { const a = no('a', '', texto); if (https(href)) a.href = href; return a; };
   dash.draw('mb-noticias', (sec) => {
-    const todas = linhas('noticias'), m = montagem();
+    // A mesma matéria pode estar em duas seções da seleção (Brasil e mercado imobiliário); no relatório ela entra uma vez.
+    const vistas = new Set(), m = montagem();
+    const todas = linhas('noticias').filter((n) => !vistas.has(n.link) && vistas.add(n.link));
     if (!todas.length) { sec.replaceChildren(junto(titulo('Notícias e inteligência de mercado'), no('p', 'mb-nota', INDISPONIVEL + ': a seleção de notícias não foi montada.'))); return; }
     const comResumo = todas.filter((n) => n.resumo).length;
     const categoriaDe = (n) => (CATEGORIAS.includes(n.categoria) ? n.categoria : PELA_SECAO[n.secao] || 'Brasil');
