@@ -75,6 +75,7 @@
       comparado: 'PTAX de ' + d(vd('ano') && vd('ano').base_data), ref: dolar ? d(dolar.data) : INDISPONIVEL });
     return lista;
   };
+  VC.resumoItens = itens;   // o relatório diário monta o seu resumo de mercado com estes mesmos itens
 
   dash.draw('rs-valor', (el) => {
     const i = itens().find((x) => x.id === el.dataset.item), campo = el.dataset.campo;
@@ -119,7 +120,7 @@
   });
 
   // Agenda: decisões do Copom e do FOMC (já usadas nas outras abas) e divulgações dos EUA pelo calendário do FRED.
-  dash.draw('rs-agenda', (corpo) => {
+  const agenda = () => {
     const hoje = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());   // AAAA-MM-DD em Brasília
     const EVENTOS = {
       payroll: ['Payroll: emprego nos Estados Unidos', 'FRED (divulgação do BLS)'],
@@ -135,8 +136,10 @@
       .forEach((r) => itens.push({ chave: r.chave, data: r.data, evento: EVENTOS[r.evento][0], fonte: EVENTOS[r.evento][1] }));
     itens.sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0));
     const faltam = (d) => { const n = Math.round((VC.ms(d) - VC.ms(hoje)) / 86400000); return n === 0 ? 'hoje' : n === 1 ? '1 dia' : n + ' dias'; };
-    tabela(corpo, itens, 'chave', [[(r) => data(r.data), 'di-strong'], [(r) => r.evento, ''], [(r) => faltam(r.data), 'di-num'], [(r) => r.fonte, '']]);
-  });
+    return itens.map((r) => ({ ...r, faltam: faltam(r.data) }));
+  };
+  VC.agendaItens = agenda;   // também usado pelo relatório diário
+  dash.draw('rs-agenda', (corpo) => tabela(corpo, agenda(), 'chave', [[(r) => data(r.data), 'di-strong'], [(r) => r.evento, ''], [(r) => r.faltam, 'di-num'], [(r) => r.fonte, '']]));
 
   const BLOCOS = {
     curva_di: 'curva DI (B3)', ntnb: 'NTN-B (Tesouro Direto)', fed_funds: 'Fed funds (NY Fed)', treasuries: 'Treasuries (Tesouro americano)', fomc: 'dot plot e calendário do Fed',

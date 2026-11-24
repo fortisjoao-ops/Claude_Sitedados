@@ -282,6 +282,16 @@ select.di-date {
 a.vc-botao { display: inline-block; text-decoration: none; }
 /* Atalho do relatório diário em PDF, logo abaixo dos destaques do Resumo */
 .di-page > .vc-relatorio { margin-top: 40px; }
+/* Inscrição para receber o relatório por email: campo e botão na mesma linha, notas embaixo */
+.vc-inscricao { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 28px; margin: 34px 0 0; padding-top: 22px; border-top: 1px solid var(--linha); }
+.vc-inscricao .di-field { flex: 0 1 22rem; }
+.vc-inscricao .di-note { flex: 0 0 100%; max-width: none; padding-right: max(0px, calc(100% - 64ch)); }
+.vc-inscricao-estado:empty { display: none; }
+.vc-inscricao-estado:not(.vc-alerta) { color: var(--tinta); font-weight: 500; }
+.vc-botao-enviar { margin-bottom: 9px; }
+.vc-botao-enviar::after { content: "\2192"; }
+.vc-botao-enviar:hover::after { transform: translateX(2px); }
+.vc-isca { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .vc-seg { display: inline-flex; gap: 22px; justify-self: start; }
 .vc-seg-botao {
   appearance: none; padding: 4px 0 3px; border: 0; border-bottom: 1px solid transparent; border-radius: 0; background: none;
@@ -362,7 +372,7 @@ a.vc-botao { display: inline-block; text-decoration: none; }
   body { border-top: 0; background: #fff; }
   .di-wrap { max-width: none; padding: 0; }
   .vc-cabeca { padding-top: 0; }
-  .vc-tabs, .vc-baixar, .vc-seg, .vc-controles, .di-tip, .di-query .di-field, .vc-rodape-nav { display: none !important; }
+  .vc-tabs, .vc-baixar, .vc-inscricao, .vc-seg, .vc-controles, .di-tip, .di-query .di-field, .vc-rodape-nav { display: none !important; }
   .vc-painel:not([hidden]) { animation: none; }
   .di-query, .di-chart svg { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .di-head { padding: 28px 0 24px; }

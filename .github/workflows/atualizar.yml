@@ -5,12 +5,17 @@ on:
     # Horários em UTC. Brasília = UTC menos 3 horas.
     # O GitHub costuma disparar com cerca de meia hora de atraso e às vezes pula um disparo.
     - cron: '15 11 * * *'          # 8h15 de Brasília, todos os dias: notícias e dados (na prática, perto de 8h45)
-    - cron: '20 13,17,21 * * 1-5'  # 10h20, 14h20 e 18h20 de Brasília, dias úteis: dados de mercado; monta as notícias se a rodada da manhã falhou
+    - cron: '45 12 * * 1-5'        # 9h45 de Brasília, dias úteis: na prática roda entre 10h20 e 11h, com o pregão aberto; é a rodada que gera e envia o relatório diário
+    - cron: '20 13,17,21 * * 1-5'  # 10h20, 14h20 e 18h20 de Brasília, dias úteis: dados de mercado; monta as notícias e gera o relatório se as rodadas anteriores falharam
     - cron: '50 13 * * 0,6'        # 10h50 de Brasília, sábado e domingo: só monta as notícias se a rodada da manhã falhou
   workflow_dispatch:
     inputs:
       noticias:
         description: Montar também a seleção de notícias
+        type: boolean
+        default: false
+      email_rascunho:
+        description: Só criar o rascunho do email do dia no Brevo, sem enviar
         type: boolean
         default: false
 
@@ -24,7 +29,7 @@ concurrency:
 jobs:
   atualizar:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -38,12 +43,28 @@ jobs:
           FRED_KEY: ${{ secrets.FRED_KEY }}
           MODO: ${{ (github.event.schedule == '15 11 * * *' || inputs.noticias) && 'noticias' || (github.event.schedule == '50 13 * * 0,6' && 'recuperar' || '') }}
           HISTORICO: site/historico.json
+          NOTICIAS_TEXTOS: ${{ runner.temp }}/noticias-textos.json   # texto dos feeds das matérias escolhidas, só para o resumo editorial
         run: |
           python3 -I atualizar.py site/index.html site/index.html $MODO | tee saida.txt
           grep -qE '^(UPDATED|UNCHANGED)' saida.txt
           rm saida.txt
 
-      # Uma vez por dia, depois de montada a seleção de notícias: imprime o relatório em PDF com o Chrome que já vem na máquina do GitHub.
+      # Na rodada que monta as notícias: o Claude resume o texto que cada veículo distribui no feed e classifica a matéria.
+      # Sem a chave ANTHROPIC_API_KEY nos segredos, não faz nada e o relatório sai só com título, veículo, data e link.
+      - name: Escrever os resumos editoriais das notícias
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -n "$ANTHROPIC_API_KEY" ] && [ -f "$RUNNER_TEMP/noticias-textos.json" ]; then
+            python3 -m venv "$RUNNER_TEMP/venv" && "$RUNNER_TEMP/venv/bin/pip" install --quiet anthropic
+            "$RUNNER_TEMP/venv/bin/python" resumir_noticias.py site/index.html "$RUNNER_TEMP/noticias-textos.json"
+          else
+            echo "RESUMOS: nada a fazer; sem a chave ou sem selecao de noticias nova nesta rodada"
+          fi
+
+      # Uma vez por dia útil, com as notícias do dia montadas e as cotações de hoje da B3 já gravadas: imprime o relatório em PDF
+      # com o Chrome que já vem na máquina do GitHub. Antes da abertura do pregão, em fim de semana e em feriado, não faz nada.
       # Se esta etapa falhar, os dados são gravados do mesmo jeito e a rodada seguinte tenta de novo.
       - name: Gerar o relatório diário em PDF
         continue-on-error: true
@@ -62,3 +83,13 @@ jobs:
           if [ -f site/relatorio-diario.pdf ] && [ -f site/relatorio.json ]; then git add site/relatorio-diario.pdf site/relatorio.json; fi
           git commit -m "Dados de $(TZ=America/Sao_Paulo date '+%d/%m/%Y %H:%M')"
           git push
+
+      # Depois de gravada a edição do dia: manda o email aos inscritos, pelo Brevo, uma vez por edição.
+      # Espera o site publicar a edição nova antes de enviar. Sem a chave ou sem o número da lista, não faz nada.
+      - name: Enviar o relatório por email
+        continue-on-error: true
+        env:
+          BREVO_KEY: ${{ secrets.BREVO_KEY }}
+          BREVO_LISTA: '3'   # número da lista "Relatório diário" no Brevo
+          EMAIL_MODO: ${{ inputs.email_rascunho && 'rascunho' || '' }}
+        run: python3 -I enviar_email.py

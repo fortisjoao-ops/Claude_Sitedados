@@ -10,6 +10,9 @@ P = lambda n: open('page/' + n, encoding='utf-8').read()
 # Endereço público do site: entra na prévia de compartilhamento. Troque aqui quando o site ganhar domínio próprio.
 ENDERECO = 'https://veracruzdata.netlify.app/'
 TITULO = 'Dash Vera Cruz'
+# Formulário de inscrição no relatório por email: o endereço (action) do formulário criado no Brevo, com confirmação por email.
+# É um endereço público, não uma chave. Vazio: o campo de inscrição não aparece no site.
+BREVO_FORMULARIO = 'https://cef8f3ab.sibforms.com/serve/MUIFAKatWPT-tah9X0GoOqrjfIb4_9nPTHM7yhG3hEe88vUIf9TJqGsRUWHR10iteF78Z21IrvmpWDH4OwfAHOdpSOTsSbOoxbdzm2LaXAHhUJoYBVPKT7zupC3vHWf-DEvJuUkNlcL3IrtM1eubd6KLgZKIkFNBDq0rZiM17EhM5t3e2SJKb-2n-WXXJJWiJIq2AeoxzAKnbR-HBw=='
 DESCRICAO = 'Curva DI, juro real, juros dos Estados Unidos, inflação, Focus, ações, fundos imobiliários e notícias, atualizados automaticamente.'
 FONTES = 'https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=Work+Sans:wght@400;500;600&display=swap'
 
@@ -165,6 +168,7 @@ corpo = """</head>
 """ % (nav, paineis, links)
 
 scripts = '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>\n'
+scripts += '<script>\nwindow.VC_FORMULARIO = %s;\n</script>\n' % json.dumps(BREVO_FORMULARIO)
 scripts += '<script>\n' + shim + '\n</script>\n<script>\n' + P('vc.js') + '\n</script>\n<script>\n(() => {\n' + P('app.js') + '\n})();\n</script>\n'
 for n in SCRIPTS:
     scripts += '<script>\n' + P(n) + '\n</script>\n'
@@ -172,26 +176,15 @@ scripts += '<script>\n' + abas_js + '\n</script>\n'
 
 html_final = cabeca + '<style>\n' + P('estilo.css') + '</style>\n' + corpo + scripts + '</body>\n</html>\n'
 
-def sem_regras_do_site(css):
-    # A largura da folha A4 é menor que a de um tablet: sem isto, o relatório herdaria o desenho de celular do site.
-    # Também sai o bloco de impressão do site, que é para quem imprime uma aba pelo navegador.
-    saida, i = [], 0
-    for m in re.finditer(r'@media\s*(\(max-width[^{]*|print\s*)\{', css):
-        if m.start() < i: continue
-        nivel, j = 1, m.end()
-        while nivel:
-            nivel += {'{': 1, '}': -1}.get(css[j], 0); j += 1
-        saida.append(css[i:m.start()]); i = j
-    return ''.join(saida) + css[i:]
-
 if RELATORIO:
-    # Relatório diário: o modelo (relatorio.html) na frente e as abas inteiras guardadas, fora da vista, em #rl-origem.
-    # relatorio.js traz das abas os trechos que o modelo pede e descarta o resto; os scripts são os mesmos do site,
-    # sem a troca de abas e sem a releitura ao vivo da B3, para o PDF sair igual aos dados gravados.
-    guardadas = '\n\n'.join('<div class="di-page vc-painel" id="%s">\n%s\n</div>' % (i, P(arq).strip('\n')) for i, t, arq in ABAS)
-    cabeca_rl = '<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<title>Relatório diário Vera Cruz</title>\n<link rel="stylesheet" href="%s">\n' % FONTES
-    scripts_rl = scripts[:scripts.rindex('<script>\n' + abas_js)].replace('<script>\n' + shim, '<script>\nwindow.VC_ESTATICO = true;\nwindow.VC_ENDERECO = %s;\n</script>\n<script>\n' % json.dumps(ENDERECO) + shim, 1)
-    html_final = (cabeca_rl + '<style>\n' + sem_regras_do_site(P('estilo.css')) + P('relatorio.css') + '</style>\n</head>\n<body>\n' + P('relatorio.html')
-                  + '<div id="rl-origem" hidden>\n' + guardadas + '\n</div>\n' + scripts_rl + '<script>\n' + P('relatorio.js') + '\n</script>\n</body>\n</html>\n')
+    # Daily Market Briefing: documento próprio para impressão em A4. O modelo (relatorio.html) e os componentes
+    # (relatorio.js) montam o relatório direto dos dados e dos cálculos; por isso os scripts do site entram inteiros,
+    # sem as abas e sem a releitura ao vivo da B3 (a biblioteca d3 continua, porque alguns cálculos a usam). Do estilo do site vêm só as variáveis
+    # de cor e de fonte (bloco :root de estilo.css); o desenho da página está em relatorio.css.
+    variaveis = re.search(r':root \{.*?\n\}', P('estilo.css'), re.S).group(0)
+    cabeca_rl = '<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<title>Daily Market Briefing · Vera Cruz</title>\n<link rel="stylesheet" href="%s">\n' % FONTES
+    scripts_rl = scripts[:scripts.rindex('<script>\n' + abas_js)].replace('<script>\nwindow.VC_FORMULARIO', '<script>\nwindow.VC_ESTATICO = true;\nwindow.VC_ENDERECO = %s;\n</script>\n<script>\nwindow.VC_FORMULARIO' % json.dumps(ENDERECO), 1)
+    html_final = (cabeca_rl + '<style>\n' + variaveis + '\n' + P('relatorio.css') + '</style>\n</head>\n<body>\n' + P('relatorio.html')
+                  + scripts_rl + '<script>\n' + P('relatorio.js') + '\n</script>\n</body>\n</html>\n')
 open(out, 'w', encoding='utf-8').write(html_final)
 print(len(html_final), 'bytes;', len(json.dumps(dados, ensure_ascii=False, separators=(',', ':'))), 'de dados')
