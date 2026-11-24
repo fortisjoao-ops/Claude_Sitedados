@@ -279,6 +279,9 @@ select.di-date {
 .vc-botao:hover { color: var(--navy); border-bottom-color: var(--navy); }
 .vc-botao:hover::after { transform: translateY(2px); }
 .vc-botao:disabled { opacity: .4; cursor: default; }
+a.vc-botao { display: inline-block; text-decoration: none; }
+/* Atalho do relatório diário em PDF, logo abaixo dos destaques do Resumo */
+.di-page > .vc-relatorio { margin-top: 40px; }
 .vc-seg { display: inline-flex; gap: 22px; justify-self: start; }
 .vc-seg-botao {
   appearance: none; padding: 4px 0 3px; border: 0; border-bottom: 1px solid transparent; border-radius: 0; background: none;

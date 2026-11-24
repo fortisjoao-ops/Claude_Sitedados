@@ -304,6 +304,9 @@ select.di-date {
 .vc-botao:hover { color: var(--navy); border-bottom-color: var(--navy); }
 .vc-botao:hover::after { transform: translateY(2px); }
 .vc-botao:disabled { opacity: .4; cursor: default; }
+a.vc-botao { display: inline-block; text-decoration: none; }
+/* Atalho do relatório diário em PDF, logo abaixo dos destaques do Resumo */
+.di-page > .vc-relatorio { margin-top: 40px; }
 .vc-seg { display: inline-flex; gap: 22px; justify-self: start; }
 .vc-seg-botao {
   appearance: none; padding: 4px 0 3px; border: 0; border-bottom: 1px solid transparent; border-radius: 0; background: none;
@@ -435,6 +438,8 @@ select.di-date {
   </header>
 
   <section class="di-tiles vc-tiles-resumo" id="rs-destaques" aria-label="Principais números do dia" data-draw="rs-tiles"></section>
+
+  <p class="di-note vc-baixar vc-relatorio" id="rs-relatorio" data-draw="relatorio-link" hidden><a class="vc-botao" href="relatorio-diario.pdf">Baixar o relatório diário em PDF</a><span></span></p>
 
   <section class="di-block" id="rs-agenda">
     <h2 class="di-h2">Agenda</h2>
@@ -3460,6 +3465,7 @@ dash.draw('grafico', (el) => {
     return p.weekday !== 'Sat' && p.weekday !== 'Sun' && minutos >= 9 * 60 && minutos <= 18 * 60 + 50;
   };
   dash.onData(() => {
+    if (window.VC_ESTATICO) return;   // relatório em PDF: ficam os dados gravados
     setTimeout(relerTudo, 0);   // uma leitura ao abrir a página, mesmo fora do pregão
     setInterval(() => { if (document.visibilityState === 'visible' && emPregao()) relerTudo(); }, 60000);
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && emPregao()) relerTudo(); });
@@ -3842,6 +3848,24 @@ dash.draw('grafico', (el) => {
     const meses = ultima && hoje ? (ms(ultima) - ms(hoje)) / (30.44 * 86400000) : NaN;
     el.hidden = !(meses < 6);
     el.textContent = el.hidden ? '' : `O calendário do Copom nesta página vai até ${data(ultima)}. As reuniões seguintes entram quando o Banco Central divulgar as datas; uma rotina mensal confere o calendário oficial.`;
+  });
+
+  // Resumo: atalho para o relatório diário em PDF, que a rotina da manhã gera depois da seleção de notícias.
+  // A ficha (relatorio.json) diz de que dia é a edição publicada; sem ela, o atalho não aparece.
+  let ficha = null, pedida = false;
+  dash.draw('relatorio-link', (el) => {
+    if (!pedida) {
+      pedida = true;
+      fetch('relatorio.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).then((j) => { ficha = j; dash.draw('relatorio-link'); }).catch(() => {});
+    }
+    const valida = ficha && /^\d{4}-\d{2}-\d{2}$/.test(String(ficha.edicao));
+    el.hidden = !valida;
+    if (!valida) return;
+    const link = el.querySelector('a'), nota = el.querySelector('span');
+    link.href = 'relatorio-diario.pdf?e=' + ficha.edicao;   // o endereço muda a cada edição, para o navegador não servir a de ontem
+    link.download = `relatorio-diario-vera-cruz-${ficha.edicao}.pdf`;
+    nota.textContent = `Edição de ${data(ficha.edicao)}` + (+ficha.paginas ? `, ${+ficha.paginas} páginas` : '')
+      + ': o resumo do dia, os principais números de cada tema e as notícias selecionadas. É gerado toda manhã, depois da seleção de notícias.';
   });
 
   // Juros EUA: núcleo do PCE, quando a rotina tem a chave do FRED.

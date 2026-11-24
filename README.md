@@ -4,10 +4,11 @@ Fontes do dashboard público de mercado: uma página única com doze abas, publi
 
 - `page/`: o conteúdo de cada aba (`tab_*.html`), os scripts de cálculo e desenho (`*.js`) e a folha de estilo. Todo o visual fica em `page/estilo.css`, a única folha de estilo do site: as cores, as fontes e as medidas estão nas variáveis do começo do arquivo, e cada componente (cabeçalho, navegação, destaques, seções, tabelas, gráficos, campos, notícias, rodapé, telas menores, impressão) tem a sua parte numerada. As cotações relidas ao vivo (dólar futuro, Ibovespa e IFIX) ficam em `page/aovivo.js`: além do valor gravado na atualização, o navegador relê cada uma direto da B3 a cada minuto, em horário de pregão. A aba Dólar fica em `page/cambio.js` e a calculadora de equivalência de taxas em `page/calculadora.js`. Os botões de baixar em CSV ficam em `page/csv.js`: o arquivo é montado no navegador com os mesmos dados da página.
 - `build_dashboard.py`: monta a página única. Uso: `python3 build_dashboard.py <página com os DADOS atuais> <saída.html>`. Gera o documento HTML completo de `site/index.html`: cabeçalho, navegação entre abas, os painéis, o rodapé e as etiquetas da prévia de compartilhamento. A lista de abas e a ordem dos scripts ficam no começo do arquivo.
+- `relatorio.py`: gera o relatório diário em PDF (`site/relatorio-diario.pdf`) e a ficha dele (`site/relatorio.json`, com a data da edição). Uso: `python3 relatorio.py [forcar]`. Sem `forcar`, só gera quando a seleção de notícias do dia já foi montada e a edição do dia ainda não existe. O PDF é a impressão, pelo Chrome, do documento que `build_dashboard.py` monta com o argumento `relatorio`: o modelo fica em `page/relatorio.html`, que aponta com `data-de="#id"` os trechos das abas que entram; `page/relatorio.js` os traz para o lugar e `page/relatorio.css` acomoda tudo em páginas A4. Não há conta própria do relatório: números e gráficos saem do mesmo código do site. Antes de publicar, o arquivo é conferido (tamanho, páginas, seções, data e notícias); se algo falhar, fica a edição anterior.
 - `atualizar.py`: busca os dados nas fontes públicas e reescreve só a linha `const DADOS = {...};` da página. Uso: `python3 -I atualizar.py <página atual> <saída.html> [noticias]`. Imprime `UPDATED; ...` ou `UNCHANGED`.
 - `assets/`: logotipo e símbolos publicados junto da página.
 - `site/`: a página pronta para hospedagem (`index.html` e as imagens). É o que o Netlify publica.
-- `.github/workflows/atualizar.yml`: roda o atualizador no GitHub nos horários marcados e grava `site/index.html` quando algum dado muda.
+- `.github/workflows/atualizar.yml`: roda o atualizador no GitHub nos horários marcados, gera o relatório diário depois da seleção de notícias da manhã e grava `site/index.html`, o histórico e o relatório quando mudam.
 - `site/historico.json`: um registro por dia útil (ajustes do DI, taxas das NTN-B e curva dos Treasuries), acrescentado pelo atualizador quando a variável `HISTORICO` aponta para ele. A aba Histórico lê esse arquivo.
 - `site/icone.png` e `site/previa.png`: ícone da aba do navegador e imagem da prévia ao compartilhar o link.
 - `ferramentas/retroativo_di.py`: preenche o histórico com curvas de DI de pregões passados, lidas do boletim da B3.
@@ -20,6 +21,8 @@ Variáveis de ambiente opcionais do atualizador (nunca escreva chaves em arquivo
 - `HISTORICO`: caminho do arquivo de histórico a completar (no GitHub, `site/historico.json`).
 - `COPOM_ADICIONAR`: datas novas de decisão do Copom, `AAAA-MM-DD` separadas por vírgula.
 - `SO_BLOCOS`: roda só os blocos listados, para teste.
+
+Do gerador do relatório: `CHROME` (caminho do navegador, quando não é o `google-chrome` da máquina) e `RELATORIO_D3` (cópia local do d3, para gerar sem acesso ao cdnjs).
 
 Depois de mudar qualquer arquivo de `page/`, regenere o site com os dados que já estão publicados:
 

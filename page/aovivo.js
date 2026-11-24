@@ -53,6 +53,7 @@
     return p.weekday !== 'Sat' && p.weekday !== 'Sun' && minutos >= 9 * 60 && minutos <= 18 * 60 + 50;
   };
   dash.onData(() => {
+    if (window.VC_ESTATICO) return;   // relatório em PDF: ficam os dados gravados
     setTimeout(relerTudo, 0);   // uma leitura ao abrir a página, mesmo fora do pregão
     setInterval(() => { if (document.visibilityState === 'visible' && emPregao()) relerTudo(); }, 60000);
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && emPregao()) relerTudo(); });

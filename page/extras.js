@@ -11,6 +11,24 @@
     el.textContent = el.hidden ? '' : `O calendário do Copom nesta página vai até ${data(ultima)}. As reuniões seguintes entram quando o Banco Central divulgar as datas; uma rotina mensal confere o calendário oficial.`;
   });
 
+  // Resumo: atalho para o relatório diário em PDF, que a rotina da manhã gera depois da seleção de notícias.
+  // A ficha (relatorio.json) diz de que dia é a edição publicada; sem ela, o atalho não aparece.
+  let ficha = null, pedida = false;
+  dash.draw('relatorio-link', (el) => {
+    if (!pedida) {
+      pedida = true;
+      fetch('relatorio.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).then((j) => { ficha = j; dash.draw('relatorio-link'); }).catch(() => {});
+    }
+    const valida = ficha && /^\d{4}-\d{2}-\d{2}$/.test(String(ficha.edicao));
+    el.hidden = !valida;
+    if (!valida) return;
+    const link = el.querySelector('a'), nota = el.querySelector('span');
+    link.href = 'relatorio-diario.pdf?e=' + ficha.edicao;   // o endereço muda a cada edição, para o navegador não servir a de ontem
+    link.download = `relatorio-diario-vera-cruz-${ficha.edicao}.pdf`;
+    nota.textContent = `Edição de ${data(ficha.edicao)}` + (+ficha.paginas ? `, ${+ficha.paginas} páginas` : '')
+      + ': o resumo do dia, os principais números de cada tema e as notícias selecionadas. É gerado toda manhã, depois da seleção de notícias.';
+  });
+
   // Juros EUA: núcleo do PCE, quando a rotina tem a chave do FRED.
   dash.draw('eua-pce', (el) => {
     const serie = linhas('eua_macro').filter((l) => l.serie === 'pce_nucleo').sort((a, b) => (a.periodo < b.periodo ? -1 : 1));
