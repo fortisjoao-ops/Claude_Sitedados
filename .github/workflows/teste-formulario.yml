@@ -1,0 +1,20 @@
+name: Teste do formulário (temporário)
+on:
+  push:
+    branches: [claude/relatorio-email]
+    paths: ['.github/workflows/teste-formulario.yml']
+jobs:
+  teste:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pedido sem email, para ver o formato da resposta (não inscreve ninguém)
+        run: |
+          URL=$(python3 -c "import re;print(re.search(r\"^BREVO_FORMULARIO = '([^']*)'\", open('build_dashboard.py').read(), re.M).group(1))")
+          echo "=== com isAjax=1"
+          curl -sS -m 30 -D - -o corpo.txt -X POST "$URL?isAjax=1" -H "Origin: https://veracruzdata.netlify.app" -F "EMAIL=" -F "email_address_check=" -F "locale=en" | grep -i "^HTTP\|content-type\|access-control\|location" || true
+          head -c 600 corpo.txt; echo
+          echo "=== email com formato inválido"
+          curl -sS -m 30 -D - -o corpo2.txt -X POST "$URL?isAjax=1" -H "Origin: https://veracruzdata.netlify.app" -F "EMAIL=nao-e-email" -F "email_address_check=" -F "locale=en" | grep -i "^HTTP\|content-type\|access-control\|location" || true
+          head -c 600 corpo2.txt; echo

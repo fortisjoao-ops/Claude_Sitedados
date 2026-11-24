@@ -12,7 +12,7 @@ ENDERECO = 'https://veracruzdata.netlify.app/'
 TITULO = 'Dash Vera Cruz'
 # Formulário de inscrição no relatório por email: o endereço (action) do formulário criado no Brevo, com confirmação por email.
 # É um endereço público, não uma chave. Vazio: o campo de inscrição não aparece no site.
-BREVO_FORMULARIO = ''
+BREVO_FORMULARIO = 'https://cef8f3ab.sibforms.com/serve/MUIFAKatWPT-tah9X0GoOqrjfIb4_9nPTHM7yhG3hEe88vUIf9TJqGsRUWHR10iteF78Z21IrvmpWDH4OwfAHOdpSOTsSbOoxbdzm2LaXAHhUJoYBVPKT7zupC3vHWf-DEvJuUkNlcL3IrtM1eubd6KLgZKIkFNBDq0rZiM17EhM5t3e2SJKb-2n-WXXJJWiJIq2AeoxzAKnbR-HBw=='
 DESCRICAO = 'Curva DI, juro real, juros dos Estados Unidos, inflação, Focus, ações, fundos imobiliários e notícias, atualizados automaticamente.'
 FONTES = 'https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=Work+Sans:wght@400;500;600&display=swap'
 
