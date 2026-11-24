@@ -117,5 +117,6 @@ p { orphans: 3; widows: 3; }
 .mb-tab-ranking .mb-nome { overflow-wrap: anywhere; }
 
 /* ---------- 8. Notas finais e conferência ---------- */
-.mb-notas .mb-nota { max-width: 165mm; }
+.mb-notas-colunas { columns: 2; column-gap: 7mm; }
+.mb-notas-colunas .mb-nota { break-inside: avoid; margin: 0 0 1.7mm; }
 .mb-incompleto { margin: 6mm 0 0; font-weight: 600; color: #A5382F; }

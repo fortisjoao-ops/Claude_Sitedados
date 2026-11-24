@@ -202,12 +202,13 @@
       : `As ${nomes.length} fontes usadas neste relatório responderam na última atualização.`;
     const link = no('a', '', siteCurto || INDISPONIVEL);
     if (site) link.href = site;
-    sec.replaceChildren(junto(titulo('Notas e fontes'),
+    // As notas vão em duas colunas: ocupam metade da altura e raramente sobram sozinhas numa última página.
+    sec.replaceChildren(junto(titulo('Notas e fontes'), no('div', 'mb-notas-colunas', [
       no('p', 'mb-nota', fontes),
       no('p', 'mb-nota', 'Fontes: B3 (DI futuro, Ibovespa, IFIX, dólar futuro, ações e fundos), Tesouro Direto (NTN-B), Banco Central (Selic, IPCA, PTAX, Focus), NY Fed e Tesouro americano (Fed funds e Treasuries), CVM (informes dos fundos) e FRED (agenda). '
         + 'Cada indicador traz a data do próprio dado: cotações da B3 são intradiárias, com 15 minutos de atraso; os demais são fechamentos ou dados periódicos.'),
       no('p', 'mb-nota', 'A plataforma não acompanha índices acionários internacionais nem commodities, e por isso eles não aparecem no resumo de mercado.'),
-      no('p', 'mb-nota', ['Relatório informativo, montado automaticamente pela Vera Cruz Data a partir de fontes públicas; não é recomendação de investimento. Curvas, séries históricas, metodologia e fórmulas de cada conta estão em ', link, '.'])));
+      no('p', 'mb-nota', ['Relatório informativo, montado automaticamente pela Vera Cruz Data a partir de fontes públicas; não é recomendação de investimento. Curvas, séries históricas, metodologia e fórmulas de cada conta estão em ', link, '.'])])));
   });
 
   // ----- Conferência para a rotina que imprime -----
