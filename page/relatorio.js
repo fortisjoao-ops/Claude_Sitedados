@@ -24,13 +24,13 @@
   });
   dash.draw('rl-montagem', (el) => { const a = atualizado(); el.textContent = a ? dataHora(a) : INDISPONIVEL; });
 
+  // O relatório traz as primeiras matérias de cada seção (o corte é feito em relatorio.css); a seleção inteira fica no site.
+  const POR_SECAO = 4;
   dash.draw('rl-noticias-resumo', (el) => {
     const itens = linhas('noticias'), m = montagem();
     if (!itens.length || !m) { el.textContent = INDISPONIVEL; return; }
-    const veiculos = new Set(itens.map((n) => n.fonte)).size;
-    const repetidas = itens.filter((n) => +n.veiculos > 1).length;
-    el.textContent = `Seleção montada em ${dataHora(m)}: ${itens.length} matérias de ${veiculos} veículos, em três seções.`
-      + (repetidas ? ` ${repetidas === 1 ? 'Uma delas saiu' : repetidas + ' delas saíram'} em mais de um veículo, o que este relatório indica ao lado do título.` : '');
+    el.textContent = `As ${POR_SECAO} primeiras matérias de cada seção da seleção automática montada em ${dataHora(m)}, a partir dos feeds públicos de veículos brasileiros e estrangeiros, em ordem de destaque. `
+      + `O relatório traz só o título, o veículo e o horário; o título leva ao texto original. A seleção completa, com ${itens.length} matérias, está no site, na aba Notícias.`;
   });
 
   // Fontes que não responderam na última tentativa: o relatório traz o dado anterior, com a data ao lado de cada número.
@@ -46,7 +46,7 @@
     const falhas = nomes.filter((n) => !status[n].ok);
     el.textContent = falhas.length
       ? `Fontes que não responderam na última tentativa antes da montagem: ${falhas.map((n) => `${BLOCOS[n]}, com dado de ${dataHora(status[n].em)}`).join('; ')}. `
-        + `Nesses blocos o relatório traz o dado anterior. Antes da abertura do pregão é normal a B3 ainda não ter cotação do dia. As outras ${nomes.length - falhas.length} fontes responderam.`
+        + `Nesses blocos o relatório traz o dado anterior. As outras ${nomes.length - falhas.length} fontes responderam.`
       : `As ${nomes.length} fontes responderam na última tentativa antes da montagem.`;
   });
 

@@ -5,7 +5,8 @@ on:
     # Horários em UTC. Brasília = UTC menos 3 horas.
     # O GitHub costuma disparar com cerca de meia hora de atraso e às vezes pula um disparo.
     - cron: '15 11 * * *'          # 8h15 de Brasília, todos os dias: notícias e dados (na prática, perto de 8h45)
-    - cron: '20 13,17,21 * * 1-5'  # 10h20, 14h20 e 18h20 de Brasília, dias úteis: dados de mercado; monta as notícias se a rodada da manhã falhou
+    - cron: '45 12 * * 1-5'        # 9h45 de Brasília, dias úteis: na prática roda entre 10h20 e 11h, com o pregão aberto; é a rodada que gera e envia o relatório diário
+    - cron: '20 13,17,21 * * 1-5'  # 10h20, 14h20 e 18h20 de Brasília, dias úteis: dados de mercado; monta as notícias e gera o relatório se as rodadas anteriores falharam
     - cron: '50 13 * * 0,6'        # 10h50 de Brasília, sábado e domingo: só monta as notícias se a rodada da manhã falhou
   workflow_dispatch:
     inputs:
@@ -47,7 +48,8 @@ jobs:
           grep -qE '^(UPDATED|UNCHANGED)' saida.txt
           rm saida.txt
 
-      # Uma vez por dia, depois de montada a seleção de notícias: imprime o relatório em PDF com o Chrome que já vem na máquina do GitHub.
+      # Uma vez por dia útil, com as notícias do dia montadas e as cotações de hoje da B3 já gravadas: imprime o relatório em PDF
+      # com o Chrome que já vem na máquina do GitHub. Antes da abertura do pregão, em fim de semana e em feriado, não faz nada.
       # Se esta etapa falhar, os dados são gravados do mesmo jeito e a rodada seguinte tenta de novo.
       - name: Gerar o relatório diário em PDF
         continue-on-error: true

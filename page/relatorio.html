@@ -7,105 +7,55 @@
   <section class="rl-abertura">
     <h1 class="rl-titulo">Resumo do dia</h1>
     <div data-de="#rs-resumo"></div>
-    <p class="rl-fonte">Edição montada em <b data-draw="rl-montagem">—</b>, depois da seleção de notícias da manhã. Cada número traz a data do próprio dado, porque as fontes fecham em horários diferentes: as cotações de bolsa, DI e dólar são as últimas gravadas até a montagem, com os 15 minutos de atraso da B3, e antes da abertura do pregão são as do dia útil anterior.</p>
+    <p class="rl-fonte">Edição montada em <b data-draw="rl-montagem">—</b>, com o pregão aberto. As cotações de bolsa, DI e dólar futuro são as de hoje até esse horário, com os 15 minutos de atraso da B3. O que ainda não saiu hoje vem do último fechamento publicado, e cada número traz a data do próprio dado.</p>
     <div data-de="#rs-destaques"></div>
   </section>
 
   <div data-de="#rs-dia"></div>
-  <div data-de="#rs-longo"></div>
-  <div data-de="#rs-agenda"></div>
+  <div class="rl-agenda"><div data-de="#rs-agenda"></div></div>
 
   <section class="rl-tema">
     <div class="rl-topo">
       <h2 class="rl-h2">Juros no Brasil</h2>
       <div data-de="#resumo"></div>
-      <p class="rl-fonte">Cotações dos contratos de DI futuro na B3 de <span data-draw="quando" data-source="di1" data-field="cotacao_em" data-row="0">—</span>, com 15 minutos de atraso. As taxas em prazos fixos saem da curva interpolada por spline cúbica.</p>
-      <div data-de="#destaques"></div>
+      <p class="rl-fonte">Cotações dos contratos de DI futuro na B3 de <span data-draw="quando" data-source="di1" data-field="cotacao_em" data-row="0">—</span>, com 15 minutos de atraso.</p>
     </div>
-    <div data-de="#curva"></div>
-    <div data-de="#copom"></div>
-  </section>
-
-  <section class="rl-tema">
-    <div class="rl-topo">
-      <h2 class="rl-h2">Juro real e inflação implícita</h2>
-      <div data-de="#jr-resumo"></div>
-      <p class="rl-fonte">Taxas das NTN-B da manhã de <span data-draw="jr-data" data-campo="td_ref">—</span> (Tesouro Direto) e taxas de ajuste do DI de <span data-draw="jr-data" data-campo="di_ref">—</span> (B3). A inflação implícita é uma conta, não um número publicado, e carrega prêmio de risco.</p>
-      <div data-de="#jr-destaques"></div>
+    <div class="rl-par">
+      <div data-de="#curva"></div>
+      <div data-de="#copom"></div>
     </div>
   </section>
 
   <section class="rl-tema">
     <div class="rl-topo">
-      <h2 class="rl-h2">Juros dos Estados Unidos</h2>
-      <div data-de="#eua-resumo"></div>
-      <p class="rl-fonte">Taxa efetiva de <span data-draw="eua-effr-data">—</span> (NY Fed) e Treasuries do fechamento de <span data-draw="eua-ust-data">—</span> (Tesouro americano). São dados de fechamento, não intradiários.</p>
-      <div data-de="#eua-destaques"></div>
-    </div>
-    <div data-de="#eua-mercado"></div>
-  </section>
-
-  <section class="rl-tema">
-    <div class="rl-topo">
-      <h2 class="rl-h2">Inflação e expectativas</h2>
-      <div data-de="#inflacao-resumo"></div>
-      <p class="rl-fonte">Séries do Banco Central (SGS), com o último mês publicado de cada índice.</p>
-      <div data-de="#inflacao-destaques"></div>
-    </div>
-    <div class="rl-subtema">
-      <div data-de="#fx-resumo"></div>
-      <p class="rl-fonte">Medianas das expectativas de mercado coletadas pelo Banco Central até <span data-draw="fx-data">—</span> (boletim Focus). É uma pesquisa com economistas, não um preço de mercado.</p>
-      <div data-de="#fx-destaques"></div>
-    </div>
-  </section>
-
-  <section class="rl-tema">
-    <div class="rl-topo">
-      <h2 class="rl-h2">Dólar</h2>
-      <div data-de="#cb-resumo"></div>
-      <p class="rl-fonte">Dólar futuro (contrato <span data-draw="dol-simbolo">—</span>) cotado na B3 em <span data-draw="dol-quando">—</span>, com 15 minutos de atraso. A PTAX é a taxa de fechamento do Banco Central, não a cotação do momento.</p>
-      <div data-de="#cb-destaques"></div>
-    </div>
-    <div data-de="#cb-diferencial"></div>
-  </section>
-
-  <section class="rl-tema">
-    <div class="rl-topo">
-      <h2 class="rl-h2">Ações</h2>
+      <h2 class="rl-h2">Bolsa e fundos imobiliários</h2>
       <div data-de="#acoes-resumo"></div>
-      <p class="rl-fonte">Ibovespa cotado na B3 em <span data-draw="ac-cotado">—</span>, com 15 minutos de atraso.</p>
-      <div data-de="#acoes-destaques"></div>
+      <p class="rl-fonte">Ibovespa cotado na B3 em <span data-draw="ac-cotado">—</span> e dólar futuro (contrato <span data-draw="dol-simbolo">—</span>) em <span data-draw="dol-quando">—</span>, com 15 minutos de atraso. A PTAX é a taxa de fechamento do Banco Central, não a cotação do momento.</p>
     </div>
     <div data-de="#acoes-altas"></div>
-  </section>
-
-  <section class="rl-tema">
-    <div class="rl-topo">
-      <h2 class="rl-h2">Fundos imobiliários</h2>
+    <div class="rl-subtema">
       <div data-de="#fii-resumo"></div>
       <p class="rl-fonte">IFIX cotado na B3 em <span data-draw="fii-cotado">—</span>, com 15 minutos de atraso. O IFIX já inclui os rendimentos distribuídos pelos fundos.</p>
-      <div data-de="#fii-destaques"></div>
     </div>
     <div data-de="#fii-altas"></div>
   </section>
 
   <section class="rl-tema rl-noticias">
     <div class="rl-topo">
-      <h2 class="rl-h2">Notícias selecionadas</h2>
-      <p class="di-lede" data-draw="rl-noticias-resumo">—</p>
-      <p class="rl-fonte">Seleção automática a partir dos feeds públicos de Agência Brasil, G1, Folha de S.Paulo, InfoMoney, Money Times, BBC, The Washington Post e NPR. Em cada seção as histórias vêm em ordem de destaque: pesa mais a que foi publicada por vários veículos, depois a mais recente. O relatório traz só o título, o veículo e o horário; o título leva ao texto original.</p>
+      <h2 class="rl-h2">Notícias do dia</h2>
+      <p class="rl-fonte" data-draw="rl-noticias-resumo">—</p>
     </div>
-    <div data-de="#noticias-brasil"></div>
-    <div data-de="#noticias-mundo"></div>
-    <div data-de="#noticias-imobiliario"></div>
+    <div class="rl-tres">
+      <div data-de="#noticias-brasil"></div>
+      <div data-de="#noticias-mundo"></div>
+      <div data-de="#noticias-imobiliario"></div>
+    </div>
   </section>
 
   <section class="rl-tema rl-colofao">
-    <div class="rl-topo">
-      <h2 class="rl-h2">Sobre este relatório</h2>
-      <p class="di-note" data-draw="rl-fontes">—</p>
-    </div>
-    <p class="di-note">Relatório informativo, montado automaticamente a partir de fontes públicas; não é recomendação de investimento. Os números são os mesmos do site no momento da montagem. Gráficos interativos, tabelas completas, séries históricas, fontes e fórmulas de cada conta estão em <a data-draw="rl-site" href="#visao-geral">—</a>.</p>
+    <h2 class="rl-h2">Sobre este relatório</h2>
+    <p class="di-note" data-draw="rl-fontes">—</p>
+    <p class="di-note">Relatório informativo, montado automaticamente a partir de fontes públicas; não é recomendação de investimento. É um recorte para acompanhar o dia: juro real, juros dos Estados Unidos, inflação, Focus, dólar, séries históricas, gráficos interativos, fontes e fórmulas de cada conta estão em <a data-draw="rl-site" href="#visao-geral">—</a>.</p>
   </section>
 
   <p class="rl-incompleto" data-draw="rl-conferencia" hidden></p>

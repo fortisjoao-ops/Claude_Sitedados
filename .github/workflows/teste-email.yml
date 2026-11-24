@@ -6,15 +6,20 @@ on:
 jobs:
   teste:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
-      - name: Gerar a edição de hoje só nesta máquina, com o resumo para o email
-        run: python3 -I relatorio.py forcar
+      - name: Buscar os dados de agora, só nesta máquina (nada é gravado no repositório)
+        run: python3 -I atualizar.py site/index.html site/index.html | cut -c1-600
+      - name: Regra do dia a dia (deve recusar, porque a edição de hoje já existe)
+        run: python3 -I relatorio.py
+      - name: Gerar a edição com os dados de agora
+        run: python3 -I relatorio.py forcar && pdfinfo site/relatorio-diario.pdf | grep Pages && python3 -c "import json;j=json.load(open('site/relatorio.json'));print(j['resumo']);print([d['rotulo']+': '+d['valor']+' ('+d['ref']+')' for d in j['destaques']])"
       - name: Criar o rascunho do email no Brevo, sem enviar
         env:
           BREVO_KEY: ${{ secrets.BREVO_KEY }}
           BREVO_LISTA: '3'
           EMAIL_MODO: rascunho
         run: python3 -I enviar_email.py
+# segunda tentativa

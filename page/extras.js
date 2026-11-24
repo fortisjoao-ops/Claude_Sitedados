@@ -26,7 +26,7 @@
     link.href = 'relatorio-diario.pdf?e=' + ficha.edicao;   // o endereço muda a cada edição, para o navegador não servir a de ontem
     link.download = `relatorio-diario-vera-cruz-${ficha.edicao}.pdf`;
     nota.textContent = `Edição de ${data(ficha.edicao)}` + (+ficha.paginas ? `, ${+ficha.paginas} páginas` : '')
-      + ': o resumo do dia, os principais números de cada tema e as notícias selecionadas. É gerado toda manhã, depois da seleção de notícias.';
+      + ': os números do dia, a curva de juros, as maiores altas e baixas da bolsa, a agenda e as notícias. Sai nos dias úteis, no fim da manhã, já com as cotações do dia.';
   });
 
   // Resumo: inscrição para receber o relatório por email. O pedido vai direto para o formulário criado no Brevo, que guarda a lista

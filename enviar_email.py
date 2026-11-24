@@ -118,9 +118,9 @@ def montar_email(ficha, site):
   <tr><td style="padding:14px 0 0;font-family:%(serifa)s;font-size:19px;line-height:28px;color:%(tinta)s;">%(resumo)s</td></tr>
   <tr><td style="padding:26px 0 30px;">
     <a href="%(pdf)s" style="display:inline-block;padding:13px 22px;background:%(navy)s;font-family:%(sans)s;font-size:14px;line-height:18px;font-weight:bold;color:#ffffff;text-decoration:none;">Abrir o relatório completo em PDF</a>
-    <div style="padding-top:10px;font-family:%(sans)s;font-size:12px;line-height:18px;color:%(tinta3)s;">Edição de %(data_curta)s%(paginas)s: os números de cada tema, a curva de juros, a agenda e as notícias selecionadas.</div></td></tr>
+    <div style="padding-top:10px;font-family:%(sans)s;font-size:12px;line-height:18px;color:%(tinta3)s;">Edição de %(data_curta)s%(paginas)s: os números do dia, a curva de juros, as maiores altas e baixas da bolsa, a agenda e as notícias.</div></td></tr>
   <tr><td><table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0">%(linhas)s</table></td></tr>
-  <tr><td style="padding:6px 0 0;border-top:1px solid %(tinta)s;font-family:%(sans)s;font-size:12px;line-height:18px;color:%(tinta3)s;">Cada número traz a data do próprio dado, porque as fontes fecham em horários diferentes. Antes da abertura do pregão, as cotações de bolsa, DI e dólar são as do dia útil anterior.</td></tr>
+  <tr><td style="padding:6px 0 0;border-top:1px solid %(tinta)s;font-family:%(sans)s;font-size:12px;line-height:18px;color:%(tinta3)s;">Cotações de bolsa, DI e dólar futuro de hoje, com os 15 minutos de atraso da B3. O que ainda não saiu hoje vem do último fechamento publicado; cada número traz a data do próprio dado.</td></tr>
   %(manchetes)s
   <tr><td style="padding:34px 0 0;font-family:%(sans)s;font-size:14px;line-height:22px;color:%(tinta)s;">Gráficos interativos, tabelas completas e séries históricas: <a href="%(site)s" style="color:%(navy)s;">%(site_curto)s</a></td></tr>
   <tr><td style="padding:30px 0 40px;"><div style="border-top:1px solid %(tinta)s;padding-top:14px;font-family:%(sans)s;font-size:12px;line-height:18px;color:%(tinta3)s;">
