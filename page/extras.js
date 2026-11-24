@@ -46,7 +46,7 @@
       const dados = new FormData();
       dados.append('EMAIL', email);
       dados.append('email_address_check', '');
-      dados.append('locale', 'pt');
+      dados.append('locale', 'en');   // o mesmo valor do formulário criado no Brevo
       botao.disabled = true;
       dizer('Enviando…');
       fetch(destino + (destino.includes('?') ? '&' : '?') + 'isAjax=1', { method: 'POST', body: dados })

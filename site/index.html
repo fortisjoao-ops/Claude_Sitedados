@@ -1494,7 +1494,7 @@ a.vc-botao { display: inline-block; text-decoration: none; }
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
-window.VC_FORMULARIO = "";
+window.VC_FORMULARIO = "https://cef8f3ab.sibforms.com/serve/MUIFAKatWPT-tah9X0GoOqrjfIb4_9nPTHM7yhG3hEe88vUIf9TJqGsRUWHR10iteF78Z21IrvmpWDH4OwfAHOdpSOTsSbOoxbdzm2LaXAHhUJoYBVPKT7zupC3vHWf-DEvJuUkNlcL3IrtM1eubd6KLgZKIkFNBDq0rZiM17EhM5t3e2SJKb-2n-WXXJJWiJIq2AeoxzAKnbR-HBw==";
 </script>
 <script>
 (() => {
@@ -3907,7 +3907,7 @@ dash.draw('grafico', (el) => {
       const dados = new FormData();
       dados.append('EMAIL', email);
       dados.append('email_address_check', '');
-      dados.append('locale', 'pt');
+      dados.append('locale', 'en');   // o mesmo valor do formulário criado no Brevo
       botao.disabled = true;
       dizer('Enviando…');
       fetch(destino + (destino.includes('?') ? '&' : '?') + 'isAjax=1', { method: 'POST', body: dados })

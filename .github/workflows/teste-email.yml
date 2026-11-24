@@ -1,0 +1,20 @@
+name: Teste do email (temporário)
+on:
+  push:
+    branches: [claude/relatorio-email]
+    paths: ['.github/workflows/teste-email.yml']
+jobs:
+  teste:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+      - name: Gerar a edição de hoje só nesta máquina, com o resumo para o email
+        run: python3 -I relatorio.py forcar
+      - name: Criar o rascunho do email no Brevo, sem enviar
+        env:
+          BREVO_KEY: ${{ secrets.BREVO_KEY }}
+          BREVO_LISTA: '3'
+          EMAIL_MODO: rascunho
+        run: python3 -I enviar_email.py
