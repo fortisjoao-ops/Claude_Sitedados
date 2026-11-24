@@ -167,7 +167,7 @@ def main():
         assunto, corpo = montar_email(ficha, site)
         codigo, resposta = brevo('POST', '/emailCampaigns', {
             'name': nome, 'subject': assunto, 'sender': REMETENTE, 'replyTo': REMETENTE['email'], 'previewText': ficha['resumo'][:180],
-            'htmlContent': corpo, 'recipients': {'listIds': [int(lista)]}, 'tag': 'relatorio-diario'}, tolerar=(400,))
+            'htmlContent': corpo, 'recipients': {'listIds': [int(lista)]}}, tolerar=(400,))
         if codigo == 400:
             # O Brevo não cria campanha para uma lista vazia: sem inscritos, não há email a mandar.
             if 'no contacts' in str((resposta or {}).get('message', '')).lower():
