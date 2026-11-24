@@ -1,37 +1,29 @@
-# Monta a página única do dashboard a partir dos arquivos em page/.
-# Uso: python3 build_dashboard.py <pagina-com-DADOS-atuais.html> <saida.html> [d3-local.js]
+# Monta o site (uma página única com abas) a partir dos arquivos em page/.
+# Uso: python3 build_dashboard.py <página com os DADOS atuais> <saída.html>
+# Os dados ficam numa única linha "const DADOS = {...};" da página; a montagem copia essa linha da página indicada.
 import re, json, sys
 src, out = sys.argv[1], sys.argv[2]
-# Terceiro argumento: 'site' gera um documento HTML completo (para hospedar fora do artifact); um caminho de d3 gera a página de teste local.
-site = len(sys.argv) > 3 and sys.argv[3] == 'site'
-d3local = sys.argv[3] if len(sys.argv) > 3 and not site else None
 P = lambda n: open('page/' + n, encoding='utf-8').read()
 
-antigo = open('build_public.py', encoding='utf-8').read()
-tokens = re.search(r"tokens='''(.*?)'''", antigo, re.S).group(1)
-brand_css = re.search(r"brand_css='''(.*?)'''", antigo, re.S).group(1)
+# Endereço público do site: entra na prévia de compartilhamento. Troque aqui quando o site ganhar domínio próprio.
+ENDERECO = 'https://veracruzdata.netlify.app/'
+TITULO = 'Dash Vera Cruz'
+DESCRICAO = 'Curva DI, juro real, juros dos Estados Unidos, inflação, Focus, ações, fundos imobiliários e notícias, atualizados automaticamente.'
+FONTES = 'https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=Work+Sans:wght@400;500;600&display=swap'
 
-# Aba 1: o conteúdo atual, sem a casca do dashboard original.
-aba1 = P('index.html').replace('<meta name="dash-one-writer">\n', '').replace('<link rel="stylesheet" href="style.css">\n', '').replace('<script src="app.js"></script>\n', '')
-aba1 = aba1.replace(' dash-skeleton', '')
-velho = 'Esta página mostra uma cópia dessas cotações e só muda quando o arquivo é atualizado.'
-assert velho in aba1
-aba1 = aba1.replace(velho, 'Esta página busca novas cotações três vezes por dia nos dias úteis, a partir de 10h20, 14h20 e 18h20; o agendamento costuma atrasar cerca de meia hora.')
-assert aba1.lstrip().startswith('<div class="di-page">')
-aba1 = aba1.strip()[len('<div class="di-page">'):]
-aba1 = aba1[:aba1.rindex('</div>')].strip('\n')
-
-ABAS = [('visao-geral', 'Resumo', P('tab_resumo.html')), ('juros-br', 'Curva DI Futuro', aba1), ('juro-real-br', 'Juro real BR', P('tab_juroreal.html')),
-        ('juros-eua', 'Juros EUA', P('tab_eua.html')), ('inflacao-br', 'Inflação BR', P('tab_inflacao.html')), ('focus', 'Focus', P('tab_focus.html')),
-        ('dolar', 'Dólar', P('tab_dolar.html')), ('acoes-br', 'Ações BR', P('tab_acoes.html')), ('fiis', 'FIIs', P('tab_fiis.html')),
-        ('calculadora', 'Calculadora', P('tab_calculadora.html')), ('historico', 'Histórico', P('tab_historico.html')),
-        ('noticias', 'Notícias', P('tab_noticias.html'))]
+ABAS = [('visao-geral', 'Resumo', 'tab_resumo.html'), ('juros-br', 'Curva DI Futuro', 'tab_curva_di.html'), ('juro-real-br', 'Juro real BR', 'tab_juroreal.html'),
+        ('juros-eua', 'Juros EUA', 'tab_eua.html'), ('inflacao-br', 'Inflação BR', 'tab_inflacao.html'), ('focus', 'Focus', 'tab_focus.html'),
+        ('dolar', 'Dólar', 'tab_dolar.html'), ('acoes-br', 'Ações BR', 'tab_acoes.html'), ('fiis', 'FIIs', 'tab_fiis.html'),
+        ('calculadora', 'Calculadora', 'tab_calculadora.html'), ('historico', 'Histórico', 'tab_historico.html'), ('noticias', 'Notícias', 'tab_noticias.html')]
+# A ordem importa: vc.js e a aba Curva DI vêm primeiro; resumo.js usa o que as outras abas calculam.
+SCRIPTS = ['ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'aovivo.js', 'cambio.js', 'calculadora.js',
+           'resumo.js', 'extras.js', 'historico.js', 'csv.js']
 
 pagina = open(src, encoding='utf-8').read()
-m = re.search(r'^\s*const DADOS = (\{.*\});[ \t]*$', pagina, re.M)
-dados = json.loads(m.group(1))
+dados = json.loads(re.search(r'^\s*const DADOS = (\{.*\});[ \t]*$', pagina, re.M).group(1))
 
-shim = '''(() => {
+# Base da página: guarda os dados, calcula sob demanda e redesenha os elementos marcados com data-draw.
+shim = """(() => {
   const DADOS = %s;
   const calculos = {}, valores = {}, desenhos = {}, avisos = [];
   const desenhar = (nome) => document.querySelectorAll('[data-draw="' + nome + '"]').forEach((el) => {
@@ -76,53 +68,52 @@ shim = '''(() => {
       }).observe(el);
     });
   };
-})();''' % json.dumps(dados, ensure_ascii=False, separators=(',', ':'))
+})();""" % json.dumps(dados, ensure_ascii=False, separators=(',', ':'))
 
-abas_js = '''(() => {
-  const paineis = [...document.querySelectorAll('.vc-painel')], abas = [...document.querySelectorAll('.vc-tab')];
-  const mostrar = () => {
+# Troca de aba pelo endereço (#aba): mostra o painel, marca a aba e a traz para a vista na barra de navegação.
+abas_js = """(() => {
+  const paineis = [...document.querySelectorAll('.vc-painel')], abas = [...document.querySelectorAll('.vc-tab')], barra = document.querySelector('.vc-tabs');
+  const mostrar = (evento) => {
     const alvo = paineis.find((p) => '#' + p.id === location.hash) || paineis[0];
     paineis.forEach((p) => { p.hidden = p !== alvo; });
     abas.forEach((a) => { if (a.getAttribute('href') === '#' + alvo.id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    const ativa = abas.find((a) => a.getAttribute('aria-current') === 'page');
+    if (ativa && barra) barra.scrollTo({ left: Math.max(0, ativa.offsetLeft - (barra.clientWidth - ativa.offsetWidth) / 2), behavior: evento ? 'smooth' : 'auto' });
+    // Ao trocar de aba com a página rolada, volta ao começo do conteúdo novo.
+    if (evento) { const cabeca = document.querySelector('.vc-cabeca'), topo = cabeca ? cabeca.offsetTop + cabeca.offsetHeight : 0; if (window.scrollY > topo) window.scrollTo(0, topo); }
   };
+  // Quando as abas não cabem na largura, a barra rola e ganha um esmaecimento à direita enquanto houver abas escondidas.
+  const sobra = () => { if (barra) barra.classList.toggle('vc-tabs-mais', barra.scrollWidth - barra.clientWidth - barra.scrollLeft > 4); barra.classList.toggle('vc-tabs-antes', barra.scrollLeft > 4); };
+  if (barra) barra.addEventListener('scroll', sobra, { passive: true });
+  window.addEventListener('resize', sobra);
+  // Clique num link para uma aba: troca o painel sem o salto de âncora do navegador, que esconderia o título sob a barra fixa.
+  // Quem está no alto da página continua onde está; quem já rolou volta ao começo do conteúdo (regra acima, em mostrar).
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!link || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const destino = link.getAttribute('href');
+    if (!paineis.some((p) => '#' + p.id === destino)) return;
+    e.preventDefault();
+    if (location.hash === destino) return;
+    history.pushState(null, '', destino);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  });
   window.addEventListener('hashchange', mostrar);
   mostrar();
+  sobra();
   window.iniciarCurvaDI();
-})();'''
+})();"""
 
-head = '''<title>Dash Vera Cruz</title>
-<meta name="claude:viewport-fit-sides" content="cover">
-''' + ('' if d3local else '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap">\n')
-nav = '\n'.join('      <a class="vc-tab" href="#%s">%s</a>' % (i, t) for i, t, _ in ABAS)
-paineis = '\n\n'.join('<div class="di-page vc-painel" id="%s"%s>\n%s\n</div>' % (i, '' if k == 0 else ' hidden', c.strip('\n')) for k, (i, t, c) in enumerate(ABAS))
-corpo = '''<div class="di-wrap">
-  <div class="vc-top">
-    <div class="vc-brand"><img class="vc-logo" src="vera-cruz-logo.svg" alt="Vera Cruz"></div>
-    <nav class="vc-tabs" aria-label="Abas do dashboard">
-%s
-    </nav>
-  </div>
+nav = '\n'.join('    <a class="vc-tab" href="#%s">%s</a>' % (i, t) for i, t, _ in ABAS)
+links = '\n'.join('        <li><a href="#%s">%s</a></li>' % (i, t) for i, t, _ in ABAS)
+paineis = '\n\n'.join('<div class="di-page vc-painel" id="%s"%s>\n%s\n</div>' % (i, '' if k == 0 else ' hidden', P(arq).strip('\n')) for k, (i, t, arq) in enumerate(ABAS))
 
-%s
-
-  <footer class="di-foot">
-    <img class="vc-simbolo" src="vera-cruz-simbolo.png" alt="" aria-hidden="true">
-    <p>Página informativa; não é recomendação de investimento. A fonte e a data de cada número estão na aba correspondente.</p>
-  </footer>
-</div>
-''' % (nav, paineis)
-d3tag = ('<script>' + open(d3local, encoding='utf-8').read() + '</script>') if d3local else '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>'
-scripts = '<script>\n' + shim + '\n</script>\n<script>\n' + P('vc.js') + '\n</script>\n<script>\n(() => {\n' + P('app.js') + '\n})();\n</script>\n'
-for n in ('ntnb.js', 'eua.js', 'inflacao.js', 'acoes.js', 'noticias.js', 'juroreal.js', 'fiis.js', 'focus.js', 'aovivo.js', 'cambio.js', 'calculadora.js', 'resumo.js', 'extras.js', 'historico.js', 'csv.js'):
-    scripts += '<script>\n' + P(n) + '\n</script>\n'
-scripts += '<script>\n' + abas_js + '\n</script>\n'
-html_final = head + '<style>\n' + tokens + P('style.css') + brand_css + P('tabs.css') + P('refino.css') + '</style>\n' + corpo + d3tag + '\n' + scripts
-if d3local:
-    html_final = '<!doctype html><html><head><meta charset="utf8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;font-size:14px}[hidden]{display:none!important}img{max-width:100%}</style></head><body>' + html_final + '</body></html>'
-# Endereço público do site: entra na prévia de compartilhamento. Troque aqui quando o site ganhar domínio próprio.
-ENDERECO = 'https://veracruzdata.netlify.app/'
-DESCRICAO = 'Curva DI, juro real, juros dos Estados Unidos, inflação, Focus, ações, fundos imobiliários e notícias, atualizados automaticamente.'
-META = ('''<meta name="description" content="%(d)s">
+cabeca = """<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="%(d)s">
 <meta name="theme-color" content="#1C466C">
 <link rel="icon" type="image/png" href="icone.png">
 <link rel="apple-touch-icon" href="icone.png">
@@ -130,17 +121,53 @@ META = ('''<meta name="description" content="%(d)s">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:site_name" content="Vera Cruz">
-<meta property="og:title" content="Dash Vera Cruz">
+<meta property="og:title" content="%(t)s">
 <meta property="og:description" content="%(d)s">
 <meta property="og:url" content="%(u)s">
 <meta property="og:image" content="%(u)sprevia.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-''' % {'d': DESCRICAO, 'u': ENDERECO})
-if site:
-    html_final = ('<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n' + META +
-                  '<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>\n' + html_final.replace('<meta name="claude:viewport-fit-sides" content="cover">\n', '')
-                  .replace('<div class="di-wrap">', '</head>\n<body>\n<div class="di-wrap">', 1) + '</body>\n</html>\n')
+<title>%(t)s</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="%(f)s">
+""" % {'d': DESCRICAO, 'u': ENDERECO, 't': TITULO, 'f': FONTES}
+
+corpo = """</head>
+<body>
+<div class="di-wrap">
+  <header class="vc-cabeca">
+    <a class="vc-brand" href="#visao-geral" aria-label="Vera Cruz: ir para o resumo"><img class="vc-logo" src="vera-cruz-logo.svg" alt="Vera Cruz"></a>
+    <p class="vc-cabeca-meta"><span class="vc-cabeca-rotulo">Dados de mercado</span><span data-draw="vc-atualizado"></span></p>
+  </header>
+  <nav class="vc-tabs" aria-label="Abas do dashboard">
+%s
+  </nav>
+
+%s
+
+  <footer class="di-foot">
+    <div class="vc-rodape-marca">
+      <img class="vc-simbolo" src="vera-cruz-simbolo.png" alt="" aria-hidden="true">
+      <p>Página informativa; não é recomendação de investimento. A fonte e a data de cada número estão na aba correspondente.</p>
+    </div>
+    <nav class="vc-rodape-nav" aria-label="Seções do site">
+      <span class="vc-rodape-titulo">Seções</span>
+      <ul class="vc-rodape-links">
+%s
+      </ul>
+    </nav>
+  </footer>
+</div>
+""" % (nav, paineis, links)
+
+scripts = '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>\n'
+scripts += '<script>\n' + shim + '\n</script>\n<script>\n' + P('vc.js') + '\n</script>\n<script>\n(() => {\n' + P('app.js') + '\n})();\n</script>\n'
+for n in SCRIPTS:
+    scripts += '<script>\n' + P(n) + '\n</script>\n'
+scripts += '<script>\n' + abas_js + '\n</script>\n'
+
+html_final = cabeca + '<style>\n' + P('estilo.css') + '</style>\n' + corpo + scripts + '</body>\n</html>\n'
 open(out, 'w', encoding='utf-8').write(html_final)
 print(len(html_final), 'bytes;', len(json.dumps(dados, ensure_ascii=False, separators=(',', ':'))), 'de dados')
