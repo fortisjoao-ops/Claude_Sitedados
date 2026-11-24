@@ -38,8 +38,9 @@ def endereco_do_site():
     return m.group(1)
 
 
-def brevo(metodo, caminho, corpo=None):
-    # Devolve (código, resposta em JSON ou None). Erros de rede e respostas que não sejam 2xx encerram a rotina sem enviar.
+def brevo(metodo, caminho, corpo=None, tolerar=()):
+    # Devolve (código, resposta em JSON ou None). Erros de rede e respostas que não sejam 2xx encerram a rotina sem enviar,
+    # a não ser os códigos em "tolerar", que voltam para quem chamou decidir.
     dados = json.dumps(corpo).encode('utf-8') if corpo is not None else None
     pedido = urllib.request.Request(API + caminho, data=dados, method=metodo,
                                     headers={'api-key': os.environ['BREVO_KEY'], 'accept': 'application/json', 'content-type': 'application/json'})
@@ -49,6 +50,7 @@ def brevo(metodo, caminho, corpo=None):
             return r.status, (json.loads(texto) if texto.strip() else None)
     except urllib.error.HTTPError as e:
         detalhe = e.read().decode('utf-8', 'replace')[:300].replace('\n', ' ')
+        if e.code in tolerar: return e.code, {'message': detalhe}
         falha('o Brevo respondeu %d em %s %s (%s)' % (e.code, metodo, caminho.split('?')[0], detalhe))
     except Exception as e:
         falha('sem resposta do Brevo em %s %s (%s)' % (metodo, caminho.split('?')[0], type(e).__name__))
@@ -165,7 +167,12 @@ def main():
         assunto, corpo = montar_email(ficha, site)
         codigo, resposta = brevo('POST', '/emailCampaigns', {
             'name': nome, 'subject': assunto, 'sender': REMETENTE, 'replyTo': REMETENTE['email'], 'previewText': ficha['resumo'][:180],
-            'htmlContent': corpo, 'recipients': {'listIds': [int(lista)]}, 'tag': 'relatorio-diario'})
+            'htmlContent': corpo, 'recipients': {'listIds': [int(lista)]}, 'tag': 'relatorio-diario'}, tolerar=(400,))
+        if codigo == 400:
+            # O Brevo não cria campanha para uma lista vazia: sem inscritos, não há email a mandar.
+            if 'no contacts' in str((resposta or {}).get('message', '')).lower():
+                print('EMAIL: nada a fazer; a lista ainda nao tem inscritos confirmados'); return
+            falha('o Brevo recusou a campanha (%s)' % (resposta or {}).get('message', ''))
         campanha = (resposta or {}).get('id')
     if not campanha: falha('o Brevo nao devolveu o numero da campanha')
     if rascunho:
