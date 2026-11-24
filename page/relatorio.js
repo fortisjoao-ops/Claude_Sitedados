@@ -66,4 +66,24 @@
   });
   // No PDF, os atalhos para as abas levam ao site.
   if (site) document.querySelectorAll('a[href^="#"]').forEach((a) => { a.href = site + a.getAttribute('href'); });
+
+  // Resumo da edição para o email do dia: a frase de abertura, os destaques e a primeira matéria de cada seção, como saíram
+  // no relatório. A rotina lê este bloco do documento e o grava na ficha (relatorio.json); o email não refaz conta nenhuma.
+  const limpo = (no) => (no ? no.textContent.replace(/\s+/g, ' ').trim() : '');
+  const resumo = {
+    resumo: limpo(document.getElementById('rs-resumo')),
+    destaques: [...document.querySelectorAll('#rs-destaques .di-tile')].map((t) => ({
+      rotulo: limpo(t.querySelector('.di-tile-label')), valor: limpo(t.querySelector('.di-tile-num')),
+      nota: limpo(t.querySelector('.di-tile-sub:not(.vc-tile-ref)')), ref: limpo(t.querySelector('.vc-tile-ref')),
+    })),
+    manchetes: [['brasil', 'Brasil'], ['mundo', 'Mundo'], ['imobiliario', 'Mercado imobiliário']].map(([secao, nome]) => {
+      const n = linhas('noticias').filter((x) => x.secao === secao).sort((a, b) => a.ordem - b.ordem)[0];
+      return n && /^https:\/\//.test(n.link) ? { secao: nome, titulo: n.titulo, fonte: n.fonte, link: n.link } : null;
+    }).filter(Boolean),
+  };
+  const bloco = document.createElement('script');
+  bloco.type = 'application/json';
+  bloco.id = 'rl-resumo-email';
+  bloco.textContent = JSON.stringify(resumo).replace(/</g, '\\u003c');
+  document.body.append(bloco);
 })();

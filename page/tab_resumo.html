@@ -8,6 +8,15 @@
 
   <p class="di-note vc-baixar vc-relatorio" id="rs-relatorio" data-draw="relatorio-link" hidden><a class="vc-botao" href="relatorio-diario.pdf">Baixar o relatório diário em PDF</a><span></span></p>
 
+  <form class="vc-inscricao" id="rs-inscricao" data-draw="inscricao" hidden novalidate>
+    <label class="di-field" for="rs-email"><span>Receba este relatório por email</span>
+      <input class="di-date" id="rs-email" name="EMAIL" type="email" inputmode="email" autocomplete="email" placeholder="seu@email.com" required></label>
+    <input class="vc-isca" type="text" name="email_address_check" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <button type="submit" class="vc-botao vc-botao-enviar">Inscrever</button>
+    <p class="di-note vc-inscricao-estado" role="status" aria-live="polite" data-estado></p>
+    <p class="di-note">Enviado toda manhã por contato@veracruzasset.com.br. A inscrição só vale depois de confirmada pelo link que chega no seu email, e você sai da lista quando quiser, pelo link no rodapé de cada mensagem. O endereço é usado só para este envio.</p>
+  </form>
+
   <section class="di-block" id="rs-agenda">
     <h2 class="di-h2">Agenda</h2>
     <p class="di-note">Próximas decisões de juros e divulgações que costumam mexer com as curvas. As datas podem ser alteradas por quem as publica.</p>

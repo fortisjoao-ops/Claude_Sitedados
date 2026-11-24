@@ -13,6 +13,10 @@ on:
         description: Montar também a seleção de notícias
         type: boolean
         default: false
+      email_rascunho:
+        description: Só criar o rascunho do email do dia no Brevo, sem enviar
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -24,7 +28,7 @@ concurrency:
 jobs:
   atualizar:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -62,3 +66,13 @@ jobs:
           if [ -f site/relatorio-diario.pdf ] && [ -f site/relatorio.json ]; then git add site/relatorio-diario.pdf site/relatorio.json; fi
           git commit -m "Dados de $(TZ=America/Sao_Paulo date '+%d/%m/%Y %H:%M')"
           git push
+
+      # Depois de gravada a edição do dia: manda o email aos inscritos, pelo Brevo, uma vez por edição.
+      # Espera o site publicar a edição nova antes de enviar. Sem a chave ou sem o número da lista, não faz nada.
+      - name: Enviar o relatório por email
+        continue-on-error: true
+        env:
+          BREVO_KEY: ${{ secrets.BREVO_KEY }}
+          BREVO_LISTA: ''   # número da lista de inscritos no Brevo
+          EMAIL_MODO: ${{ inputs.email_rascunho && 'rascunho' || '' }}
+        run: python3 -I enviar_email.py

@@ -10,6 +10,9 @@ P = lambda n: open('page/' + n, encoding='utf-8').read()
 # Endereço público do site: entra na prévia de compartilhamento. Troque aqui quando o site ganhar domínio próprio.
 ENDERECO = 'https://veracruzdata.netlify.app/'
 TITULO = 'Dash Vera Cruz'
+# Formulário de inscrição no relatório por email: o endereço (action) do formulário criado no Brevo, com confirmação por email.
+# É um endereço público, não uma chave. Vazio: o campo de inscrição não aparece no site.
+BREVO_FORMULARIO = ''
 DESCRICAO = 'Curva DI, juro real, juros dos Estados Unidos, inflação, Focus, ações, fundos imobiliários e notícias, atualizados automaticamente.'
 FONTES = 'https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=Work+Sans:wght@400;500;600&display=swap'
 
@@ -165,6 +168,7 @@ corpo = """</head>
 """ % (nav, paineis, links)
 
 scripts = '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>\n'
+scripts += '<script>\nwindow.VC_FORMULARIO = %s;\n</script>\n' % json.dumps(BREVO_FORMULARIO)
 scripts += '<script>\n' + shim + '\n</script>\n<script>\n' + P('vc.js') + '\n</script>\n<script>\n(() => {\n' + P('app.js') + '\n})();\n</script>\n'
 for n in SCRIPTS:
     scripts += '<script>\n' + P(n) + '\n</script>\n'

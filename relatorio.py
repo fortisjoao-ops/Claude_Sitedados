@@ -34,6 +34,20 @@ def imprimir(navegador):
         falha('o navegador nao gerou o PDF (%s)' % (r.stderr.strip().splitlines() or ['sem mensagem'])[-1][:200])
 
 
+def ler_resumo(navegador):
+    # Resumo da edição (frase de abertura, destaques e manchetes) para o email do dia: o documento o deixa pronto num bloco
+    # próprio, e aqui o navegador devolve a página já desenhada. Se não der para ler, o relatório sai do mesmo jeito, sem o resumo.
+    try:
+        r = subprocess.run([navegador, '--headless=new', '--no-sandbox', '--disable-gpu', '--virtual-time-budget=30000', '--dump-dom',
+                            'file://' + os.path.abspath(FONTE)], capture_output=True, text=True, timeout=150)
+        bloco = re.search(r'<script type="application/json" id="rl-resumo-email">(.*?)</script>', r.stdout, re.S)
+        resumo = json.loads(bloco.group(1))
+        if not resumo.get('resumo') or len(resumo.get('destaques') or []) < 4 or 'indispon' in resumo['resumo']: return None
+        return resumo
+    except Exception:
+        return None
+
+
 def conferir(dados, edicao):
     # O arquivo só é publicado se tiver tamanho e número de páginas plausíveis e trouxer o que um relatório completo traz.
     tamanho = os.path.getsize(PROVA)
@@ -78,11 +92,13 @@ def main():
             open(FONTE, 'w', encoding='utf-8').write(html.replace(D3, 'file://' + os.path.abspath(os.environ['RELATORIO_D3'])))
         imprimir(navegador)
         paginas, tamanho = conferir(dados, montagem)
+        resumo = ler_resumo(navegador)
         os.replace(PROVA, PDF)
-        json.dump({'edicao': montagem, 'gerado_em': datetime.now(BRT).strftime('%Y-%m-%dT%H:%M:%S-03:00'), 'paginas': paginas, 'bytes': tamanho},
-                  open(FICHA, 'w', encoding='utf-8'), ensure_ascii=False)
+        ficha = {'edicao': montagem, 'gerado_em': datetime.now(BRT).strftime('%Y-%m-%dT%H:%M:%S-03:00'), 'paginas': paginas, 'bytes': tamanho}
+        if resumo: ficha.update(resumo)
+        json.dump(ficha, open(FICHA, 'w', encoding='utf-8'), ensure_ascii=False)
         open(FICHA, 'a', encoding='utf-8').write('\n')
-        print('RELATORIO: gerado; edicao de %s, %d paginas, %d KB' % (montagem, paginas, round(tamanho / 1024)))
+        print('RELATORIO: gerado; edicao de %s, %d paginas, %d KB%s' % (montagem, paginas, round(tamanho / 1024), '' if resumo else '; sem o resumo para o email'))
     finally:
         for arquivo in (FONTE, PROVA):
             if os.path.exists(arquivo): os.remove(arquivo)

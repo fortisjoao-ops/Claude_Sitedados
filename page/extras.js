@@ -29,6 +29,41 @@
       + ': o resumo do dia, os principais números de cada tema e as notícias selecionadas. É gerado toda manhã, depois da seleção de notícias.';
   });
 
+  // Resumo: inscrição para receber o relatório por email. O pedido vai direto para o formulário criado no Brevo, que guarda a lista
+  // e manda o email de confirmação; o site não guarda endereço nenhum. Sem formulário configurado (build_dashboard.py), o campo não aparece.
+  dash.draw('inscricao', (form) => {
+    const destino = String(window.VC_FORMULARIO || '');
+    form.hidden = !/^https:\/\/[a-z0-9.-]+\.(sibforms\.com|brevo\.com)\//.test(destino);
+    if (form.hidden || form.dataset.pronto) return;
+    form.dataset.pronto = '1';
+    const campo = form.querySelector('input[type="email"]'), isca = form.querySelector('.vc-isca'), botao = form.querySelector('button'), estado = form.querySelector('[data-estado]');
+    const dizer = (texto, erro) => { estado.textContent = texto; estado.classList.toggle('vc-alerta', !!erro); };
+    form.addEventListener('submit', (evento) => {
+      evento.preventDefault();
+      const email = campo.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { dizer('Confira o endereço de email.', true); campo.focus(); return; }
+      if (isca.value) return;   // campo invisível que só robôs preenchem
+      const dados = new FormData();
+      dados.append('EMAIL', email);
+      dados.append('email_address_check', '');
+      dados.append('locale', 'pt');
+      botao.disabled = true;
+      dizer('Enviando…');
+      fetch(destino + (destino.includes('?') ? '&' : '?') + 'isAjax=1', { method: 'POST', body: dados })
+        .then((r) => r.json().catch(() => ({})).then((j) => r.ok && j.success !== false))
+        .then((aceito) => {
+          if (!aceito) { dizer('Não foi possível concluir a inscrição agora. Confira o endereço e tente de novo.', true); return; }
+          campo.value = '';
+          dizer(`Falta um passo: enviamos uma mensagem para ${email}. Abra e clique no link para confirmar a inscrição.`);
+        })
+        // Resposta ilegível para o navegador: o pedido pode ter chegado. A mensagem não afirma o que a página não sabe.
+        .catch(() => (navigator.onLine === false
+          ? dizer('Sem conexão com a internet. Tente de novo em instantes.', true)
+          : dizer('Pedido enviado. Se o endereço estiver correto, chega em instantes uma mensagem com o link para confirmar a inscrição.')))
+        .then(() => { botao.disabled = false; });
+    });
+  });
+
   // Juros EUA: núcleo do PCE, quando a rotina tem a chave do FRED.
   dash.draw('eua-pce', (el) => {
     const serie = linhas('eua_macro').filter((l) => l.serie === 'pce_nucleo').sort((a, b) => (a.periodo < b.periodo ? -1 : 1));
