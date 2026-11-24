@@ -1,0 +1,36 @@
+name: Teste dos resumos das notícias (temporário)
+on:
+  push:
+    branches: [claude/relatorio-email]
+    paths: ['.github/workflows/teste-resumos.yml']
+jobs:
+  teste:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+      - name: Montar a seleção de notícias de agora, só nesta máquina (nada é gravado no repositório)
+        env:
+          NOTICIAS_TEXTOS: ${{ runner.temp }}/noticias-textos.json
+          SO_BLOCOS: noticias
+        run: |
+          python3 -I atualizar.py site/index.html site/index.html noticias | cut -c1-300
+      - name: Escrever os resumos editoriais com a chave salva
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then echo "RESUMOS: sem a chave ANTHROPIC_API_KEY nos segredos"; exit 1; fi
+          python3 -m venv "$RUNNER_TEMP/venv" && "$RUNNER_TEMP/venv/bin/pip" install --quiet anthropic
+          "$RUNNER_TEMP/venv/bin/python" resumir_noticias.py site/index.html "$RUNNER_TEMP/noticias-textos.json"
+      - name: Mostrar o resultado e gerar o PDF
+        run: |
+          python3 - <<'PY'
+          import json, re, base64
+          d = json.loads(re.search(r'^\s*const DADOS = (\{.*\});[ \t]*$', open('site/index.html', encoding='utf-8').read(), re.M).group(1))
+          t = json.load(open(__import__('os').environ['RUNNER_TEMP'] + '/noticias-textos.json', encoding='utf-8'))
+          saida = {'noticias': d['noticias'], 'noticias_montagem': d['noticias_montagem'], 'tamanho_do_texto': {n['link']: len(t.get(n['link'], {}).get('texto', '')) for n in d['noticias']}}
+          print('NOTICIAS-B64 ' + base64.b64encode(json.dumps(saida, ensure_ascii=False).encode()).decode())
+          PY
+          python3 -I relatorio.py forcar
+          pdfinfo site/relatorio-diario.pdf | grep Pages
