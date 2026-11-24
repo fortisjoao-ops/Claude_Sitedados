@@ -1,8 +1,10 @@
 # Monta o site (uma página única com abas) a partir dos arquivos em page/.
-# Uso: python3 build_dashboard.py <página com os DADOS atuais> <saída.html>
+# Uso: python3 build_dashboard.py <página com os DADOS atuais> <saída.html> [relatorio]
+# Com "relatorio", monta o documento do relatório diário (o que a rotina da manhã imprime em PDF) em vez do site.
 # Os dados ficam numa única linha "const DADOS = {...};" da página; a montagem copia essa linha da página indicada.
 import re, json, sys
 src, out = sys.argv[1], sys.argv[2]
+RELATORIO = len(sys.argv) > 3 and sys.argv[3] == 'relatorio'
 P = lambda n: open('page/' + n, encoding='utf-8').read()
 
 # Endereço público do site: entra na prévia de compartilhamento. Troque aqui quando o site ganhar domínio próprio.
@@ -169,5 +171,27 @@ for n in SCRIPTS:
 scripts += '<script>\n' + abas_js + '\n</script>\n'
 
 html_final = cabeca + '<style>\n' + P('estilo.css') + '</style>\n' + corpo + scripts + '</body>\n</html>\n'
+
+def sem_regras_do_site(css):
+    # A largura da folha A4 é menor que a de um tablet: sem isto, o relatório herdaria o desenho de celular do site.
+    # Também sai o bloco de impressão do site, que é para quem imprime uma aba pelo navegador.
+    saida, i = [], 0
+    for m in re.finditer(r'@media\s*(\(max-width[^{]*|print\s*)\{', css):
+        if m.start() < i: continue
+        nivel, j = 1, m.end()
+        while nivel:
+            nivel += {'{': 1, '}': -1}.get(css[j], 0); j += 1
+        saida.append(css[i:m.start()]); i = j
+    return ''.join(saida) + css[i:]
+
+if RELATORIO:
+    # Relatório diário: o modelo (relatorio.html) na frente e as abas inteiras guardadas, fora da vista, em #rl-origem.
+    # relatorio.js traz das abas os trechos que o modelo pede e descarta o resto; os scripts são os mesmos do site,
+    # sem a troca de abas e sem a releitura ao vivo da B3, para o PDF sair igual aos dados gravados.
+    guardadas = '\n\n'.join('<div class="di-page vc-painel" id="%s">\n%s\n</div>' % (i, P(arq).strip('\n')) for i, t, arq in ABAS)
+    cabeca_rl = '<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<title>Relatório diário Vera Cruz</title>\n<link rel="stylesheet" href="%s">\n' % FONTES
+    scripts_rl = scripts[:scripts.rindex('<script>\n' + abas_js)].replace('<script>\n' + shim, '<script>\nwindow.VC_ESTATICO = true;\nwindow.VC_ENDERECO = %s;\n</script>\n<script>\n' % json.dumps(ENDERECO) + shim, 1)
+    html_final = (cabeca_rl + '<style>\n' + sem_regras_do_site(P('estilo.css')) + P('relatorio.css') + '</style>\n</head>\n<body>\n' + P('relatorio.html')
+                  + '<div id="rl-origem" hidden>\n' + guardadas + '\n</div>\n' + scripts_rl + '<script>\n' + P('relatorio.js') + '\n</script>\n</body>\n</html>\n')
 open(out, 'w', encoding='utf-8').write(html_final)
 print(len(html_final), 'bytes;', len(json.dumps(dados, ensure_ascii=False, separators=(',', ':'))), 'de dados')
