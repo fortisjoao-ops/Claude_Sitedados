@@ -1,32 +1,28 @@
-<meta name="dash-one-writer">
-<link rel="stylesheet" href="style.css">
-<div class="di-page">
-
   <header class="di-head">
     <h1 class="di-title" id="titulo">Curva DI Futuro</h1>
     <p class="di-lede" id="resumo">A taxa interpolada vai de <b data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=1a">—</b> em 1 ano a <b data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=5a">—</b> em 5 anos. O ponto de 5 anos varia <b data-draw="var-prazo" data-source="prazos" data-field="var_bps" data-where="prazo=5a">—</b> frente ao ajuste anterior.</p>
-    <p class="di-stamp" id="carimbo">Cotações da B3 de <span data-draw="quando" data-source="di1" data-field="cotacao_em" data-row="0">—</span>, divulgadas com 15 minutos de atraso. Esta página mostra uma cópia dessas cotações e só muda quando o arquivo é atualizado.</p>
+    <p class="di-stamp" id="carimbo">Cotações da B3 de <span data-draw="quando" data-source="di1" data-field="cotacao_em" data-row="0">—</span>, divulgadas com 15 minutos de atraso. Esta página busca novas cotações três vezes por dia nos dias úteis, a partir de 10h20, 14h20 e 18h20; o agendamento costuma atrasar cerca de meia hora.</p>
   </header>
 
   <section class="di-tiles" id="destaques" aria-label="Taxas interpoladas em prazos fixos">
     <div class="di-tile" id="tile-1a">
       <div class="di-tile-label">1 ano</div>
-      <div class="di-tile-num dash-skeleton" data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=1a">—</div>
+      <div class="di-tile-num" data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=1a">—</div>
       <div class="di-tile-sub"><span data-draw="var-prazo" data-source="prazos" data-field="var_bps" data-where="prazo=1a">—</span> vs. ajuste anterior</div>
     </div>
     <div class="di-tile" id="tile-2a">
       <div class="di-tile-label">2 anos</div>
-      <div class="di-tile-num dash-skeleton" data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=2a">—</div>
+      <div class="di-tile-num" data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=2a">—</div>
       <div class="di-tile-sub"><span data-draw="var-prazo" data-source="prazos" data-field="var_bps" data-where="prazo=2a">—</span> vs. ajuste anterior</div>
     </div>
     <div class="di-tile" id="tile-5a">
       <div class="di-tile-label">5 anos</div>
-      <div class="di-tile-num dash-skeleton" data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=5a">—</div>
+      <div class="di-tile-num" data-draw="taxa-prazo" data-source="prazos" data-field="taxa" data-where="prazo=5a">—</div>
       <div class="di-tile-sub"><span data-draw="var-prazo" data-source="prazos" data-field="var_bps" data-where="prazo=5a">—</span> vs. ajuste anterior</div>
     </div>
     <div class="di-tile" id="tile-inclinacao">
       <div class="di-tile-label">Inclinação 1–5 anos</div>
-      <div class="di-tile-num dash-skeleton" data-draw="inclinacao" data-source="inclinacao">—</div>
+      <div class="di-tile-num" data-draw="inclinacao" data-source="inclinacao">—</div>
       <div class="di-tile-sub">taxa de 5 anos menos a de 1 ano</div>
     </div>
   </section>
@@ -104,7 +100,7 @@
   </section>
 
   <section class="di-block" id="ntnb">
-    <h2 class="di-h2" id="ntnb-titulo">Preço das NTN-B no Tesouro Direto</h2>
+    <h2 class="di-h2" id="ntnb-titulo">Preço das <span class="vc-junto">NTN-B</span> no Tesouro Direto</h2>
     <p class="di-note">Preço unitário (PU, em R$) de referência do Tesouro Direto em <span data-draw="ntnb-ref">—</span>, o último dia útil com dado publicado. É um preço defasado, não intradiário, e não é o fechamento da ANBIMA. Variação no dia: contra <span data-draw="ntnb-ant">—</span>. Variação em 3 meses: contra <span data-draw="ntnb-3m">—</span>, o dado disponível mais próximo de <span data-draw="ntnb-alvo">—</span>.</p>
     <div class="di-scroll">
       <table class="di-table vc-cab-quebra" data-source="ntnb_var" data-row-key="chave">
@@ -164,6 +160,3 @@
     <p>A curva do ajuste anterior usa os mesmos prazos com a taxa de ajuste do pregão anterior. A variação é a diferença entre as duas, em pontos-base.</p>
     <p>A curva de 3 meses atrás usa as taxas de ajuste dos contratos DI1 daquele pregão, publicadas no Boletim Diário do Mercado da B3, com os dias úteis contados a partir daquela data. As curvas são comparadas pelo mesmo prazo, e não pelo mesmo contrato.</p>
   </details>
-
-</div>
-<script src="app.js"></script>

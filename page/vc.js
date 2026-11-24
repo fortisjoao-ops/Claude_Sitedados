@@ -72,6 +72,12 @@ window.VC = (() => {
     }
   });
 
+  // Cabeçalho do site: quando os dados foram buscados pela última vez, somando todas as fontes.
+  dash.draw('vc-atualizado', (el) => {
+    const ultima = Object.values(valor('status') || {}).map((s) => s && s.em).filter(Boolean).sort().pop();
+    el.textContent = ultima ? 'Atualizado em ' + dataHora(ultima) : '';
+  });
+
   const aviso = (el, texto) => {
     const p = document.createElement('p');
     p.className = 'di-chart-msg';
